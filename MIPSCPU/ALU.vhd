@@ -19,6 +19,8 @@ architecture Behavioral of ALU is
 begin
 	with operation select result <=
 		number1 + number2 when ALU_OPERATION_ADD,
-		number1 - number2 when ALU_OPERATION_SUBSTRACT,
+		number1 - number2 when ALU_OPERATION_SUBTRACT,
+		number1 and number2 when ALU_OPERATION_LOGIC_AND,
+		number1 or number2 when ALU_OPERATION_LOGIC_OR,
 		(others => 'X') when others;
 end Behavioral;
