@@ -58,3 +58,13 @@ xlnx_auto_0_xdb/
 xst/
 _ngo/
 _xmsgs/
+
+# Log files and generated messages
+*.log
+*.xmsgs
+
+# Generated scripts
+*.cmd
+
+# Isim folders
+isim/
