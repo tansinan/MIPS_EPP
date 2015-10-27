@@ -12,7 +12,7 @@ entity ALU is
 		operation : in std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 		result : out std_logic_vector(bit_length - 1 downto 0)
 	);
-end ALU;
+end entity;
 
 
 architecture Behavioral of ALU is
@@ -23,4 +23,4 @@ begin
 		number1 and number2 when ALU_OPERATION_LOGIC_AND,
 		number1 or number2 when ALU_OPERATION_LOGIC_OR,
 		(others => 'X') when others;
-end Behavioral;
+end architecture;

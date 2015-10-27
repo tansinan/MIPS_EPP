@@ -44,6 +44,8 @@
 *_summary.xml
 *_usage.xml
 *_xst.xrpt
+*.exe
+*.wdb
 
 # project-wide generated files
 *.gise
