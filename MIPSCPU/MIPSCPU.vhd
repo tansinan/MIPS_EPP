@@ -11,7 +11,12 @@ package MIPSCPU is
 		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "00010";
 	constant ALU_OPERATION_LOGIC_OR : 
 		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "00011";
+	constant REGISTER_OPERATION_READ : std_logic := '0';
+	constant REGISTER_OPERATION_WRITE : std_logic := '1';
+	type array_2d is array(natural range <>, natural range <>) of std_logic;
+	
 end MIPSCPU;
+
 
 package body MIPSCPU is
 end MIPSCPU;
