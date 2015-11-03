@@ -4,7 +4,7 @@ use work.MIPSCPU.all;
 
 entity SingleRegister is
 	generic (
-		width : integer := 32
+		width : integer := MIPS_CPU_DATA_WIDTH
 	);
 	port ( 
 		reset : in std_logic;

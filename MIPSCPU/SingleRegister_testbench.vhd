@@ -1,30 +1,3 @@
---------------------------------------------------------------------------------
--- company: 
--- engineer:
---
--- create date:   13:59:26 10/20/2015
--- design name:   
--- module name:   d:/documents/life_in_tsinghua/2015_2016_autumn/computer_organization/challenge_project/mips32_cpu/singleregister_testbench.vhd
--- project name:  mips32_cpu
--- target device:  
--- tool versions:  
--- description:   
--- 
--- vhdl test bench created by ise for module: singleregister
--- 
--- dependencies:
--- 
--- revision:
--- revision 0.01 - file created
--- additional comments:
---
--- notes: 
--- this testbench has been automatically generated using types std_logic and
--- std_logic_vector for the ports of the unit under test.  xilinx recommends
--- that these types always be used for the top-level i/o of a design in order
--- to guarantee that the testbench will bind correctly to the post-implementation 
--- simulation model.
---------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
  
