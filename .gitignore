@@ -46,12 +46,15 @@
 *_xst.xrpt
 *.exe
 *.wdb
+*.bmm
+*.tcl
+*.ipf
 
 # project-wide generated files
 *.gise
 par_usage_statistics.html
 usage_statistics_webtalk.html
-webtalk.log
+webtalk_impact.xml
 webtalk_pn.xml
 
 # generated folders
@@ -70,3 +73,17 @@ _xmsgs/
 
 # Isim folders
 isim/
+
+# Plan Ahead generated files
+planAhead_run_*/
+
+# Debugging files
+*.debug
+
+# iMPACT related files
+current_webtalk_impact.xml
+impact.xsl
+impact_impact.xwbt
+
+# netgen
+netgen

@@ -1,0 +1,32 @@
+NET "clock_divided" LOC = L24;
+INST "clock_BUFGP" LOC = U25;
+NET "clock" LOC = U25;
+NET "reset" LOC = T1;
+NET "disp" LOC = K24;
+NET "rdn" LOC = R25;
+NET "data_ready" LOC = P24;
+NET "wrn" LOC = T24;
+NET "rdn" LOC = R25;
+NET "tbre" LOC = R23;
+NET "tsre" LOC = T26;
+
+NET "data_bus_1[0]" LOC = AC24;
+NET "data_bus_1[1]" LOC = AD24;
+NET "data_bus_1[2]" LOC = AC26;
+NET "data_bus_1[3]" LOC = AB26;
+NET "data_bus_1[4]" LOC = Y24;
+NET "data_bus_1[5]" LOC = AA24;
+NET "data_bus_1[6]" LOC = Y22;
+NET "data_bus_1[7]" LOC = AB24;
+NET "data_bus_1_ce" LOC = AA26;
+NET "data_bus_1_oe" LOC = AD17;
+NET "data_bus_1_we" LOC = AA25;
+
+NET "output[0]" LOC = F26;
+NET "output[1]" LOC = G26;
+NET "output[2]" LOC = G25;
+NET "output[3]" LOC = H26;
+NET "output[4]" LOC = J26;
+NET "output[5]" LOC = J25;
+NET "output[6]" LOC = G23;
+NET "output[7]" LOC = J24;
