@@ -404,7 +404,7 @@ int main()
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			imm = atoi(s3.c_str());
-			cache[c1] = cache[c2] + imm;
+			cache[c2] = cache[c1] + imm;
 			printCommandBin(testbench,'C',"addiu",c1,c2,imm);
 		}
 		else if (command == "andi")
