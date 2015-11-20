@@ -90,3 +90,4 @@ netgen
 
 # Generated simulation testbench
 Simulator/*.txt
+*.obj

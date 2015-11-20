@@ -28,11 +28,10 @@ architecture Behavioral of RegisterFile is
 begin
 	generate_single_register: for i in 0 to MIPS_CPU_REGISTER_COUNT - 1 generate
 	begin
-		--TODO : Register $0 need to be handled
 		black_hole_register: if i = 0 generate
 		begin
 			black_hole_register: component SingleRegister
-				port map (reset, clock, input, operation(i), output(i));
+				port map (reset, clock, input, REGISTER_OPERATION_READ, output(i));
 		end generate black_hole_register;
 		
 		single_register: if i > 0 generate

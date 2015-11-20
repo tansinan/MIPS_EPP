@@ -8,11 +8,11 @@ use work.MIPSCPU.all;
  
 entity Processor_Testbench is
 end Processor_Testbench;
- 
+
 architecture behavior of Processor_Testbench is 
- 
-    -- component declaration for the unit under test (uut)
- 
+
+	-- component declaration for the unit under test (uut)
+
 	component Processor is
 		port (
 			reset : in std_logic;
@@ -61,8 +61,16 @@ begin
 		wait for clock_period*2;
 
 		reset <= '1';
-		instruction <= "00100100001000010000000000000100";
-		wait for clock_period;
+		instruction <= "00100100000000010000000000000100";
+		wait for clock_period * 3;
+		
+		reset <= '1';
+		instruction <= "00100100001000010000000000000010";
+		wait for clock_period * 3;
+		
+		reset <= '1';
+		instruction <= MIPS_CPU_INSTRUCTION_NOP;
+		wait for clock_period * 3;
 		
 		wait;
 

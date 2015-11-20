@@ -40,6 +40,9 @@ package MIPSCPU is
 
 
 	-- MIPS CPU instructions
+	constant MIPS_CPU_INSTRUCTION_NOP :
+		std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0) :=
+		"00100100000000000000000000000000";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_ADDIU :
 		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "001001";
 

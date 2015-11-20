@@ -1,5 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
 use work.MIPSCPU.all;
 
 entity Processor is
@@ -23,8 +25,11 @@ architecture Behavioral of Processor is
 	
 	signal phase_exwb_result : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal phase_exwb_register_destination : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-	
+
+	signal actual_instruction : std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
 	signal instruction_done : std_logic;
+
+	signal current_pipeline_phase : std_logic_vector(3 downto 0) := "0000";
 
 	component RegisterFile is
     Port (
@@ -86,7 +91,7 @@ begin
 		reset => reset,
 		clock => clock,
 		register_file => register_file_output,
-		instruction => instruction,
+		instruction => actual_instruction,
 		alu_operand1_output => phase_idex_operand1,
 		alu_operand2_output => phase_idex_operand2,
 		alu_operation_output => phase_idex_operation,
@@ -115,5 +120,21 @@ begin
 	);
 	
 	register_file_debug <= register_file_output;
-
+	
+	Processor_Process : process (clock, reset)
+	begin
+		if reset = '0' then
+			actual_instruction <= MIPS_CPU_INSTRUCTION_NOP;
+		elsif rising_edge(clock) then
+			if current_pipeline_phase = "0000" then
+				actual_instruction <= instruction;
+				current_pipeline_phase <= current_pipeline_phase + 1;
+			elsif current_pipeline_phase = "0011" then
+				current_pipeline_phase <= "0000";
+			else
+				actual_instruction <= MIPS_CPU_INSTRUCTION_NOP;
+				current_pipeline_phase <= current_pipeline_phase + 1;
+			end if;
+		end if;
+	end process;
 end architecture;
