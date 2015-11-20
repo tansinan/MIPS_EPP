@@ -87,3 +87,6 @@ impact_impact.xwbt
 
 # netgen
 netgen
+
+# Generated simulation testbench
+Simulator/*.txt

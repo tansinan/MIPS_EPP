@@ -64,7 +64,13 @@ void printCache(char output, int cache[])
 	}
 }
 
-void printCommandBin(char output, string command, int p1, int p2 = 0, int p3 = 0)
+void printTestbench(ofstream &testbench, string commandBin)
+{
+	testbench << "reset <= '1';\ninstruction <= \"" << commandBin
+	<< "\";\nwait for clock_period;\n\n";
+}
+
+void printCommandBin(ofstream &testbench, char output, string command, int p1, int p2 = 0, int p3 = 0)
 {
 	string commandBin = "";
 	if (command == "add")
@@ -297,10 +303,14 @@ void printCommandBin(char output, string command, int p1, int p2 = 0, int p3 = 0
 	
 	if (output == 'C')
 		cout << "Command(Bin):" << commandBin << endl;
+	printTestbench(testbench, commandBin);
 }
+
 
 int main()
 {
+	ofstream testbench;
+	testbench.open("testbench.txt", ios::out);
 	string command;
 	int cache[32];
 	for (int i = 0; i < 32; i++)
@@ -395,7 +405,7 @@ int main()
 			c2 = atoi(s2.c_str());
 			imm = atoi(s3.c_str());
 			cache[c1] = cache[c2] + imm;
-			printCommandBin('C',"addiu",c1,c2,imm);
+			printCommandBin(testbench,'C',"addiu",c1,c2,imm);
 		}
 		else if (command == "andi")
 		{
@@ -450,6 +460,7 @@ int main()
 		cache[0] = 0;
 		printCache('C', cache);
 	}
-		
+	
+	testbench.close();
 	return 0;
 }
