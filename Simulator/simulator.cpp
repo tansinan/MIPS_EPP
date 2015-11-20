@@ -61,16 +61,29 @@ void printCache(char output, int cache[])
 			}
 			cout << endl;
 		}
+		for (int i = 0; i < 32; i++)
+		{
+			cout << "Cache(Bin)[" << i << "] = " << binaryConvert((unsigned)cache[i], 32, true) <<endl;
+		}
 	}
 }
 
-void printTestbench(ofstream &testbench, string commandBin)
+void printTestbench(ofstream &testbench, string commandBin, int commandNum, int cache[])
 {
-	testbench << "reset <= '1';\ninstruction <= \"" << commandBin
-	<< "\";\nwait for clock_period;\n\n";
+	testbench << "current_test_success <= true;\nreset <= '1';\ninstruction <= \""
+	<< commandBin << "\";\nwait for clock_period * 4;\n\n";
+	for (int i = 0; i < 32; i++)
+	{
+		testbench << "if current_test_success = true then\n"
+		<< "if register_file_debug(" << i << ") /= \"" << binaryConvert((unsigned)cache[i], 32, true) << "\" then\n"
+		<< "report \"Test case " << commandNum << " failed\";\n"
+		<< "current_test_success <= false;\n"
+		<< "end if ;\n";
+	}
+	testbench << '\n';
 }
 
-void printCommandBin(ofstream &testbench, char output, string command, int p1, int p2 = 0, int p3 = 0)
+void printCommandBin(ofstream &testbench, char output,int commandNum, string command, int cache[], int p1, int p2 = 0, int p3 = 0)
 {
 	string commandBin = "";
 	if (command == "add")
@@ -303,22 +316,25 @@ void printCommandBin(ofstream &testbench, char output, string command, int p1, i
 	
 	if (output == 'C')
 		cout << "Command(Bin):" << commandBin << endl;
-	printTestbench(testbench, commandBin);
+	printTestbench(testbench, commandBin, commandNum, cache);
 }
 
 
 int main()
 {
+	int commandNum = 0;
 	ofstream testbench;
-	testbench.open("testbench.txt", ios::out);
+	testbench.open("testbench_body.txt", ios::out);
 	string command;
 	int cache[32];
 	for (int i = 0; i < 32; i++)
 	{
 		cache[i] = 0;
 	}
+	
 	while (true)
 	{
+		commandNum ++;
 		cin >> command;
 		if (command == "E")
 			break;
@@ -405,7 +421,7 @@ int main()
 			c2 = atoi(s2.c_str());
 			imm = atoi(s3.c_str());
 			cache[c2] = cache[c1] + imm;
-			printCommandBin(testbench,'C',"addiu",c1,c2,imm);
+			printCommandBin(testbench,'C',commandNum,"addiu",cache,c1,c2,imm);
 		}
 		else if (command == "andi")
 		{

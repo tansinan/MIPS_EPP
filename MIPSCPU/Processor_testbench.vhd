@@ -69,6 +69,7 @@ begin
 		if current_test_success = true then
 			if register_file_debug(0) /= "00000000000000000000000000000000" then
 				report "Test case 1 failed";
+        current_test_success <= false;
 			end if;
 		end if;
 		if current_test_success = true then
