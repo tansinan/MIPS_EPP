@@ -78,8 +78,11 @@ void printTestbench(ofstream &testbench, string commandBin, int commandNum, int 
 		<< "if register_file_debug(" << i << ") /= \"" << binaryConvert((unsigned)cache[i], 32, true) << "\" then\n"
 		<< "report \"Test case " << commandNum << " failed\";\n"
 		<< "current_test_success <= false;\n"
-		<< "end if ;\n";
+		<< "end if;\nend if;\n";
 	}
+	testbench << "if current_test_success = true then\n"
+	<< "report \"Test case " << commandNum << " succeeded\";\n"
+	<< "end if;\n";
 	testbench << '\n';
 }
 
