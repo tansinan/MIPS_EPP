@@ -18,12 +18,12 @@ architecture behavior of alu_testbench is
 		);
     end component;
 
-   signal number1 : std_logic_vector(ALU_TEST_WIDTH - 1 downto 0) := (others => '0');
-   signal number2 : std_logic_vector(ALU_TEST_WIDTH - 1 downto 0) := (others => '0');
-   signal operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := (others => '0');
-   signal result : std_logic_vector(ALU_TEST_WIDTH - 1 downto 0);
+	signal number1 : std_logic_vector(ALU_TEST_WIDTH - 1 downto 0) := (others => '0');
+	signal number2 : std_logic_vector(ALU_TEST_WIDTH - 1 downto 0) := (others => '0');
+	signal operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := (others => '0');
+	signal result : std_logic_vector(ALU_TEST_WIDTH - 1 downto 0);
 
-   constant time_delay : time := 10 ns;
+	constant time_delay : time := 10 ns;
  
 begin
  
@@ -45,6 +45,7 @@ begin
 		number1 <= "1111";
 		number2 <= "1111";
 		wait for time_delay;
+		
 		if result = "1110" then
 			report "Test case 1 passed";
 		else

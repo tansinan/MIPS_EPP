@@ -30,6 +30,7 @@ architecture behavior of Processor_Testbench is
 
  	--outputs
    signal register_file_debug : mips_register_file_port;
+   	signal current_test_success : boolean;
 
    -- clock period definitions
    constant clock_period : time := 20 ns;
@@ -58,19 +59,50 @@ begin
    stim_proc: process
    begin
 		reset <= '0';
-		wait for clock_period*2;
+		wait for clock_period * 8;
 
+		current_test_success <= true;
 		reset <= '1';
 		instruction <= "00100100000000010000000000000100";
-		wait for clock_period * 3;
+		wait for clock_period * 4;
+		
+		if current_test_success = true then
+			if register_file_debug(0) /= "00000000000000000000000000000000" then
+				report "Test case 1 failed";
+			end if;
+		end if;
+		if current_test_success = true then
+			if register_file_debug(1) /= "00000000000000000000000000000100" then
+				report "Test case 1 failed";
+			end if;
+		end if;
+		if current_test_success = true then
+			report "Test case 1 succeeded";
+		end if;
 		
 		reset <= '1';
 		instruction <= "00100100001000010000000000000010";
-		wait for clock_period * 3;
+		wait for clock_period * 4;
+		
+		if current_test_success = true then
+			if register_file_debug(0) /= "00000000000000000000000000000000" then
+				report "Test case 1 failed";
+			end if;
+		end if;
+		if current_test_success = true then
+			if register_file_debug(1) /= "00000000000000000000000000000110" then
+				report "Test case 1 failed";
+			end if;
+		end if;
+		if current_test_success = true then
+			report "Test case 1 succeeded";
+		end if;
+		
+		
 		
 		reset <= '1';
 		instruction <= MIPS_CPU_INSTRUCTION_NOP;
-		wait for clock_period * 3;
+		wait for clock_period * 4;
 		
 		wait;
 
