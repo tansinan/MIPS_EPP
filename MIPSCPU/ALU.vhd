@@ -22,5 +22,6 @@ begin
 		number1 - number2 when ALU_OPERATION_SUBTRACT,
 		number1 and number2 when ALU_OPERATION_LOGIC_AND,
 		number1 or number2 when ALU_OPERATION_LOGIC_OR,
+		number1 xor number2 when ALU_OPERATION_LOGIC_XOR,
 		(others => 'X') when others;
 end architecture;

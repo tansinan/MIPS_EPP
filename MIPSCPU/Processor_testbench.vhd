@@ -86,16 +86,16 @@ begin
 		
 		if current_test_success = true then
 			if register_file_debug(0) /= "00000000000000000000000000000000" then
-				report "Test case 1 failed";
+				report "Test case 2 failed";
 			end if;
 		end if;
 		if current_test_success = true then
 			if register_file_debug(1) /= "00000000000000000000000000000110" then
-				report "Test case 1 failed";
+				report "Test case 2 failed";
 			end if;
 		end if;
 		if current_test_success = true then
-			report "Test case 1 succeeded";
+			report "Test case 2 succeeded";
 		end if;
 		
 		

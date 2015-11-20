@@ -45,6 +45,12 @@ package MIPSCPU is
 		"00100100000000000000000000000000";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_ADDIU :
 		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "001001";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_ANDI :
+		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "001100";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_ORI :
+		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "001101";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_XORI :
+		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "001110";
 
 	-- General
 	constant ALU_OPERATION_CTRL_WIDTH : integer := 5;
@@ -56,6 +62,8 @@ package MIPSCPU is
 		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "00010";
 	constant ALU_OPERATION_LOGIC_OR :
 		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "00011";
+	constant ALU_OPERATION_LOGIC_XOR :
+		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "00100";
 	constant REGISTER_OPERATION_READ : std_logic := '0';
 	constant REGISTER_OPERATION_WRITE : std_logic := '1';
 

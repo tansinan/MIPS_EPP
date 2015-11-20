@@ -64,6 +64,9 @@ begin
 
 	with instruction_opcode select alu_operation <=
 	ALU_OPERATION_ADD when MIPS_CPU_INSTRUCTION_OPCODE_ADDIU,
+	ALU_OPERATION_LOGIC_AND when MIPS_CPU_INSTRUCTION_OPCODE_ANDI,
+	ALU_OPERATION_LOGIC_OR when MIPS_CPU_INSTRUCTION_OPCODE_ORI,
+	ALU_OPERATION_LOGIC_XOR when MIPS_CPU_INSTRUCTION_OPCODE_XORI,
 		(others => 'X') when others;
 
 	register_file_address1 <= instruction_rs;
