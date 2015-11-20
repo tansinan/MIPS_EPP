@@ -63,7 +63,7 @@ package MIPSCPU is
 	constant ALU_OPERATION_LOGIC_OR :
 		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "00011";
 	constant ALU_OPERATION_LOGIC_XOR :
-		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "00100";
+		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "00100";
 	constant REGISTER_OPERATION_READ : std_logic := '0';
 	constant REGISTER_OPERATION_WRITE : std_logic := '1';
 
