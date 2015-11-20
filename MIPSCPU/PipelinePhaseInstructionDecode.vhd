@@ -6,11 +6,12 @@ entity PipelinePhaseInstructionDecode is
 	port (
 		reset : in std_logic;
 		clock : in std_logic;
-		register_file : in std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		register_file : in mips_register_file_port;
 		instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
 		alu_operand1_output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		alu_operand2_output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		alu_operation_output : out std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0)
+		alu_operation_output : out std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
+		register_destination_output : out std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0)
 	);
 end PipelinePhaseInstructionDecode;
 
@@ -27,14 +28,14 @@ architecture Behavioral of PipelinePhaseInstructionDecode is
 	signal instruction_opcode : std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0);
 	signal instruction_rs : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 	signal instruction_rt : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-	signal instruction_imm : std_logic_vector(MIPS_CPU_REGISTER_IMM_WIDTH - 1 downto 0);
+	signal instruction_imm : std_logic_vector(MIPS_CPU_INSTRUCTION_IMM_WIDTH - 1 downto 0);
 	signal register_file_address1 : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 	signal register_file_address2 : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 	signal register_file_oprand1 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal register_file_oprand2 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal immediate_oprand : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-	signal alu_oprand1 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-	signal alu_oprand2 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+	signal alu_operand1 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+	signal alu_operand2 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal alu_operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 begin
 	register_file_reader: RegisterFileReader port map (
@@ -61,10 +62,6 @@ begin
 		MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO
 	);
 
-	instruction_imm <= instruction(
-	MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO
-	);
-
 	with instruction_opcode select alu_operation <=
 	ALU_OPERATION_ADD when MIPS_CPU_INSTRUCTION_OPCODE_ADDIU,
 		(others => 'X') when others;
@@ -72,10 +69,9 @@ begin
 	register_file_address1 <= instruction_rs;
 	register_file_address2 <= (others => 'X');
 
-	alu_oprand1 <= register_file_oprand1;
-	alu_oprand2 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+	alu_operand1 <= register_file_oprand1;
 
-	immediate_oprand(MIPS_CPU_DATA_WIDTH downto MIPS_CPU_INSTRUCTION_IMM_HI + 1)
+	immediate_oprand(MIPS_CPU_DATA_WIDTH - 1 downto MIPS_CPU_INSTRUCTION_IMM_HI + 1)
 	<= (others => '0');
 
 	immediate_oprand(
@@ -84,7 +80,7 @@ begin
 	MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO
 	);
 
-	alu_oprand2 <= immediate_oprand;
+	alu_operand2 <= immediate_oprand;
 
 	PipelinePhaseInstructionDecode_Process : process (clock, reset)
 	begin
@@ -96,6 +92,7 @@ begin
 			alu_operand1_output <= alu_operand1;
 			alu_operand2_output <= alu_operand2;
 			alu_operation_output <= alu_operation;
+			register_destination_output <= instruction_rt;
 		end if;
 	end process;
 end Behavioral;

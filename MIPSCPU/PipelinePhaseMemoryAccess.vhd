@@ -5,7 +5,6 @@ entity PipelinePhaseMemoryAccess is
 end PipelinePhaseMemoryAccess;
 
 architecture Behavioral of PipelinePhaseMemoryAccess is
-
 begin
 
 
