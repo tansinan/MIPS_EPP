@@ -323,11 +323,18 @@ void printCommandBin(ofstream &testbench, char output,int commandNum, string com
 }
 
 
-int main()
+int main(int argc, char* argv[])
 {
 	int commandNum = 0;
+	ifstream inputFileStream;
+	if(argc < 2)
+	{
+		cout << "No input file specified.";
+		return 0;
+	}
 	ofstream testbench;
 	testbench.open("testbench_body.txt", ios::out);
+	inputFileStream.open(argv[1], ios::in);
 	string command;
 	int cache[32];
 	for (int i = 0; i < 32; i++)
@@ -338,8 +345,10 @@ int main()
 	while (true)
 	{
 		commandNum ++;
-		cin >> command;
-		if (command == "E")
+		command = "";
+		inputFileStream >> command;
+		cout << command;
+		if (command == "E" || command == "")
 			break;
 		else if (command == "add")
 		{
@@ -417,7 +426,7 @@ int main()
 		{
 			string s1,s2,s3;
 			int c1,c2,imm;
-			cin >> s1 >> s2 >> s3;
+			inputFileStream >> s1 >> s2 >> s3;
 			s1 = s1.substr(1);
 			s2 = s2.substr(1);
 			c1 = atoi(s1.c_str());
@@ -480,7 +489,7 @@ int main()
 		cache[0] = 0;
 		printCache('C', cache);
 	}
-	
+	inputFileStream.close();
 	testbench.close();
 	return 0;
 }
