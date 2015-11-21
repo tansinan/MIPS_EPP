@@ -37,7 +37,22 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_IMM_LO : integer := 0;
 	constant MIPS_CPU_INSTRUCTION_IMM_WIDTH : integer :=
 		MIPS_CPU_INSTRUCTION_IMM_HI - MIPS_CPU_INSTRUCTION_IMM_LO + 1;
+	
+	-- R Type Instruction RD range
+	constant MIPS_CPU_INSTRUCTION_RD_HI : integer := 15;
+	constant MIPS_CPU_INSTRUCTION_RD_LO : integer := 11;
+	
+	-- R Type Instruction Shamt range
+	constant MIPS_CPU_INSTRUCTION_SHAMT_HI : integer := 10;
+	constant MIPS_CPU_INSTRUCTION_SHAMT_LO : integer := 6;
+	constant MIPS_CPU_INSTRUCTION_SHAMT_WIDTH : integer :=
+		MIPS_CPU_INSTRUCTION_SHAMT_HI - MIPS_CPU_INSTRUCTION_SHAMT_LO + 1;
 
+	-- R Type Instruction Funct range
+	constant MIPS_CPU_INSTRUCTION_FUNCT_HI : integer := 5;
+	constant MIPS_CPU_INSTRUCTION_FUNCT_LO : integer := 0;
+	constant MIPS_CPU_INSTRUCTION_FUNCT_WIDTH : integer :=
+		MIPS_CPU_INSTRUCTION_FUNCT_HI - MIPS_CPU_INSTRUCTION_FUNCT_LO + 1;
 
 	-- MIPS CPU instructions
 	constant MIPS_CPU_INSTRUCTION_NOP :
@@ -51,6 +66,12 @@ package MIPSCPU is
 		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "001101";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_XORI :
 		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "001110";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL :
+		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "000000";
+		
+	-- MIPS CPU funct for the special opcode
+	constant MIPS_CPU_INSTRUCTION_FUNCT_ADDU :
+		std_logic_vector(MIPS_CPU_INSTRUCTION_FUNCT_WIDTH - 1 downto 0) := "100001";
 
 	-- General
 	constant ALU_OPERATION_CTRL_WIDTH : integer := 5;
@@ -69,6 +90,16 @@ package MIPSCPU is
 
 	type mips_register_file_port is
 		array(0 to MIPS_CPU_REGISTER_COUNT - 1) of std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+
+	type InstructionDecodingResult_t is
+		record
+			regAddr1 : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+			regAddr2 : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+			regDest : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+			imm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+			operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
+			useImmOperand : std_logic;
+		end record;
 
 end MIPSCPU;
 

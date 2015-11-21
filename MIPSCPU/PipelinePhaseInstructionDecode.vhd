@@ -16,6 +16,18 @@ entity PipelinePhaseInstructionDecode is
 end PipelinePhaseInstructionDecode;
 
 architecture Behavioral of PipelinePhaseInstructionDecode is
+	component TypeIInstructionDecoder is
+		port (
+			instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
+			result : out InstructionDecodingResult_t
+		);
+	end component;
+	component TypeRInstructionDecoder is
+		port (
+			instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
+			result : out InstructionDecodingResult_t
+		);
+	end component;
 	component RegisterFileReader is
 		port (
 			register_file_output : in mips_register_file_port;
@@ -25,65 +37,50 @@ architecture Behavioral of PipelinePhaseInstructionDecode is
 			read_result_2 : out std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0)
 		);
 	end component;
-	signal instruction_opcode : std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0);
-	signal instruction_rs : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-	signal instruction_rt : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-	signal instruction_imm : std_logic_vector(MIPS_CPU_INSTRUCTION_IMM_WIDTH - 1 downto 0);
-	signal register_file_address1 : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-	signal register_file_address2 : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-	signal register_file_oprand1 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-	signal register_file_oprand2 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-	signal immediate_oprand : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal alu_operand1 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal alu_operand2 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal alu_operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
+	signal regData1 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+	signal regData2 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+	signal decodingResult : InstructionDecodingResult_t;
+	signal decodingResultTypeI : InstructionDecodingResult_t;
+	signal decodingResultTypeR : InstructionDecodingResult_t;
+	signal opcode : std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0);
 begin
-	register_file_reader: RegisterFileReader port map (
+	opcode <= instruction (MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
+
+	decoder_I : TypeIInstructionDecoder port map (
+		instruction => instruction,
+		result => decodingResultTypeI
+	);
+
+	decoder_R : TypeRInstructionDecoder port map (
+		instruction => instruction,
+		result => decodingResultTypeR
+	);
+
+	with opcode select decodingResult <=
+		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_ADDIU,
+		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_ANDI,
+		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_ORI,
+		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_XORI,
+		decodingResultTypeR when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL;
+
+	register_file_reader : RegisterFileReader port map (
 		register_file_output => register_file,
-		read_select_1 => register_file_address1,
-		read_result_1 => register_file_oprand1,
-		read_select_2 => register_file_address2,
-		read_result_2 => register_file_oprand2
+		read_select_1 => decodingResult.regAddr1,
+		read_result_1 => regData1,
+		read_select_2 => decodingResult.regAddr2,
+		read_result_2 => regData2
 	);
 
-	instruction_opcode <= instruction (
-		MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO
-	);
-
-	instruction_rs <= instruction (
-		MIPS_CPU_INSTRUCTION_RS_HI downto MIPS_CPU_INSTRUCTION_RS_LO
-	);
-
-	instruction_rt <= instruction(
-		MIPS_CPU_INSTRUCTION_RT_HI downto MIPS_CPU_INSTRUCTION_RT_LO
-	);
-
-	instruction_imm <= instruction(
-		MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO
-	);
-
-	with instruction_opcode select alu_operation <=
-	ALU_OPERATION_ADD when MIPS_CPU_INSTRUCTION_OPCODE_ADDIU,
-	ALU_OPERATION_LOGIC_AND when MIPS_CPU_INSTRUCTION_OPCODE_ANDI,
-	ALU_OPERATION_LOGIC_OR when MIPS_CPU_INSTRUCTION_OPCODE_ORI,
-	ALU_OPERATION_LOGIC_XOR when MIPS_CPU_INSTRUCTION_OPCODE_XORI,
+	alu_operand1 <= regData1;
+	with decodingResult.useImmOperand select alu_operand2 <=
+		regData2 when '0',
+		decodingResult.imm when '1',
 		(others => 'X') when others;
 
-	register_file_address1 <= instruction_rs;
-	register_file_address2 <= (others => 'X');
-
-	alu_operand1 <= register_file_oprand1;
-
-	immediate_oprand(MIPS_CPU_DATA_WIDTH - 1 downto MIPS_CPU_INSTRUCTION_IMM_HI + 1)
-	<= (others => '0');
-
-	immediate_oprand(
-		MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO
-	) <= instruction(
-	MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO
-	);
-
-	alu_operand2 <= immediate_oprand;
+	alu_operation <= decodingResult.operation;
 
 	PipelinePhaseInstructionDecode_Process : process (clock, reset)
 	begin
@@ -91,11 +88,12 @@ begin
 			alu_operand1_output <= (others => '0');
 			alu_operand2_output <= (others => '0');
 			alu_operation_output <= (others => '0');
+			register_destination_output <= (others => '0');
 		elsif rising_edge(clock) then
 			alu_operand1_output <= alu_operand1;
 			alu_operand2_output <= alu_operand2;
 			alu_operation_output <= alu_operation;
-			register_destination_output <= instruction_rt;
+			register_destination_output <= decodingResult.regDest;
 		end if;
 	end process;
 end Behavioral;
