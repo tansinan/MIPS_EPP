@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use work.MIPSCPU.all;
 
-entity RAMController is
+entity RAMController_c is
 	port (
 		clock : in std_logic;
 		reset : in std_logic;
@@ -18,28 +18,34 @@ entity RAMController is
 	);
 end entity;
 
-architecture Behavioral of RAMController is
+architecture Behavioral of RAMController_c is
 begin
 	result <= phyDataBus;
 	phyRAMEnable <= '0';
 	process(clock, reset)
-	begin
-		if readControl1.enable = '0' then
-			phyRAMWriteEnable <= '1';
-			phyRAMReadEnable <= '0';
-			phyAddressBus <= readControl1.address;
-		elsif readControl2.enable = '0' then
-			phyRAMWriteEnable <= '1';
-			phyRAMReadEnable <= '0';
-			phyAddressBus <= readControl2.address;
-		elsif writeControl.enable = '0' then
-			phyRAMWriteEnable <= '0';
-			phyRAMReadEnable <= '1';
-			phyAddressBus <= writeControl.address;
-		else
-			phyRAMWriteEnable <= '0';
-			phyRAMReadEnable <= '0';
-			phyAddressBus <= (others => '0');
+	begin	
+		if rising_edge(clock) then
+			if readControl1.enable = '0' then
+				phyRAMWriteEnable <= '1';
+				phyRAMReadEnable <= '0';
+				phyAddressBus <= readControl1.address;
+				phyDataBus <= (others => 'Z');
+			elsif readControl2.enable = '0' then
+				phyRAMWriteEnable <= '1';
+				phyRAMReadEnable <= '0';
+				phyAddressBus <= readControl2.address;
+				phyDataBus <= (others => 'Z');
+			elsif writeControl.enable = '0' then
+				phyRAMWriteEnable <= '0';
+				phyRAMReadEnable <= '1';
+				phyAddressBus <= writeControl.address;
+				phyDataBus <= writeControl.data;
+			else
+				phyRAMWriteEnable <= '0';
+				phyRAMReadEnable <= '0';
+				phyAddressBus <= (others => '0');
+				phyDataBus <= (others => 'Z');
+			end if;
 		end if;
 	end process;
 end architecture;
