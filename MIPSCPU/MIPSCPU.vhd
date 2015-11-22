@@ -88,6 +88,10 @@ package MIPSCPU is
 	constant REGISTER_OPERATION_READ : std_logic := '0';
 	constant REGISTER_OPERATION_WRITE : std_logic := '1';
 
+	--
+	constant PHYSICS_RAM_ADDRESS_WIDTH : integer := 20;
+	constant PHYSICS_RAM_DATA_WIDTH : integer := 32;
+
 	type mips_register_file_port is
 		array(0 to MIPS_CPU_REGISTER_COUNT - 1) of std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 
@@ -99,6 +103,19 @@ package MIPSCPU is
 			imm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 			operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 			useImmOperand : std_logic;
+		end record;
+	
+	type RAMWriteControl_t is
+		record
+			enable : std_logic;
+			address : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
+			data: std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
+		end record;
+	
+	type RAMReadControl_t is
+		record
+			enable : std_logic;
+			address : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
 		end record;
 
 end MIPSCPU;
