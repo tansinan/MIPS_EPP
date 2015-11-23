@@ -71,8 +71,9 @@ _xmsgs/
 # Generated scripts
 *.cmd
 
-# Isim folders
+# Isim files and folders
 isim/
+xilinxsim.ini
 
 # Plan Ahead generated files
 planAhead_run_*/

@@ -40,6 +40,8 @@ architecture Behavioral of Processor is
 	signal phyAddressBus : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
 	signal phyDataBus : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 
+	signal ramReadControl1 : RAMReadControl_t;
+
 	component RegisterFile is
     Port (
 		reset : in std_logic;
@@ -147,7 +149,7 @@ begin
 		clock => clock,
 		phaseEXInput => pipelinePhaseEXMAInterface,
 		phaseWBCtrlOutput => pipelinePhaseMAWBInterface,
-		ramReadControl => RAMReadControl_t,
+		ramReadControl => ramReadControl1,
 		ramReadResult => primaryRAMData
 	);
 	
@@ -165,10 +167,7 @@ begin
 	port map (
 		clock => clock,
 		reset => reset,
-		readControl1 => (
-			enable => FUNC_DISABLED,
-			address => (others => '0')
-		),
+		readControl1 => ramReadControl1,
 		readControl2 => (
 			enable => FUNC_DISABLED,
 			address => (others => '0')
