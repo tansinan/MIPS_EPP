@@ -91,3 +91,7 @@ netgen
 # Generated simulation testbench
 Simulator/*.txt
 *.obj
+
+#Generated translator file/Translator test file
+Translator/*.txt
+*.asm
