@@ -8,11 +8,10 @@ entity PipelinePhaseWriteBack is
 		clock : in std_logic;
 		register_file_input : out std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		register_file_operation : out std_logic_vector (MIPS_CPU_REGISTER_COUNT - 1 downto 0);
-		operation_result : in std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		register_destination : in std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+		phaseMAInput : in PipelinePhaseMAWBInterface_t;
 		instruction_done : out std_logic
 	);
-end PipelinePhaseWriteBack;
+end entity;
 
 architecture Behavioral of PipelinePhaseWriteBack is
 	component RegisterFileWriter is
@@ -25,8 +24,8 @@ architecture Behavioral of PipelinePhaseWriteBack is
 	end component;
 begin
 	register_file_writer_component: RegisterFileWriter port map (
-		write_select => register_destination,
-		write_data => operation_result,
+		write_select => phaseMAInput.targetRegAddr,
+		write_data => phaseMAInput.sourceImm,
 		operation_output => register_file_operation,
 		data_output => register_file_input
 	);

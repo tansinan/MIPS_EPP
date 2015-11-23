@@ -10,8 +10,7 @@ entity PipelinePhaseExecute is
 		operand2 : in std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		operation : in std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 		register_destination : in std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-		result_output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		register_destination_output : out std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0)
+		phaseMACtrlOutput : out PipelinePhaseEXMAInterface_t
 	);
 end entity;
 
@@ -25,6 +24,7 @@ architecture Behavioral of PipelinePhaseExecute is
 		);
 	end component;
 	signal result : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+	signal phaseMACtrl : PipelinePhaseEXMAInterface_t;
 begin
 	alu_entity: ALU port map (
 		number1 => operand1,
@@ -32,13 +32,21 @@ begin
 		operation => operation,
 		result => result
 	);
+	phaseMACtrl.sourceIsRAM <= FUNC_DISABLED;
+	phaseMACtrl.sourceRAMAddr <= (others => '0');
+	phaseMACtrl.sourceImm <= result;
+	phaseMACtrl.targetIsRAM <= FUNC_DISABLED;
+	phaseMACtrl.targetIsReg <= FUNC_ENABLED;
+	phaseMACtrl.targetRAMAddr <= (others => '0');
+	phaseMACtrl.targetRegAddr <= register_destination;
 	PipelinePhaseExecute_Process : process (clock, reset)
 	begin
 		if reset = '0' then
-			result_output <= (others => '0');
+			phaseMACtrlOutput.targetIsRAM <= FUNC_DISABLED;
+			phaseMACtrlOutput.sourceIsRAM <= FUNC_DISABLED;
+			phaseMACtrlOutput.targetIsReg <= FUNC_DISABLED;
 		elsif rising_edge(clock) then
-			result_output <= result;
-			register_destination_output <= register_destination;
+			phaseMACtrlOutput <= phaseMACtrl;
 		end if;
 	end process;
 end Behavioral;

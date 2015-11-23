@@ -2,6 +2,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use work.MIPSCPU.all;
 
+--TODO : This needs to be changed to a combo logic circuit.
+
 entity RAMController_c is
 	port (
 		clock : in std_logic;

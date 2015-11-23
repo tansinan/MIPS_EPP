@@ -23,13 +23,22 @@ architecture Behavioral of Processor is
 	signal phase_idex_operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 	signal phase_idex_register_destination : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 	
-	signal phase_exwb_result : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-	signal phase_exwb_register_destination : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+	
+	signal pipelinePhaseEXMAInterface : PipelinePhaseEXMAInterface_t;
+	signal pipelinePhaseMAWBInterface : PipelinePhaseMAWBInterface_t;
 
 	signal actual_instruction : std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
 	signal instruction_done : std_logic;
 
 	signal current_pipeline_phase : std_logic_vector(3 downto 0) := "0000";
+	
+	signal primaryRAMData : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
+	
+	signal phyRAMEnable : std_logic;
+	signal phyRAMWriteEnable : std_logic;
+	signal phyRAMReadEnable : std_logic;
+	signal phyAddressBus : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
+	signal phyDataBus : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 
 	component RegisterFile is
     Port (
@@ -38,6 +47,21 @@ architecture Behavioral of Processor is
 		input : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		operation : in std_logic_vector (MIPS_CPU_REGISTER_COUNT - 1 downto 0);
 		output : out mips_register_file_port
+	);
+	end component;
+	component RAMController_c is
+	port (
+		clock : in std_logic;
+		reset : in std_logic;
+		readControl1 : in RAMReadControl_t;
+		readControl2 : in RAMReadControl_t;
+		writeControl : in RAMWriteControl_t;
+		result : out std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
+		phyRAMEnable : out std_logic;
+		phyRAMWriteEnable : out std_logic;
+		phyRAMReadEnable : out std_logic;
+		phyAddressBus : out std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
+		phyDataBus : inout std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0)
 	);
 	end component;
 	component PipelinePhaseInstructionDecode is
@@ -52,7 +76,6 @@ architecture Behavioral of Processor is
 		register_destination_output : out std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0)
 	);
 	end component;
-	
 	component PipelinePhaseExecute is
 	port (
 		reset : in std_logic;
@@ -61,8 +84,18 @@ architecture Behavioral of Processor is
 		operand2 : in std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		operation : in std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 		register_destination : in std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-		result_output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		register_destination_output : out std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0)
+		phaseMACtrlOutput : out PipelinePhaseEXMAInterface_t
+	);
+	end component;
+	
+	component PipelinePhaseMemoryAccess is
+	port (
+		clock : in std_logic;
+		reset : in std_logic;
+		phaseEXInput : in PipelinePhaseEXMAInterface_t;
+		phaseWBCtrlOutput : out PipelinePhaseMAWBInterface_t;
+		ramReadControl : out RAMReadControl_t;
+		ramReadResult : in std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0)
 	);
 	end component;
 	
@@ -72,8 +105,7 @@ architecture Behavioral of Processor is
 		clock : in std_logic;
 		register_file_input : out std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		register_file_operation : out std_logic_vector (MIPS_CPU_REGISTER_COUNT - 1 downto 0);
-		operation_result : in std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		register_destination : in std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+		phaseMAInput : in PipelinePhaseMAWBInterface_t;
 		instruction_done : out std_logic
 	);
 	end component;
@@ -98,25 +130,60 @@ begin
 		register_destination_output => phase_idex_register_destination
 	);
 	
-	pipeline_phase_execute: PipelinePhaseExecute port map (
+	pipeline_phase_execute: PipelinePhaseExecute
+	port map (
 		reset => reset,
 		clock => clock,
 		operand1 => phase_idex_operand1,
 		operand2 => phase_idex_operand2,
 		operation => phase_idex_operation,
 		register_destination => phase_idex_register_destination,
-		result_output => phase_exwb_result,
-		register_destination_output => phase_exwb_register_destination
+		phaseMACtrlOutput => pipelinePhaseEXMAInterface
 	);
 	
-	pipeline_phase_write_back: PipelinePhaseWriteBack port map (
+	pipelinePhaseMemoryAccess_e: PipelinePhaseMemoryAccess
+	port map (
+		reset => reset,
+		clock => clock,
+		phaseEXInput => pipelinePhaseEXMAInterface,
+		phaseWBCtrlOutput => pipelinePhaseMAWBInterface,
+		ramReadControl => RAMReadControl_t,
+		ramReadResult => primaryRAMData
+	);
+	
+	pipeline_phase_write_back: PipelinePhaseWriteBack
+	port map (
 		reset => reset,
 		clock => clock,
 		register_file_input => register_file_input,
 		register_file_operation => register_file_operation,
-		operation_result => phase_exwb_result,
-		register_destination => phase_exwb_register_destination,
+		phaseMAInput => pipelinePhaseMAWBInterface,
 		instruction_done => instruction_done
+	);
+	
+	primaryRamController_e: RAMController_c
+	port map (
+		clock => clock,
+		reset => reset,
+		readControl1 => (
+			enable => FUNC_DISABLED,
+			address => (others => '0')
+		),
+		readControl2 => (
+			enable => FUNC_DISABLED,
+			address => (others => '0')
+		),
+		writeControl => (
+			enable => FUNC_DISABLED,
+			address => (others => '0'),
+			data => (others => '0')
+		),
+		result => primaryRAMData,
+		phyRAMEnable => phyRAMEnable,
+		phyRAMWriteEnable => phyRAMWriteEnable,
+		phyRAMReadEnable => phyRAMReadEnable,
+		phyAddressBus => phyAddressBus,
+		phyDataBus => phyDataBus
 	);
 	
 	register_file_debug <= register_file_output;
@@ -129,7 +196,7 @@ begin
 			if current_pipeline_phase = "0000" then
 				actual_instruction <= instruction;
 				current_pipeline_phase <= current_pipeline_phase + 1;
-			elsif current_pipeline_phase = "0011" then
+			elsif current_pipeline_phase = "0100" then
 				current_pipeline_phase <= "0000";
 			else
 				actual_instruction <= MIPS_CPU_INSTRUCTION_NOP;

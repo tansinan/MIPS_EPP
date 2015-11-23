@@ -118,6 +118,29 @@ package MIPSCPU is
 			address : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
 		end record;
 
+	type PipelinePhaseEXMAInterface_t is
+		record
+			sourceIsRAM : std_logic;
+			sourceRAMAddr : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
+			sourceImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+			targetIsRAM : std_logic;
+			targetIsReg : std_logic;
+			targetRAMAddr : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
+			targetRegAddr : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+		end record;
+		
+	type PipelinePhaseMAWBInterface_t is
+		record
+			sourceImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+			targetIsRAM : std_logic;
+			targetIsReg : std_logic;
+			targetRAMAddr : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
+			targetRegAddr : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+		end record;
+
+	constant FUNC_ENABLED : std_logic := '0';
+	constant FUNC_DISABLED : std_logic := '1';
+
 end MIPSCPU;
 
 
