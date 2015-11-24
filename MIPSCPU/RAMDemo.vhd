@@ -41,6 +41,9 @@ architecture Behavioral of RAMDemo is
 	signal r1 : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 	signal r2 : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 	signal r3 : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
+	signal rr1 : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
+	signal rr2 : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
+	signal rr3 : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 	signal testSucceeded : std_logic;
 begin
 	ramController_e : RAMController_c port map (
@@ -82,6 +85,7 @@ begin
 				readControl1.address <= "00000000000000000000";
 				state <= "0001";
 			elsif state = "0001" then
+				rr1 <= result;
 				readControl1.enable <= '1';
 				readControl2.enable <= '1';
 				writeControl.enable <= '0';
@@ -92,9 +96,10 @@ begin
 				readControl1.enable <= '0';
 				readControl2.enable <= '1';
 				writeControl.enable <= '1';
-				readControl1.address <= "00000000000000000010";
+				readControl1.address <= "00000000000000000001";
 				state <= "0010";
 			elsif state = "0010" then
+				rr2 <= result;
 				readControl1.enable <= '1';
 				readControl2.enable <= '1';
 				writeControl.enable <= '0';
@@ -102,8 +107,13 @@ begin
 				writeControl.data <= "01110111011101110111011101110111";
 				state <= "0011";
 			elsif state = "0011" then
+				readControl1.enable <= '0';
+				readControl2.enable <= '1';
+				writeControl.enable <= '1';
+				readControl1.address <= "00000000000000000000";
 				state <= "1110";
 			elsif state = "1110" then
+				rr3 <= result;
 				readControl1.enable <= '0';
 				readControl2.enable <= '1';
 				writeControl.enable <= '1';
@@ -133,7 +143,11 @@ begin
 			elsif state = "1111" then
 				if r1 = "00110011001100110011001100110011"
 				and r2 = "00010001000100010001000100010001"
-				and r3 = "01110111011101110111011101110111" then
+				and r3 = "01110111011101110111011101110111" 
+				and rr1 = "00010001000100010001000100010001"
+				and rr2 = "00110011001100110011001100110011"
+				and rr3 = "00010001000100010001000100010001"
+				then
 					testSucceeded <= '1';
 				else
 					testSucceeded <= '0';
