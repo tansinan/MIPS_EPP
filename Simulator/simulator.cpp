@@ -71,7 +71,7 @@ void printCache(char output, int cache[])
 void printTestbench(ofstream &testbench, string commandBin, int commandNum, int cache[])
 {
 	testbench << "current_test_success <= true;\nreset <= '1';\ninstruction <= \""
-	<< commandBin << "\";\nwait for clock_period * 4;\n\n";
+	<< commandBin << "\";\nwait for clock_period * 5;\n\n";
 	for (int i = 0; i < 32; i++)
 	{
 		testbench << "if current_test_success = true then\n"
