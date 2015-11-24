@@ -66,6 +66,7 @@ begin
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_ANDI,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_ORI,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_XORI,
+		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_LW,
 		decodingResultTypeR when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL;
 
 	register_file_reader : RegisterFileReader port map (

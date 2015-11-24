@@ -9,6 +9,11 @@ entity Processor is
 		reset : in std_logic;
 		clock : in std_logic;
 		instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
+		phyRAMEnable : out std_logic;
+		phyRAMWriteEnable : out std_logic;
+		phyRAMReadEnable : out std_logic;
+		phyAddressBus : out std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
+		phyDataBus : inout std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 		register_file_debug : out mips_register_file_port
 	);
 end entity;
@@ -34,12 +39,6 @@ architecture Behavioral of Processor is
 	
 	signal primaryRAMData : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 	
-	signal phyRAMEnable : std_logic;
-	signal phyRAMWriteEnable : std_logic;
-	signal phyRAMReadEnable : std_logic;
-	signal phyAddressBus : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
-	signal phyDataBus : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
-
 	signal ramReadControl1 : RAMReadControl_t;
 
 	component RegisterFile is

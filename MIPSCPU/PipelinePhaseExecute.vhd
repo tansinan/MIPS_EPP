@@ -34,9 +34,9 @@ begin
 		result => result
 	);
 	phaseMACtrl.sourceIsRAM <= useRAMAddr;
-	phaseMACtrl.sourceRAMAddr <= (others => '0');
+	phaseMACtrl.sourceRAMAddr <= result(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
 	phaseMACtrl.sourceImm <= result;
-	phaseMACtrl.targetIsRAM <= FUNC_DISABLED;
+	phaseMACtrl.targetIsRAM <= useRAMAddr;
 	phaseMACtrl.targetIsReg <= FUNC_ENABLED;
 	phaseMACtrl.targetRAMAddr <= (others => '0');
 	phaseMACtrl.targetRegAddr <= register_destination;

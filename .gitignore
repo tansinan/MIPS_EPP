@@ -73,7 +73,7 @@ _xmsgs/
 
 # Isim files and folders
 isim/
-xilinxsim.ini
+**/xilinxsim.ini
 
 # Plan Ahead generated files
 planAhead_run_*/
