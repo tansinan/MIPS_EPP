@@ -55,129 +55,129 @@ void printCommandBin(ofstream &outputFileStream, string command, int p1, int p2 
 	if (command == "add")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100000";
 	}
 	else if (command == "addu")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100001";
 	}
 	else if (command == "sub")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100010";
 	}
 	else if (command == "subu")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100011";
 	}
 	else if (command == "and")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100100";
 	}
 	else if (command == "or")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100101";
 	}
 	else if (command == "xor")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100110";
 	}
 	else if (command == "nor")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100111";
 	}
 	else if (command == "slt")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000101010";
 	}
 	else if (command == "sltu")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000101011";
 	}
 	else if (command == "sll")
 	{
 		commandBin += "00000000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
 		commandBin += "000000";
 	}
 	else if (command == "srl")
 	{
 		commandBin += "00000000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
 		commandBin += "0000010";
 	}
 	else if (command == "sra")
 	{
 		commandBin += "00000000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
 		commandBin += "0000011";
 	}
 	else if (command == "sllv")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
-		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000000100";
 	}
 	else if (command == "srlv")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
-		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000000110";
 	}
 	else if (command == "srav")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
-		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000000111";
 	}
 	else if (command == "jr")
@@ -189,36 +189,36 @@ void printCommandBin(ofstream &outputFileStream, string command, int p1, int p2 
 	else if (command == "addi")
 	{
 		commandBin += "001000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, false);
 	}
 	else if (command == "addiu")
 	{
 		commandBin += "001001";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, true);
 	}
 	else if (command == "andi")
 	{
 		commandBin += "001100";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, true);
 	}
 	else if (command == "ori")
 	{
 		commandBin += "001101";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, true);
 	}
 	else if (command == "xori")
 	{
 		commandBin += "001110";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, true);
 	}
 	else if (command == "lui")
@@ -230,54 +230,54 @@ void printCommandBin(ofstream &outputFileStream, string command, int p1, int p2 
 	else if (command == "lw")
 	{
 		commandBin += "100011";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, false);
 	}
 	else if (command == "sw")
 	{
 		commandBin += "101011";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, false);
 	}
 	else if (command == "beq")
 	{
 		commandBin += "000100";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, false);
 	}
 	else if (command == "bne")
 	{
 		commandBin += "000101";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, false);
 	}
 	else if (command == "slti")
 	{
 		commandBin += "001010";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, false);
 	}
 	else if (command == "sltiu")
 	{
 		commandBin += "001011";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, true);
 	}
 	else if (command == "j")
 	{
 		commandBin += "000010";
-		commandBin += binaryConvert(p1, 5, true);
+		commandBin += binaryConvert(p1/4, 26, true);
 	}
 	else if (command == "jal")
 	{
 		commandBin += "000011";
-		commandBin += binaryConvert(p1, 5, true);
+		commandBin += binaryConvert(p1/4, 26, true);
 	}
 	
 	outputFileStream << commandBin << endl;

@@ -75,146 +75,146 @@ void printTestbench(ofstream &testbench, string commandBin, int commandNum, int 
 	for (int i = 0; i < 32; i++)
 	{
 		testbench << "if current_test_success = true then\n"
-		<< "if register_file_debug(" << i << ") /= \"" << binaryConvert((unsigned)cache[i], 32, true) << "\" then\n"
-		<< "report \"Test case " << commandNum << " failed\";\n"
-		<< "current_test_success <= false;\n"
-		<< "end if;\nend if;\n";
+		<< "  if register_file_debug(" << i << ") /= \"" << binaryConvert((unsigned)cache[i], 32, true) << "\" then\n"
+		<< "    report \"Test case " << commandNum << " failed\";\n"
+		<< "  current_test_success <= false;\n"
+		<< "  end if;\nend if;\n\n";
 	}
 	testbench << "if current_test_success = true then\n"
-	<< "report \"Test case " << commandNum << " succeeded\";\n"
+	<< "  report \"Test case " << commandNum << " succeeded\";\n"
 	<< "end if;\n";
 	testbench << '\n';
 }
 
-void printCommandBin(ofstream &testbench, char output,int commandNum, string command, int cache[], int p1, int p2 = 0, int p3 = 0)
+void printCommandBin(ofstream &testbench, int commandNum, string command, int cache[], int p1, int p2 = 0, int p3 = 0)
 {
 	string commandBin = "";
 	if (command == "add")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100000";
 	}
 	else if (command == "addu")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100001";
 	}
 	else if (command == "sub")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100010";
 	}
 	else if (command == "subu")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100011";
 	}
 	else if (command == "and")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100100";
 	}
 	else if (command == "or")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100101";
 	}
 	else if (command == "xor")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100110";
 	}
 	else if (command == "nor")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000100111";
 	}
 	else if (command == "slt")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000101010";
 	}
 	else if (command == "sltu")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000101011";
 	}
 	else if (command == "sll")
 	{
 		commandBin += "00000000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
 		commandBin += "000000";
 	}
 	else if (command == "srl")
 	{
 		commandBin += "00000000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
 		commandBin += "0000010";
 	}
 	else if (command == "sra")
 	{
 		commandBin += "00000000000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
 		commandBin += "0000011";
 	}
 	else if (command == "sllv")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
-		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000000100";
 	}
 	else if (command == "srlv")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
-		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000000110";
 	}
 	else if (command == "srav")
 	{
 		commandBin += "000000";
-		commandBin += binaryConvert(p1, 5, true);
-		commandBin += binaryConvert(p2, 5, true);
 		commandBin += binaryConvert(p3, 5, true);
+		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += "00000000111";
 	}
 	else if (command == "jr")
@@ -226,36 +226,36 @@ void printCommandBin(ofstream &testbench, char output,int commandNum, string com
 	else if (command == "addi")
 	{
 		commandBin += "001000";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, false);
 	}
 	else if (command == "addiu")
 	{
 		commandBin += "001001";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, true);
 	}
 	else if (command == "andi")
 	{
 		commandBin += "001100";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, true);
 	}
 	else if (command == "ori")
 	{
 		commandBin += "001101";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, true);
 	}
 	else if (command == "xori")
 	{
 		commandBin += "001110";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, true);
 	}
 	else if (command == "lui")
@@ -267,58 +267,55 @@ void printCommandBin(ofstream &testbench, char output,int commandNum, string com
 	else if (command == "lw")
 	{
 		commandBin += "100011";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, false);
 	}
 	else if (command == "sw")
 	{
 		commandBin += "101011";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, false);
 	}
 	else if (command == "beq")
 	{
 		commandBin += "000100";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, false);
 	}
 	else if (command == "bne")
 	{
 		commandBin += "000101";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, false);
 	}
 	else if (command == "slti")
 	{
 		commandBin += "001010";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, false);
 	}
 	else if (command == "sltiu")
 	{
 		commandBin += "001011";
-		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p2, 5, true);
+		commandBin += binaryConvert(p1, 5, true);
 		commandBin += binaryConvert(p3, 16, true);
 	}
 	else if (command == "j")
 	{
 		commandBin += "000010";
-		commandBin += binaryConvert(p1, 5, true);
+		commandBin += binaryConvert(p1/4, 26, true);
 	}
 	else if (command == "jal")
 	{
 		commandBin += "000011";
-		commandBin += binaryConvert(p1, 5, true);
+		commandBin += binaryConvert(p1/4, 26, true);
 	}
-	
-	if (output == 'C')
-		cout << "Command(Bin):" << commandBin << endl;
 	printTestbench(testbench, commandBin, commandNum, cache);
 }
 
@@ -333,7 +330,9 @@ int main(int argc, char* argv[])
 		return 0;
 	}
 	ofstream testbench;
-	testbench.open("testbench_body.txt", ios::out);
+	string outputFileName = argv[1];
+	outputFileName += "_Testbench_Body.txt";
+	testbench.open(outputFileName.c_str(), ios::out);
 	inputFileStream.open(argv[1], ios::in);
 	string command;
 	int cache[32];
@@ -420,7 +419,17 @@ int main(int argc, char* argv[])
 		}
 		else if (command == "addi")
 		{
-			
+			string s1,s2,s3;
+			int c1,c2,imm;
+			inputFileStream >> s1 >> s2 >> s3;
+			s1 = s1.substr(1);
+			s2 = s2.substr(1);
+			c1 = atoi(s1.c_str());
+			c2 = atoi(s2.c_str());
+			imm = atoi(s3.c_str());
+			cache[c1] = cache[c2] + imm;
+			cache[0] = 0;
+			printCommandBin(testbench, commandNum, command, cache, c1, c2, imm);
 		}
 		else if (command == "addiu")
 		{
@@ -432,13 +441,23 @@ int main(int argc, char* argv[])
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			imm = atoi(s3.c_str());
-			cache[c2] = cache[c1] + imm;
+			cache[c1] = (unsigned int)cache[c2] + (unsigned int)imm;
 			cache[0] = 0;
-			printCommandBin(testbench,'C',commandNum,"addiu",cache,c1,c2,imm);
+			printCommandBin(testbench, commandNum, command, cache, c1, c2, imm);
 		}
 		else if (command == "andi")
 		{
-			
+			string s1,s2,s3;
+			int c1,c2,imm;
+			inputFileStream >> s1 >> s2 >> s3;
+			s1 = s1.substr(1);
+			s2 = s2.substr(1);
+			c1 = atoi(s1.c_str());
+			c2 = atoi(s2.c_str());
+			imm = atoi(s3.c_str());
+			cache[c1] = cache[c2] & imm;
+			cache[0] = 0;
+			printCommandBin(testbench, commandNum, command, cache, c1, c2, imm);
 		}
 		else if (command == "ori")
 		{
