@@ -346,7 +346,6 @@ int main(int argc, char* argv[])
 		commandNum ++;
 		command = "";
 		inputFileStream >> command;
-		cout << command;
 		if (command == "E" || command == "")
 			break;
 		else if (command == "add")
@@ -364,7 +363,7 @@ int main(int argc, char* argv[])
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			c3 = atoi(s3.c_str());
-			cache[c1] = (unsigned int)cache[c2] + (unsigned int)cache[3];
+			cache[c1] = (unsigned int)cache[c2] + (unsigned int)cache[c3];
 			cache[0] = 0;
 			printCommandBin(testbench, commandNum, command, cache, c1, c2, c3);
 		}
