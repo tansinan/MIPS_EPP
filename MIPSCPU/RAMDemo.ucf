@@ -60,3 +60,4 @@ NET "phyRAMWriteEnable" LOC = AA25;
 NET "reset" LOC = T1;
 NET "wrn" LOC = T24;
 NET "rdn" LOC = R25;
+NET "testSucceeded_out" LOC = F26;
