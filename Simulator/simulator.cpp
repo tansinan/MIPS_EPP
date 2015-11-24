@@ -355,7 +355,18 @@ int main(int argc, char* argv[])
 		}
 		else if (command == "addu")
 		{
-			
+			string s1,s2,s3;
+			int c1,c2,c3;
+			inputFileStream >> s1 >> s2 >> s3;
+			s1 = s1.substr(1);
+			s2 = s2.substr(1);
+			s3 = s3.substr(1);
+			c1 = atoi(s1.c_str());
+			c2 = atoi(s2.c_str());
+			c3 = atoi(s3.c_str());
+			cache[c1] = (unsigned int)cache[c2] + (unsigned int)cache[3];
+			cache[0] = 0;
+			printCommandBin(testbench, commandNum, command, cache, c1, c2, c3);
 		}
 		else if (command == "sub")
 		{
@@ -455,13 +466,23 @@ int main(int argc, char* argv[])
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			imm = atoi(s3.c_str());
-			cache[c1] = cache[c2] & imm;
+			cache[c1] = (unsigned int)cache[c2] & (unsigned int)imm;
 			cache[0] = 0;
 			printCommandBin(testbench, commandNum, command, cache, c1, c2, imm);
 		}
 		else if (command == "ori")
 		{
-			
+			string s1,s2,s3;
+			int c1,c2,imm;
+			inputFileStream >> s1 >> s2 >> s3;
+			s1 = s1.substr(1);
+			s2 = s2.substr(1);
+			c1 = atoi(s1.c_str());
+			c2 = atoi(s2.c_str());
+			imm = atoi(s3.c_str());
+			cache[c1] = (unsigned int)cache[c2] | (unsigned int)imm;
+			cache[0] = 0;
+			printCommandBin(testbench, commandNum, command, cache, c1, c2, imm);
 		}
 		else if (command == "xori")
 		{
