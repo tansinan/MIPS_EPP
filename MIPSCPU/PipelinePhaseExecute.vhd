@@ -10,6 +10,7 @@ entity PipelinePhaseExecute is
 		operand2 : in std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		operation : in std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 		register_destination : in std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+		useRAMAddr : in std_logic;
 		phaseMACtrlOutput : out PipelinePhaseEXMAInterface_t
 	);
 end entity;
@@ -32,7 +33,7 @@ begin
 		operation => operation,
 		result => result
 	);
-	phaseMACtrl.sourceIsRAM <= FUNC_DISABLED;
+	phaseMACtrl.sourceIsRAM <= useRAMAddr;
 	phaseMACtrl.sourceRAMAddr <= (others => '0');
 	phaseMACtrl.sourceImm <= result;
 	phaseMACtrl.targetIsRAM <= FUNC_DISABLED;

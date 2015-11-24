@@ -66,6 +66,8 @@ package MIPSCPU is
 		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "001101";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_XORI :
 		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "001110";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_LW :
+		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "100011";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL :
 		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "000000";
 		
@@ -95,6 +97,10 @@ package MIPSCPU is
 	type mips_register_file_port is
 		array(0 to MIPS_CPU_REGISTER_COUNT - 1) of std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 
+
+	--! InstructionDecodingResult_t: The internal representation of a instruction when decoded.
+	--! regAddr1 : The register address of the first number may be used by ALU.
+	--! resultIsRAMAddr : 
 	type InstructionDecodingResult_t is
 		record
 			regAddr1 : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
@@ -103,6 +109,7 @@ package MIPSCPU is
 			imm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 			operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 			useImmOperand : std_logic;
+			resultIsRAMAddr : std_logic;
 		end record;
 	
 	type RAMWriteControl_t is

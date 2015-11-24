@@ -95,4 +95,4 @@ Simulator/*.txt
 
 #Generated translator file/Translator test file
 Translator/*.txt
-*.asm
+Translator/*.asm

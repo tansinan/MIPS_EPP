@@ -29,7 +29,8 @@ begin
 	arithResult.regAddr2 <= rt;
 	arithResult.regDest <= rd;
 	arithResult.imm <= (others => 'X');
-	arithResult.useImmOperand <= '0';
+	arithResult.useImmOperand <= FUNC_ENABLED;
+	arithResult.resultIsRAMAddr <= FUNC_DISABLED;
 	with funct select arithResult.operation <=
 		ALU_OPERATION_ADD when MIPS_CPU_INSTRUCTION_FUNCT_ADDU,
 		(others => 'X') when others;

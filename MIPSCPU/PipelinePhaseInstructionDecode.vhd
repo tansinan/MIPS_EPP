@@ -11,7 +11,9 @@ entity PipelinePhaseInstructionDecode is
 		alu_operand1_output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		alu_operand2_output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		alu_operation_output : out std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
-		register_destination_output : out std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0)
+		register_destination_output :
+			out std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+		use_ram_addr : out std_logic
 	);
 end PipelinePhaseInstructionDecode;
 
@@ -94,6 +96,7 @@ begin
 			alu_operand2_output <= alu_operand2;
 			alu_operation_output <= alu_operation;
 			register_destination_output <= decodingResult.regDest;
+			use_ram_addr <= decodingResult.resultIsRAMAddr;
 		end if;
 	end process;
 end Behavioral;
