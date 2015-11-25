@@ -23,14 +23,7 @@ architecture Behavioral of Processor is
 	signal register_file_operation: std_logic_vector (MIPS_CPU_REGISTER_COUNT - 1 downto 0);
 	signal register_file_output : mips_register_file_port;
 
-	signal phase_idex_operand1 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-	signal phase_idex_operand2 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-	signal phase_idex_operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
-	signal phase_idex_register_destination : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-	signal phase_idex_useRAMAddr : std_logic;
-	signal phase_idex_writeBackToRAM : std_logic;
-	signal phase_idex_extraData : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-
+	signal pipelinePhaseIDEXInterface : PipelinePhaseIDEXInterface_t;
 	signal pipelinePhaseEXMAInterface : PipelinePhaseEXMAInterface_t;
 	signal pipelinePhaseMAWBInterface : PipelinePhaseMAWBInterface_t;
 
@@ -91,14 +84,7 @@ architecture Behavioral of Processor is
 		clock : in std_logic;
 		register_file : in mips_register_file_port;
 		instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
-		alu_operand1_output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		alu_operand2_output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		alu_operation_output : out std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
-		register_destination_output :
-			out std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-		use_ram_addr : out std_logic;
-		writeBackToRamAddr : out std_logic;
-		extraData : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0)
+		phaseExCtrlOutput : out PipelinePhaseIDEXInterface_t
 	);
 	end component;
 
@@ -106,14 +92,8 @@ architecture Behavioral of Processor is
 	port (
 		reset : in std_logic;
 		clock : in std_logic;
-		operand1 : in std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		operand2 : in std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		operation : in std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
-		register_destination : in std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-		phaseMACtrlOutput : out PipelinePhaseEXMAInterface_t;
-		writeBackToRAM : in std_logic;
-		extraData : in std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		useRAMAddr : in std_logic
+		phaseIDInput : in PipelinePhaseIDEXInterface_t;
+		phaseMACtrlOutput : out PipelinePhaseEXMAInterface_t
 	);
 	end component;
 
@@ -166,27 +146,15 @@ begin
 		clock => clock,
 		register_file => register_file_output,
 		instruction => actual_instruction,
-		alu_operand1_output => phase_idex_operand1,
-		alu_operand2_output => phase_idex_operand2,
-		alu_operation_output => phase_idex_operation,
-		register_destination_output => phase_idex_register_destination,
-		use_ram_addr => phase_idex_useRamAddr,
-		writeBackToRAMAddr => phase_idex_writeBackToRAM,
-		extraData => phase_idex_extraData
+		phaseExCtrlOutput => pipelinePhaseIDEXInterface
 	);
 
 	pipeline_phase_execute: PipelinePhaseExecute
 	port map (
 		reset => reset,
 		clock => clock,
-		operand1 => phase_idex_operand1,
-		operand2 => phase_idex_operand2,
-		operation => phase_idex_operation,
-		register_destination => phase_idex_register_destination,
-		useRamAddr => phase_idex_useRamAddr,
-		phaseMACtrlOutput => pipelinePhaseEXMAInterface,
-		writeBackToRAM => phase_idex_writeBackToRAM,
-		extraData => phase_idex_extraData
+		phaseIDInput => pipelinePhaseIDEXInterface,
+		phaseMACtrlOutput => pipelinePhaseEXMAInterface
 	);
 
 	pipelinePhaseMemoryAccess_e: PipelinePhaseMemoryAccess

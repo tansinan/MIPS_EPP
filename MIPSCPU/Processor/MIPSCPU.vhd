@@ -18,11 +18,16 @@ package MIPSCPU is
 	-- The instruction width of the CPU
 	constant MIPS_CPU_INSTRUCTION_WIDTH : integer := 32;
 
+	subtype Instruction_t is
+		std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
+
 	-- Instruction opcode range
 	constant MIPS_CPU_INSTRUCTION_OPCODE_HI : integer := 31;
 	constant MIPS_CPU_INSTRUCTION_OPCODE_LO : integer := 26;
 	constant MIPS_CPU_INSTRUCTION_OPCODE_WIDTH : integer :=
 		MIPS_CPU_INSTRUCTION_OPCODE_HI - MIPS_CPU_INSTRUCTION_OPCODE_LO + 1;
+	subtype InstructionOpcode_t is
+		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0);
 
 	-- R/I Type Instruction RS range
 	constant MIPS_CPU_INSTRUCTION_RS_HI : integer := 25;
@@ -58,20 +63,15 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_NOP :
 		std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0) :=
 		"00100100000000000000000000000000";
-	constant MIPS_CPU_INSTRUCTION_OPCODE_ADDIU :
-		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "001001";
-	constant MIPS_CPU_INSTRUCTION_OPCODE_ANDI :
-		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "001100";
-	constant MIPS_CPU_INSTRUCTION_OPCODE_ORI :
-		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "001101";
-	constant MIPS_CPU_INSTRUCTION_OPCODE_XORI :
-		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "001110";
-	constant MIPS_CPU_INSTRUCTION_OPCODE_LW :
-		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "100011";
-	constant MIPS_CPU_INSTRUCTION_OPCODE_SW :
-		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "101011";
-	constant MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL :
-		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "000000";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_ADDIU : InstructionOpcode_t := "001001";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_ANDI : InstructionOpcode_t := "001100";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_ORI : InstructionOpcode_t := "001101";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_XORI : InstructionOpcode_t := "001110";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_LW : InstructionOpcode_t := "100011";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_SW : InstructionOpcode_t := "101011";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_J : InstructionOpcode_t := "000010";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_JAL : InstructionOpcode_t := "000011";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL : InstructionOpcode_t := "000000";
 
 	-- MIPS CPU funct for the special opcode
 	constant MIPS_CPU_INSTRUCTION_FUNCT_ADDU :
@@ -131,6 +131,17 @@ package MIPSCPU is
 		record
 			enable : std_logic;
 			address : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
+		end record;
+
+	type PipelinePhaseIDEXInterface_t is
+		record
+			operand1 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+			operand2 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+			operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
+			targetReg : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+			resultIsRAMAddr : std_logic;
+			targetIsRAM : std_logic;
+			extraImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		end record;
 
 	type PipelinePhaseEXMAInterface_t is

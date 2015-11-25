@@ -8,14 +8,7 @@ entity PipelinePhaseInstructionDecode is
 		clock : in std_logic;
 		register_file : in mips_register_file_port;
 		instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
-		alu_operand1_output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		alu_operand2_output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		alu_operation_output : out std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
-		register_destination_output :
-			out std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-		use_ram_addr : out std_logic;
-		writeBackToRamAddr : out std_logic;
-		extraData : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0)
+		phaseExCtrlOutput : out PipelinePhaseIDEXInterface_t
 	);
 end PipelinePhaseInstructionDecode;
 
@@ -41,16 +34,13 @@ architecture Behavioral of PipelinePhaseInstructionDecode is
 			read_result_2 : out std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0)
 		);
 	end component;
-	signal alu_operand1 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-	signal alu_operand2 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-	signal alu_operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 	signal regData1 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal regData2 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal decodingResult : InstructionDecodingResult_t;
 	signal decodingResultTypeI : InstructionDecodingResult_t;
 	signal decodingResultTypeR : InstructionDecodingResult_t;
 	signal opcode : std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0);
-	signal writeBackToRamAddrCtrl : std_logic;
+	signal phaseExCtrl : PipelinePhaseIDEXInterface_t;
 begin
 	opcode <= instruction (MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
 
@@ -74,7 +64,7 @@ begin
 		decodingResultTypeR when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL;
 
 	--TODO I think this is ugly, need to be changed later.
-	with opcode select writeBackToRamAddrCtrl <=
+	with opcode select phaseExCtrl.targetIsRAM <=
 		FUNC_ENABLED when MIPS_CPU_INSTRUCTION_OPCODE_SW,
 		FUNC_DISABLED when others;
 
@@ -86,29 +76,24 @@ begin
 		read_result_2 => regData2
 	);
 
-	alu_operand1 <= regData1;
-	with decodingResult.useImmOperand select alu_operand2 <=
+	phaseExCtrl.operand1 <= regData1;
+	with decodingResult.useImmOperand select phaseExCtrl.operand2 <=
 		regData2 when '0',
 		decodingResult.imm when '1',
 		(others => 'X') when others;
 
-	alu_operation <= decodingResult.operation;
-
+	phaseExCtrl.operation <= decodingResult.operation;
+	phaseExCtrl.targetReg <= decodingResult.regDest;
+	phaseExCtrl.resultIsRAMAddr <= decodingResult.resultIsRAMAddr;
+	phaseExCtrl.extraImm <= regData2;
+			
 	PipelinePhaseInstructionDecode_Process : process (clock, reset)
 	begin
 		if reset = '0' then
-			alu_operand1_output <= (others => '0');
-			alu_operand2_output <= (others => '0');
-			alu_operation_output <= (others => '0');
-			register_destination_output <= (others => '0');
+			phaseExCtrlOutput.targetReg <= (others => '0');
+			phaseExCtrlOutput.resultIsRAMAddr <= FUNC_DISABLED;
 		elsif rising_edge(clock) then
-			alu_operand1_output <= alu_operand1;
-			alu_operand2_output <= alu_operand2;
-			alu_operation_output <= alu_operation;
-			register_destination_output <= decodingResult.regDest;
-			use_ram_addr <= decodingResult.resultIsRAMAddr;
-			extraData <= regData2;
-			writeBackToRamAddr <= writeBackToRamAddrCtrl;
+			phaseExCtrlOutput <= phaseExCtrl;
 		end if;
 	end process;
 end Behavioral;
