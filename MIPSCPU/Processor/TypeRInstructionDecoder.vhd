@@ -5,6 +5,7 @@ use work.MIPSCPU.all;
 entity TypeRInstructionDecoder is
 	port (
 		instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
+		pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		result : out InstructionDecodingResult_t
 	);
 end entity;

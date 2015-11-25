@@ -118,6 +118,7 @@ package MIPSCPU is
 			operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 			useImmOperand : std_logic;
 			resultIsRAMAddr : std_logic;
+			pcControl : RegisterControl_t;
 		end record;
 
 	type RAMWriteControl_t is

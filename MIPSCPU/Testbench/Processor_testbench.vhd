@@ -149,6 +149,7 @@ begin
 
 executeInstruction("10001100000000010000000000011100");
 executeInstruction("10101100000000010000000000001100");
+executeInstruction("00001000000000000000000000001100");
 
 if current_test_success = true then
   if register_file_debug(0) /= "00000000000000000000000000000000" then

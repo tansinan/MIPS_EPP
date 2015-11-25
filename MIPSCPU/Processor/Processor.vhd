@@ -14,7 +14,8 @@ entity Processor is
 		phyRAMReadEnable : out std_logic;
 		phyAddressBus : out std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
 		phyDataBus : inout std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
-		register_file_debug : out mips_register_file_port
+		register_file_debug : out mips_register_file_port;
+		pcValueDebug : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0)
 	);
 end entity;
 
@@ -84,7 +85,9 @@ architecture Behavioral of Processor is
 		clock : in std_logic;
 		register_file : in mips_register_file_port;
 		instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
-		phaseExCtrlOutput : out PipelinePhaseIDEXInterface_t
+		phaseExCtrlOutput : out PipelinePhaseIDEXInterface_t;
+		pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		pcControl : out RegisterControl_t
 	);
 	end component;
 
@@ -146,7 +149,9 @@ begin
 		clock => clock,
 		register_file => register_file_output,
 		instruction => actual_instruction,
-		phaseExCtrlOutput => pipelinePhaseIDEXInterface
+		phaseExCtrlOutput => pipelinePhaseIDEXInterface,
+		pcValue => pcValue,
+		pcControl => pcControl1
 	);
 
 	pipeline_phase_execute: PipelinePhaseExecute
@@ -197,6 +202,7 @@ begin
 	);
 
 	register_file_debug <= register_file_output;
+	pcValueDebug <= pcValue;
 
 	Processor_Process : process (clock, reset)
 	begin

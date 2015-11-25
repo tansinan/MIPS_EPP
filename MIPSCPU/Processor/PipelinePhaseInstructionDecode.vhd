@@ -8,6 +8,8 @@ entity PipelinePhaseInstructionDecode is
 		clock : in std_logic;
 		register_file : in mips_register_file_port;
 		instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
+		pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		pcControl : out RegisterControl_t;
 		phaseExCtrlOutput : out PipelinePhaseIDEXInterface_t
 	);
 end PipelinePhaseInstructionDecode;
@@ -16,12 +18,21 @@ architecture Behavioral of PipelinePhaseInstructionDecode is
 	component TypeIInstructionDecoder is
 		port (
 			instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
+			pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 			result : out InstructionDecodingResult_t
 		);
 	end component;
 	component TypeRInstructionDecoder is
 		port (
 			instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
+			pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
+			result : out InstructionDecodingResult_t
+		);
+	end component;
+	component TypeJInstructionDecoder is
+		port (
+			instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
+			pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 			result : out InstructionDecodingResult_t
 		);
 	end component;
@@ -39,6 +50,7 @@ architecture Behavioral of PipelinePhaseInstructionDecode is
 	signal decodingResult : InstructionDecodingResult_t;
 	signal decodingResultTypeI : InstructionDecodingResult_t;
 	signal decodingResultTypeR : InstructionDecodingResult_t;
+	signal decodingResultTypeJ : InstructionDecodingResult_t;
 	signal opcode : std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0);
 	signal phaseExCtrl : PipelinePhaseIDEXInterface_t;
 begin
@@ -46,12 +58,20 @@ begin
 
 	decoder_I : TypeIInstructionDecoder port map (
 		instruction => instruction,
-		result => decodingResultTypeI
+		result => decodingResultTypeI,
+		pcValue => pcValue
 	);
 
 	decoder_R : TypeRInstructionDecoder port map (
 		instruction => instruction,
-		result => decodingResultTypeR
+		result => decodingResultTypeR,
+		pcValue => pcValue
+	);
+
+	decoder_J : TypeJInstructionDecoder port map (
+		instruction => instruction,
+		result => decodingResultTypeJ,
+		pcValue => pcValue
 	);
 
 	with opcode select decodingResult <=
@@ -61,8 +81,10 @@ begin
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_XORI,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_LW,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_SW,
-		decodingResultTypeR when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL;
+		decodingResultTypeR when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL,
+		decodingResultTypeJ when MIPS_CPU_INSTRUCTION_OPCODE_J;
 
+	pcControl <= decodingResult.pcControl;
 	--TODO I think this is ugly, need to be changed later.
 	with opcode select phaseExCtrl.targetIsRAM <=
 		FUNC_ENABLED when MIPS_CPU_INSTRUCTION_OPCODE_SW,
@@ -86,7 +108,7 @@ begin
 	phaseExCtrl.targetReg <= decodingResult.regDest;
 	phaseExCtrl.resultIsRAMAddr <= decodingResult.resultIsRAMAddr;
 	phaseExCtrl.extraImm <= regData2;
-			
+
 	PipelinePhaseInstructionDecode_Process : process (clock, reset)
 	begin
 		if reset = '0' then

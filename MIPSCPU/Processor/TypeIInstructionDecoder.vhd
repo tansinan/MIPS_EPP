@@ -5,6 +5,7 @@ use work.MIPSCPU.all;
 entity TypeIInstructionDecoder is
 	port (
 		instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
+		pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		result : out InstructionDecodingResult_t
 	);
 end entity;
@@ -19,10 +20,12 @@ begin
 	rs <= instruction(MIPS_CPU_INSTRUCTION_RS_HI downto MIPS_CPU_INSTRUCTION_RS_LO);
 	rt <= instruction(MIPS_CPU_INSTRUCTION_RT_HI downto MIPS_CPU_INSTRUCTION_RT_LO);
 	imm <= instruction(MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO);
+	
+	result.pcControl.operation <= REGISTER_OPERATION_READ;
 	result.regAddr1 <= rs;
 	result.regAddr2 <= rt;
 	result.regDest <= rt;
-	
+
 	result.imm(MIPS_CPU_DATA_WIDTH - 1 downto MIPS_CPU_INSTRUCTION_IMM_HI + 1)
 		<= (others => '0');
 
@@ -30,7 +33,7 @@ begin
 		<= instruction(MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO);
 
 	result.useImmOperand <= '1';
-	
+
 	with opcode select result.operation <=
 		ALU_OPERATION_ADD when MIPS_CPU_INSTRUCTION_OPCODE_ADDIU,
 		ALU_OPERATION_LOGIC_AND when MIPS_CPU_INSTRUCTION_OPCODE_ANDI,
@@ -39,7 +42,7 @@ begin
 		ALU_OPERATION_ADD when MIPS_CPU_INSTRUCTION_OPCODE_LW,
 		ALU_OPERATION_ADD when MIPS_CPU_INSTRUCTION_OPCODE_SW,
 		(others => 'X') when others;
-		
+
 	with opcode select result.resultIsRAMAddr <=
 		FUNC_DISABLED when MIPS_CPU_INSTRUCTION_OPCODE_ADDIU,
 		FUNC_DISABLED when MIPS_CPU_INSTRUCTION_OPCODE_ANDI,
@@ -50,4 +53,3 @@ begin
 		FUNC_DISABLED when others;
 
 end architecture;
-
