@@ -11,6 +11,8 @@ entity PipelinePhaseExecute is
 		operation : in std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 		register_destination : in std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 		useRAMAddr : in std_logic;
+		writeBackToRAM : in std_logic;
+		extraData : in std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		phaseMACtrlOutput : out PipelinePhaseEXMAInterface_t
 	);
 end entity;
@@ -33,12 +35,18 @@ begin
 		operation => operation,
 		result => result
 	);
-	phaseMACtrl.sourceIsRAM <= useRAMAddr;
+	with writeBackToRAM select phaseMACtrl.sourceIsRAM <=
+		useRAMAddr when FUNC_DISABLED,
+		FUNC_DISABLED when FUNC_ENABLED;
 	phaseMACtrl.sourceRAMAddr <= result(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
-	phaseMACtrl.sourceImm <= result;
-	phaseMACtrl.targetIsRAM <= useRAMAddr;
-	phaseMACtrl.targetIsReg <= FUNC_ENABLED;
-	phaseMACtrl.targetRAMAddr <= (others => '0');
+	with writeBackToRAM select phaseMACtrl.sourceImm <=
+		result when FUNC_DISABLED,
+		extraData when FUNC_ENABLED;
+	phaseMACtrl.targetIsRAM <= writeBackToRAM;
+	with writeBackToRAM select phaseMACtrl.targetIsReg <=
+		FUNC_ENABLED when FUNC_DISABLED,
+		FUNC_DISABLED when FUNC_ENABLED;
+	phaseMACtrl.targetRAMAddr <= result(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
 	phaseMACtrl.targetRegAddr <= register_destination;
 	PipelinePhaseExecute_Process : process (clock, reset)
 	begin

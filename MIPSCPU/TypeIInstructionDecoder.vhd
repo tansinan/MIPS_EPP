@@ -20,7 +20,7 @@ begin
 	rt <= instruction(MIPS_CPU_INSTRUCTION_RT_HI downto MIPS_CPU_INSTRUCTION_RT_LO);
 	imm <= instruction(MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO);
 	result.regAddr1 <= rs;
-	result.regAddr2 <= (others => '0');
+	result.regAddr2 <= rt;
 	result.regDest <= rt;
 	
 	result.imm(MIPS_CPU_DATA_WIDTH - 1 downto MIPS_CPU_INSTRUCTION_IMM_HI + 1)
@@ -37,6 +37,7 @@ begin
 		ALU_OPERATION_LOGIC_OR when MIPS_CPU_INSTRUCTION_OPCODE_ORI,
 		ALU_OPERATION_LOGIC_XOR when MIPS_CPU_INSTRUCTION_OPCODE_XORI,
 		ALU_OPERATION_ADD when MIPS_CPU_INSTRUCTION_OPCODE_LW,
+		ALU_OPERATION_ADD when MIPS_CPU_INSTRUCTION_OPCODE_SW,
 		(others => 'X') when others;
 		
 	with opcode select result.resultIsRAMAddr <=
@@ -45,6 +46,7 @@ begin
 		FUNC_DISABLED when MIPS_CPU_INSTRUCTION_OPCODE_ORI,
 		FUNC_DISABLED when MIPS_CPU_INSTRUCTION_OPCODE_XORI,
 		FUNC_ENABLED when MIPS_CPU_INSTRUCTION_OPCODE_LW,
+		FUNC_ENABLED when MIPS_CPU_INSTRUCTION_OPCODE_SW,
 		FUNC_DISABLED when others;
 
 end architecture;

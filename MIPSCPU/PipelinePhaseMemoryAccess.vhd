@@ -10,6 +10,7 @@ entity PipelinePhaseMemoryAccess is
 		phaseEXInput : in PipelinePhaseEXMAInterface_t;
 		phaseWBCtrlOutput : out PipelinePhaseMAWBInterface_t;
 		ramReadControl : out RAMReadControl_t;
+		ramWriteControl : out RAMWriteControl_t;
 		ramReadResult : in std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0)
 	);
 end PipelinePhaseMemoryAccess;
@@ -19,6 +20,9 @@ architecture Behavioral of PipelinePhaseMemoryAccess is
 begin
 	ramReadControl.enable <= phaseEXInput.sourceIsRAM;
 	ramReadControl.address <= phaseEXInput.sourceRAMAddr;
+	ramWriteControl.enable <= phaseEXInput.targetIsRAM;
+	ramWriteControl.address <= phaseEXInput.targetRAMAddr;
+	ramWriteControl.data <= phaseWBCtrl.sourceImm;
 	with phaseEXInput.sourceIsRAM select phaseWBCtrl.sourceImm <=
 		ramReadResult when FUNC_ENABLED,
 		phaseEXInput.sourceImm when FUNC_DISABLED;

@@ -68,6 +68,8 @@ package MIPSCPU is
 		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "001110";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_LW :
 		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "100011";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_SW :
+		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "101011";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL :
 		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "000000";
 		

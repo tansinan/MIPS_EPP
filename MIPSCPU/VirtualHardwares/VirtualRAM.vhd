@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+--use ieee.std_logic_arith.all;
 use ieee.numeric_std.all;
 use work.MIPSCPU.all;
 use std.textio.all;
@@ -20,10 +21,12 @@ architecture behavior of VirtualRAM_c is
 begin
 	process(clock, reset)
 		file file_pointer : text;
-		variable readResult : std_logic_vector(32 - 1 downto 0);
+		file tmpRAMFile : text;
+		variable readResult : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
+		variable writeData : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 		variable lineToRead : integer;
 		procedure fileWriteData(
-			variable data : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0)		
+			variable data : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0)
 		) is
 			variable content : string(1 to PHYSICS_RAM_DATA_WIDTH);
 			variable contentLine : line;
@@ -70,6 +73,27 @@ begin
 				end loop;
 			end if;
 		end procedure;
+		
+		procedure fileEditLine(
+			lineNumber : integer;
+			data : inout std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0)
+		) is
+			variable contentLine : line;
+		begin
+			file_open(tmpRAMFile, "Z:\\a.txt", READ_MODE);
+			file_open(file_pointer, "Z:\\a_temp.txt", WRITE_MODE);
+			for i in 0 to 1024 - 1 loop
+				readline (tmpRAMFile, contentLine);
+				if i /= lineNumber then
+					writeline(file_pointer, contentLine);
+				else
+					report "Weird!";
+					fileWriteData(data);
+				end if;
+			end loop;
+			file_close(tmpRAMFile);
+			file_close(file_pointer);
+		end procedure;
 	begin
 		if reset = '0' then
 			dataBus <= (others => 'Z');
@@ -86,7 +110,10 @@ begin
 				dataBus <= readResult;
 				file_close(file_pointer);
 			elsif writeEnabled = FUNC_ENABLED then
-				report "Virtual RAM Read is not implemented.";
+
+				lineToRead := to_integer(unsigned(addressBus));
+				writeData := dataBus;
+				fileEditLine(to_integer(unsigned(addressBus)), writeData);
 			else
 				report "Warning : Virtual RAM detected Read/Write enabled at same time!";
 			end if;

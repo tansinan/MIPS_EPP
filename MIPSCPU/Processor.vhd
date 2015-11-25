@@ -27,7 +27,9 @@ architecture Behavioral of Processor is
 	signal phase_idex_operand2 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal phase_idex_operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 	signal phase_idex_register_destination : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-	signal phase_idex_useRamAddr : std_logic;
+	signal phase_idex_useRAMAddr : std_logic;
+	signal phase_idex_writeBackToRAM : std_logic;
+	signal phase_idex_extraData : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	
 	signal pipelinePhaseEXMAInterface : PipelinePhaseEXMAInterface_t;
 	signal pipelinePhaseMAWBInterface : PipelinePhaseMAWBInterface_t;
@@ -40,6 +42,7 @@ architecture Behavioral of Processor is
 	signal primaryRAMData : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 	
 	signal ramReadControl1 : RAMReadControl_t;
+	signal ramWriteControl : RAMWriteControl_t;
 
 	component RegisterFile is
     Port (
@@ -76,7 +79,9 @@ architecture Behavioral of Processor is
 		alu_operation_output : out std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 		register_destination_output :
 			out std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-		use_ram_addr : out std_logic
+		use_ram_addr : out std_logic;
+		writeBackToRamAddr : out std_logic;
+		extraData : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0)
 	);
 	end component;
 	component PipelinePhaseExecute is
@@ -88,6 +93,8 @@ architecture Behavioral of Processor is
 		operation : in std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 		register_destination : in std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 		phaseMACtrlOutput : out PipelinePhaseEXMAInterface_t;
+		writeBackToRAM : in std_logic;
+		extraData : in std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		useRAMAddr : in std_logic
 	);
 	end component;
@@ -99,6 +106,7 @@ architecture Behavioral of Processor is
 		phaseEXInput : in PipelinePhaseEXMAInterface_t;
 		phaseWBCtrlOutput : out PipelinePhaseMAWBInterface_t;
 		ramReadControl : out RAMReadControl_t;
+		ramWriteControl : out RAMWriteControl_t;
 		ramReadResult : in std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0)
 	);
 	end component;
@@ -132,7 +140,9 @@ begin
 		alu_operand2_output => phase_idex_operand2,
 		alu_operation_output => phase_idex_operation,
 		register_destination_output => phase_idex_register_destination,
-		use_ram_addr => phase_idex_useRamAddr
+		use_ram_addr => phase_idex_useRamAddr,
+		writeBackToRAMAddr => phase_idex_writeBackToRAM,
+		extraData => phase_idex_extraData
 	);
 	
 	pipeline_phase_execute: PipelinePhaseExecute
@@ -144,7 +154,9 @@ begin
 		operation => phase_idex_operation,
 		register_destination => phase_idex_register_destination,
 		useRamAddr => phase_idex_useRamAddr,
-		phaseMACtrlOutput => pipelinePhaseEXMAInterface
+		phaseMACtrlOutput => pipelinePhaseEXMAInterface,
+		writeBackToRAM => phase_idex_writeBackToRAM,
+		extraData => phase_idex_extraData
 	);
 	
 	pipelinePhaseMemoryAccess_e: PipelinePhaseMemoryAccess
@@ -154,6 +166,7 @@ begin
 		phaseEXInput => pipelinePhaseEXMAInterface,
 		phaseWBCtrlOutput => pipelinePhaseMAWBInterface,
 		ramReadControl => ramReadControl1,
+		ramWriteControl => ramWriteControl,
 		ramReadResult => primaryRAMData
 	);
 	
@@ -176,11 +189,7 @@ begin
 			enable => FUNC_DISABLED,
 			address => (others => '0')
 		),
-		writeControl => (
-			enable => FUNC_DISABLED,
-			address => (others => '0'),
-			data => (others => '0')
-		),
+		writeControl => ramWriteControl,
 		result => primaryRAMData,
 		phyRAMEnable => phyRAMEnable,
 		phyRAMWriteEnable => phyRAMWriteEnable,

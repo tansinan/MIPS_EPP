@@ -376,6 +376,8 @@ end if;
 if current_test_success = true then
   report "Test case 1 succeeded";
 end if;	
+
+executeInstruction("10101100000000010000000000000011");
 		reset <= '1';
 		instruction <= MIPS_CPU_INSTRUCTION_NOP;
 		wait for clock_period * 5;

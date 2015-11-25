@@ -13,7 +13,9 @@ entity PipelinePhaseInstructionDecode is
 		alu_operation_output : out std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 		register_destination_output :
 			out std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-		use_ram_addr : out std_logic
+		use_ram_addr : out std_logic;
+		writeBackToRamAddr : out std_logic;
+		extraData : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0)
 	);
 end PipelinePhaseInstructionDecode;
 
@@ -48,6 +50,7 @@ architecture Behavioral of PipelinePhaseInstructionDecode is
 	signal decodingResultTypeI : InstructionDecodingResult_t;
 	signal decodingResultTypeR : InstructionDecodingResult_t;
 	signal opcode : std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0);
+	signal writeBackToRamAddrCtrl : std_logic;
 begin
 	opcode <= instruction (MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
 
@@ -67,7 +70,13 @@ begin
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_ORI,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_XORI,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_LW,
+		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_SW,
 		decodingResultTypeR when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL;
+
+	--TODO I think this is ugly, need to be changed later.
+	with opcode select writeBackToRamAddrCtrl <=
+		FUNC_ENABLED when MIPS_CPU_INSTRUCTION_OPCODE_SW,
+		FUNC_DISABLED when others;
 
 	register_file_reader : RegisterFileReader port map (
 		register_file_output => register_file,
@@ -98,6 +107,8 @@ begin
 			alu_operation_output <= alu_operation;
 			register_destination_output <= decodingResult.regDest;
 			use_ram_addr <= decodingResult.resultIsRAMAddr;
+			extraData <= regData2;
+			writeBackToRamAddr <= writeBackToRamAddrCtrl;
 		end if;
 	end process;
 end Behavioral;
