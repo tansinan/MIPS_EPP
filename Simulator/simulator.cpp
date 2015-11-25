@@ -767,6 +767,7 @@ int main(int argc, char* argv[])
 			for (unsigned int i = 0; i < 4; i++)
 				memory->read(address + i, &word[i]);
 			cache[c1] = *((int*)word);
+			printCommandBin(testbench, commandNum, command, cache, c1, c2, imm);
 		}
 		else if (command == "sw")
 		{
@@ -782,6 +783,7 @@ int main(int argc, char* argv[])
 			char* word = (char*)&cache[c1];
 			for (unsigned int i = 0; i < 4; i++)
 				memory->write(address + i, word[i]);
+			printCommandBin(testbench, commandNum, command, cache, c1, c2, imm);
 		}
 		else if (command == "beq")
 		{
