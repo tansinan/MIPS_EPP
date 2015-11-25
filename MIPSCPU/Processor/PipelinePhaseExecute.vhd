@@ -38,7 +38,9 @@ begin
 	with writeBackToRAM select phaseMACtrl.sourceIsRAM <=
 		useRAMAddr when FUNC_DISABLED,
 		FUNC_DISABLED when FUNC_ENABLED;
-	phaseMACtrl.sourceRAMAddr <= result(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
+
+	-- TODO: produce an exception when address is not valid.
+	phaseMACtrl.sourceRAMAddr <= result(PHYSICS_RAM_ADDRESS_WIDTH + 1 downto 2);
 	with writeBackToRAM select phaseMACtrl.sourceImm <=
 		result when FUNC_DISABLED,
 		extraData when FUNC_ENABLED;
@@ -46,7 +48,9 @@ begin
 	with writeBackToRAM select phaseMACtrl.targetIsReg <=
 		FUNC_ENABLED when FUNC_DISABLED,
 		FUNC_DISABLED when FUNC_ENABLED;
-	phaseMACtrl.targetRAMAddr <= result(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
+
+	-- TODO: produce an exception when address is not valid.
+	phaseMACtrl.targetRAMAddr <= result(PHYSICS_RAM_ADDRESS_WIDTH + 1 downto 2);
 	phaseMACtrl.targetRegAddr <= register_destination;
 	PipelinePhaseExecute_Process : process (clock, reset)
 	begin

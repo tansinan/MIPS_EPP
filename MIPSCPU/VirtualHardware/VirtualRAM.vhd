@@ -1,6 +1,5 @@
 library ieee;
 use ieee.std_logic_1164.all;
---use ieee.std_logic_arith.all;
 use ieee.numeric_std.all;
 use work.MIPSCPU.all;
 use std.textio.all;
@@ -87,9 +86,16 @@ begin
 				if i /= lineNumber then
 					writeline(file_pointer, contentLine);
 				else
-					report "Weird!";
 					fileWriteData(data);
 				end if;
+			end loop;
+			file_close(tmpRAMFile);
+			file_close(file_pointer);
+			file_open(file_pointer, "Z:\\a.txt", WRITE_MODE);
+			file_open(tmpRAMFile, "Z:\\a_temp.txt", READ_MODE);
+			for i in 0 to 1024 - 1 loop
+				readline (tmpRAMFile, contentLine);
+				writeline(file_pointer, contentLine);
 			end loop;
 			file_close(tmpRAMFile);
 			file_close(file_pointer);
@@ -110,7 +116,6 @@ begin
 				dataBus <= readResult;
 				file_close(file_pointer);
 			elsif writeEnabled = FUNC_ENABLED then
-
 				lineToRead := to_integer(unsigned(addressBus));
 				writeData := dataBus;
 				fileEditLine(to_integer(unsigned(addressBus)), writeData);

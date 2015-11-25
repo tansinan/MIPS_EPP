@@ -24,7 +24,7 @@ begin
 	opcode <= instruction(MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
 	funct <= instruction(MIPS_CPU_INSTRUCTION_FUNCT_HI downto MIPS_CPU_INSTRUCTION_FUNCT_LO);
 	shamt <= instruction(MIPS_CPU_INSTRUCTION_SHAMT_HI downto MIPS_CPU_INSTRUCTION_SHAMT_LO);
-	
+
 	arithResult.regAddr1 <= rs;
 	arithResult.regAddr2 <= rt;
 	arithResult.regDest <= rd;
@@ -34,8 +34,9 @@ begin
 	with funct select arithResult.operation <=
 		ALU_OPERATION_ADD when MIPS_CPU_INSTRUCTION_FUNCT_ADDU,
 		(others => 'X') when others;
-	
+
 	with opcode select result <=
-		arithResult when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL;
+		arithResult when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL,
+		arithResult when others;
 
 end architecture;

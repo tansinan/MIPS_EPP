@@ -4,12 +4,12 @@ use ieee.std_logic_arith.all;
 use ieee.numeric_std.all;
 use work.MIPSCPU.all;
 use std.textio.all;
- 
+
 entity Processor_Testbench is
 end Processor_Testbench;
 
-architecture behavior of Processor_Testbench is 
-	
+architecture behavior of Processor_Testbench is
+
 	-- Declare our processor to test.
 	component Processor is
 		port (
@@ -24,7 +24,7 @@ architecture behavior of Processor_Testbench is
 			register_file_debug : out mips_register_file_port
 		);
 	end component;
-	
+
 	component VirtualRAM_c is
 		port (
 			clock : in std_logic;
@@ -40,18 +40,18 @@ architecture behavior of Processor_Testbench is
 	-- CPU Clock.
 	signal reset : std_logic := '0';
 	signal clock : std_logic := '0';
-	
+
 	-- RAM Clock, they need to be slightly faster than the CPU clock
 	-- for in our board it's always done in one clock cycle.
 	signal ramClock : std_logic := '0';
-	
+
 	-- Bus interface
 	signal phyRAMEnable : std_logic;
 	signal phyRAMWriteEnable : std_logic;
 	signal phyRAMReadEnable : std_logic;
 	signal phyAddressBus : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
 	signal phyDataBus : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
-	
+
 	signal instruction : std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
 
  	--outputs
@@ -94,7 +94,7 @@ begin
 		clock <= '1';
 		wait for CPU_CLOCK_PERIOD/2;
    end process;
-   
+
 	ramClockProcess : process
 	begin
 		ramClock <= '0';
@@ -102,7 +102,7 @@ begin
 		ramClock <= '1';
 		wait for RAM_CLOCK_PERIOD/2;
 	end process;
- 
+
 
    -- stimulus process
 	stim_proc: process
@@ -112,7 +112,7 @@ begin
 			reset <= '0';
 			wait for clock_period * 10;
 		end procedure;
-		
+
 		procedure executeInstruction (
 			code : std_logic_vector(32 - 1 downto 0)
 		) is
@@ -123,9 +123,9 @@ begin
 			wait for clock_period * 5;
 		end procedure;
 	begin
-	
-	
-	
+
+
+
    	--file_open(file_pointer, "Z:\\a.txt", WRITE_MODE);
     --for i in 0 to 1023 loop
 	--	bin_value := conv_std_logic_vector(i,32);
@@ -134,20 +134,21 @@ begin
 	--file_close(file_pointer);
 
 	--file_open(file_pointer, "Z:\\a.txt", READ_MODE);
-	
+
 	--m := 0;
-	
+
 	--fileSeek(m);
 	--fileReadData(bin_value);
-	
+
 	--m := 13;
 	--fileSeek(m);
 	--fileReadData(bin_value);
 	--file_close(file_pointer);
-	
+
 	systemReset;
-		
-executeInstruction("10001100000000010000000000000010");
+
+executeInstruction("10001100000000010000000000011100");
+executeInstruction("10101100000000010000000000001100");
 
 if current_test_success = true then
   if register_file_debug(0) /= "00000000000000000000000000000000" then
@@ -157,7 +158,7 @@ if current_test_success = true then
 end if;
 
 if current_test_success = true then
-  if register_file_debug(1) /= "00000000000000000000000000000010" then
+  if register_file_debug(1) /= "00000000000000000000000000000111" then
     report "Test case 1 failed";
   current_test_success <= false;
   end if;
@@ -375,13 +376,12 @@ end if;
 
 if current_test_success = true then
   report "Test case 1 succeeded";
-end if;	
+end if;
 
-executeInstruction("10101100000000010000000000000011");
 		reset <= '1';
 		instruction <= MIPS_CPU_INSTRUCTION_NOP;
 		wait for clock_period * 5;
-		
+
 		wait;
 
    end process;
