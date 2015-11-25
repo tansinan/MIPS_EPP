@@ -37,11 +37,11 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_IMM_LO : integer := 0;
 	constant MIPS_CPU_INSTRUCTION_IMM_WIDTH : integer :=
 		MIPS_CPU_INSTRUCTION_IMM_HI - MIPS_CPU_INSTRUCTION_IMM_LO + 1;
-	
+
 	-- R Type Instruction RD range
 	constant MIPS_CPU_INSTRUCTION_RD_HI : integer := 15;
 	constant MIPS_CPU_INSTRUCTION_RD_LO : integer := 11;
-	
+
 	-- R Type Instruction Shamt range
 	constant MIPS_CPU_INSTRUCTION_SHAMT_HI : integer := 10;
 	constant MIPS_CPU_INSTRUCTION_SHAMT_LO : integer := 6;
@@ -72,7 +72,7 @@ package MIPSCPU is
 		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "101011";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL :
 		std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0) := "000000";
-		
+
 	-- MIPS CPU funct for the special opcode
 	constant MIPS_CPU_INSTRUCTION_FUNCT_ADDU :
 		std_logic_vector(MIPS_CPU_INSTRUCTION_FUNCT_WIDTH - 1 downto 0) := "100001";
@@ -92,7 +92,13 @@ package MIPSCPU is
 	constant REGISTER_OPERATION_READ : std_logic := '0';
 	constant REGISTER_OPERATION_WRITE : std_logic := '1';
 
-	--
+	type RegisterControl_t is
+		record
+			operation : std_logic;
+			data : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		end record;
+
+	--! Parameters related to physics RAM bus.
 	constant PHYSICS_RAM_ADDRESS_WIDTH : integer := 20;
 	constant PHYSICS_RAM_DATA_WIDTH : integer := 32;
 
@@ -102,7 +108,7 @@ package MIPSCPU is
 
 	--! InstructionDecodingResult_t: The internal representation of a instruction when decoded.
 	--! regAddr1 : The register address of the first number may be used by ALU.
-	--! resultIsRAMAddr : 
+	--! resultIsRAMAddr :
 	type InstructionDecodingResult_t is
 		record
 			regAddr1 : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
@@ -113,14 +119,14 @@ package MIPSCPU is
 			useImmOperand : std_logic;
 			resultIsRAMAddr : std_logic;
 		end record;
-	
+
 	type RAMWriteControl_t is
 		record
 			enable : std_logic;
 			address : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
 			data: std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 		end record;
-	
+
 	type RAMReadControl_t is
 		record
 			enable : std_logic;
@@ -137,7 +143,7 @@ package MIPSCPU is
 			targetRAMAddr : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
 			targetRegAddr : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 		end record;
-		
+
 	type PipelinePhaseMAWBInterface_t is
 		record
 			sourceImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);

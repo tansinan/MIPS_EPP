@@ -22,7 +22,7 @@ architecture Behavioral of Processor is
 	signal register_file_input: std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal register_file_operation: std_logic_vector (MIPS_CPU_REGISTER_COUNT - 1 downto 0);
 	signal register_file_output : mips_register_file_port;
-	
+
 	signal phase_idex_operand1 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal phase_idex_operand2 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal phase_idex_operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
@@ -30,7 +30,7 @@ architecture Behavioral of Processor is
 	signal phase_idex_useRAMAddr : std_logic;
 	signal phase_idex_writeBackToRAM : std_logic;
 	signal phase_idex_extraData : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-	
+
 	signal pipelinePhaseEXMAInterface : PipelinePhaseEXMAInterface_t;
 	signal pipelinePhaseMAWBInterface : PipelinePhaseMAWBInterface_t;
 
@@ -38,11 +38,26 @@ architecture Behavioral of Processor is
 	signal instruction_done : std_logic;
 
 	signal current_pipeline_phase : std_logic_vector(3 downto 0) := "0000";
-	
+
 	signal primaryRAMData : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
-	
+
 	signal ramReadControl1 : RAMReadControl_t;
 	signal ramWriteControl : RAMWriteControl_t;
+
+	signal pcControl1 : RegisterControl_t;
+	signal pcControl2 : RegisterControl_t;
+	signal pcValue : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+
+	component SpecialRegister is
+		port (
+			reset : in std_logic;
+			clock : in std_logic;
+	        control1 : in RegisterControl_t;
+	        control2 : in RegisterControl_t;
+	        control3 : in RegisterControl_t;
+	        output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0)
+		);
+	end component;
 
 	component RegisterFile is
     Port (
@@ -53,6 +68,7 @@ architecture Behavioral of Processor is
 		output : out mips_register_file_port
 	);
 	end component;
+
 	component RAMController_c is
 	port (
 		clock : in std_logic;
@@ -68,6 +84,7 @@ architecture Behavioral of Processor is
 		phyDataBus : inout std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0)
 	);
 	end component;
+
 	component PipelinePhaseInstructionDecode is
 	port (
 		reset : in std_logic;
@@ -84,6 +101,7 @@ architecture Behavioral of Processor is
 		extraData : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0)
 	);
 	end component;
+
 	component PipelinePhaseExecute is
 	port (
 		reset : in std_logic;
@@ -98,7 +116,7 @@ architecture Behavioral of Processor is
 		useRAMAddr : in std_logic
 	);
 	end component;
-	
+
 	component PipelinePhaseMemoryAccess is
 	port (
 		clock : in std_logic;
@@ -110,7 +128,7 @@ architecture Behavioral of Processor is
 		ramReadResult : in std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0)
 	);
 	end component;
-	
+
 	component PipelinePhaseWriteBack is
     port (
 		reset : in std_logic;
@@ -122,7 +140,7 @@ architecture Behavioral of Processor is
 	);
 	end component;
 begin
-	
+
 	register_file : RegisterFile port map (
 		reset => reset,
 		clock => clock,
@@ -130,7 +148,19 @@ begin
 		operation => register_file_operation,
 		output => register_file_output
 	);
-	
+
+	pcRegister : SpecialRegister port map (
+		reset => reset,
+		clock => clock,
+		control1 => pcControl1,
+		control2 => pcControl2,
+		control3 => (
+			operation => REGISTER_OPERATION_READ,
+			data => (others => '0')
+		),
+		output => pcValue
+	);
+
 	pipeline_phase_instruction_decode: PipelinePhaseInstructionDecode port map (
 		reset => reset,
 		clock => clock,
@@ -144,7 +174,7 @@ begin
 		writeBackToRAMAddr => phase_idex_writeBackToRAM,
 		extraData => phase_idex_extraData
 	);
-	
+
 	pipeline_phase_execute: PipelinePhaseExecute
 	port map (
 		reset => reset,
@@ -158,7 +188,7 @@ begin
 		writeBackToRAM => phase_idex_writeBackToRAM,
 		extraData => phase_idex_extraData
 	);
-	
+
 	pipelinePhaseMemoryAccess_e: PipelinePhaseMemoryAccess
 	port map (
 		reset => reset,
@@ -169,7 +199,7 @@ begin
 		ramWriteControl => ramWriteControl,
 		ramReadResult => primaryRAMData
 	);
-	
+
 	pipeline_phase_write_back: PipelinePhaseWriteBack
 	port map (
 		reset => reset,
@@ -179,7 +209,7 @@ begin
 		phaseMAInput => pipelinePhaseMAWBInterface,
 		instruction_done => instruction_done
 	);
-	
+
 	primaryRamController_e: RAMController_c
 	port map (
 		clock => clock,
@@ -197,9 +227,9 @@ begin
 		phyAddressBus => phyAddressBus,
 		phyDataBus => phyDataBus
 	);
-	
+
 	register_file_debug <= register_file_output;
-	
+
 	Processor_Process : process (clock, reset)
 	begin
 		if reset = '0' then
