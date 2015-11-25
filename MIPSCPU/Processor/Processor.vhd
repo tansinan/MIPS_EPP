@@ -36,6 +36,7 @@ architecture Behavioral of Processor is
 	signal primaryRAMData : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 
 	signal ramReadControl1 : RAMReadControl_t;
+	signal ramReadControl2 : RAMReadControl_t;
 	signal ramWriteControl : RAMWriteControl_t;
 
 	signal pcControl1 : RegisterControl_t;
@@ -188,10 +189,7 @@ begin
 		clock => clock,
 		reset => reset,
 		readControl1 => ramReadControl1,
-		readControl2 => (
-			enable => FUNC_DISABLED,
-			address => (others => '0')
-		),
+		readControl2 => ramReadControl2,
 		writeControl => ramWriteControl,
 		result => primaryRAMData,
 		phyRAMEnable => phyRAMEnable,
@@ -203,20 +201,29 @@ begin
 
 	register_file_debug <= register_file_output;
 	pcValueDebug <= pcValue;
+	ramReadControl2.address <= pcValue(PHYSICS_RAM_ADDRESS_WIDTH + 1 downto 2);
 
 	Processor_Process : process (clock, reset)
 	begin
 		if reset = '0' then
 			actual_instruction <= MIPS_CPU_INSTRUCTION_NOP;
+			current_pipeline_phase <= "0100";
 		elsif rising_edge(clock) then
 			if current_pipeline_phase = "0000" then
-				actual_instruction <= instruction;
+				pcControl2.operation <= REGISTER_OPERATION_WRITE;
+				pcControl2.data <= pcValue + 4;
+				actual_instruction <= primaryRAMData;
 				current_pipeline_phase <= current_pipeline_phase + 1;
+				ramReadControl2.enable <= FUNC_DISABLED;
 			elsif current_pipeline_phase = "0100" then
+				pcControl2.operation <= REGISTER_OPERATION_READ;
 				current_pipeline_phase <= "0000";
+				ramReadControl2.enable <= FUNC_ENABLED;
 			else
+				pcControl2.operation <= REGISTER_OPERATION_READ;
 				actual_instruction <= MIPS_CPU_INSTRUCTION_NOP;
 				current_pipeline_phase <= current_pipeline_phase + 1;
+				ramReadControl2.enable <= FUNC_DISABLED;
 			end if;
 		end if;
 	end process;
