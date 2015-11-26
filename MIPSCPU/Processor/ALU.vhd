@@ -1,6 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
+--use ieee.numeric_std.all;
 use ieee.std_logic_unsigned.all;
 use work.MIPSCPU.all;
 
@@ -44,6 +45,18 @@ begin
 				end if;
 			when ALU_OPERATION_LOGIC_NOR =>
 				result <= number1 nor number2;
+			when ALU_OPERATION_LESS_THAN_SIGNED =>
+				if signed(number1) < signed(number2) then
+					result <= (0 => '1', others => '0');
+				else
+					result <= (others => '0');
+				end if;
+			when ALU_OPERATION_LESS_THAN_UNSIGNED =>
+				if unsigned(number1) < unsigned(number2) then
+					result <= (0 => '1', others => '0');
+				else
+					result <= (others => '0');
+				end if;
 			when others =>
 				result <= (others => 'X');
 		end case;

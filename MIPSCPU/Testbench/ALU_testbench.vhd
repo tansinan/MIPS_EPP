@@ -84,6 +84,82 @@ begin
 		else
 			report "Test case 4 failed";
 		end if;
+		
+		report "Testing ALU_OPERATION_LESS_THAN_SIGNED...";
+		operation <= ALU_OPERATION_LESS_THAN_SIGNED;
+		number1 <= "1100";
+		number2 <= "1010";
+		wait for time_delay;
+		if result = "0000" then
+			report "Test case 5 passed";
+		else
+			report "Test case 5 failed";
+		end if;
+		
+		number1 <= "1000";
+		number2 <= "1010";
+		wait for time_delay;
+		if result = "0001" then
+			report "Test case 6 passed";
+		else
+			report "Test case 6 failed";
+		end if;
+		
+		number1 <= "0001";
+		number2 <= "0110";
+		wait for time_delay;
+		if result = "0001" then
+			report "Test case 7 passed";
+		else
+			report "Test case 7 failed";
+		end if;
+		
+		number1 <= "1001";
+		number2 <= "0110";
+		wait for time_delay;
+		if result = "0001" then
+			report "Test case 8 passed";
+		else
+			report "Test case 8 failed";
+		end if;
+		
+		report "Testing ALU_OPERATION_LESS_THAN_UNSIGNED...";
+		operation <= ALU_OPERATION_LESS_THAN_UNSIGNED;
+		number1 <= "1100";
+		number2 <= "1010";
+		wait for time_delay;
+		if result = "0000" then
+			report "Test case 9 passed";
+		else
+			report "Test case 9 failed";
+		end if;
+		
+		number1 <= "1000";
+		number2 <= "1010";
+		wait for time_delay;
+		if result = "0001" then
+			report "Test case 10 passed";
+		else
+			report "Test case 10 failed";
+		end if;
+		
+		number1 <= "0001";
+		number2 <= "0110";
+		wait for time_delay;
+		if result = "0001" then
+			report "Test case 11 passed";
+		else
+			report "Test case 11 failed";
+		end if;
+		
+		number1 <= "1001";
+		number2 <= "0110";
+		wait for time_delay;
+		if result = "0000" then
+			report "Test case 12 passed";
+		else
+			report "Test case 12 failed";
+		end if;
 
 		wait;
 	end process;
