@@ -212,13 +212,13 @@ begin
 			current_pipeline_phase <= "0100";
 		elsif rising_edge(clock) then
 			if current_pipeline_phase = "0000" then
-				pcControl2.operation <= REGISTER_OPERATION_WRITE;
-				pcControl2.data <= pcValue + 4;
+				pcControl2.operation <= REGISTER_OPERATION_READ;
 				actual_instruction <= primaryRAMData;
 				current_pipeline_phase <= current_pipeline_phase + 1;
 				ramReadControl2.enable <= FUNC_DISABLED;
 			elsif current_pipeline_phase = "0100" then
-				pcControl2.operation <= REGISTER_OPERATION_READ;
+				pcControl2.operation <= REGISTER_OPERATION_WRITE;
+				pcControl2.data <= pcValue + 4;
 				current_pipeline_phase <= "0000";
 				ramReadControl2.enable <= FUNC_ENABLED;
 			else

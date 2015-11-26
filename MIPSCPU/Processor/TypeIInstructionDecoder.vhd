@@ -23,21 +23,27 @@ begin
 	rt <= instruction(MIPS_CPU_INSTRUCTION_RT_HI downto MIPS_CPU_INSTRUCTION_RT_LO);
 	imm <= instruction(MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO);
 
-	process(opcode, rs, rt, imm)
+	process(opcode, rs, rt, imm, pcValue, instruction)
 		variable zeroExtendedImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		variable signExtendedImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		variable signExtendedAddrImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	begin
 		zeroExtendedImm(MIPS_CPU_DATA_WIDTH - 1 downto MIPS_CPU_INSTRUCTION_IMM_HI + 1)
 			:= (others => '0');
 
 		zeroExtendedImm(MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO)
-			:= instruction(MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO);
+			:= imm(MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO);
 
 		signExtendedImm(MIPS_CPU_DATA_WIDTH - 1 downto MIPS_CPU_INSTRUCTION_IMM_HI + 1)
 			:= (others => instruction(MIPS_CPU_INSTRUCTION_IMM_HI));
 
 		signExtendedImm(MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO)
-			:= instruction(MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO);
+			:= imm(MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO);
+			
+		signExtendedAddrImm(MIPS_CPU_DATA_WIDTH - 1 downto 2) :=
+			signExtendedImm(MIPS_CPU_DATA_WIDTH - 3 downto 0);
+			
+		signExtendedAddrImm(1 downto 0) := "00";
 
 		case opcode is
 			when MIPS_CPU_INSTRUCTION_OPCODE_ADDIU =>
@@ -101,10 +107,10 @@ begin
 				result.useImmOperand <= '1';
 				result.immIsPCValue <= FUNC_DISABLED;
 			when MIPS_CPU_INSTRUCTION_OPCODE_BNE =>
-				result.operation <= ALU_OPERATION_EQUAL;
+				result.operation <= ALU_OPERATION_NOT_EQUAL;
 				result.resultIsRAMAddr <= FUNC_DISABLED;
 				result.pcControl.operation <= REGISTER_OPERATION_READ;
-				result.imm <= signExtendedImm + pcValue;
+				result.imm <= signExtendedAddrImm + pcValue;
 				result.regAddr1 <= rs;
 				result.regAddr2 <= rt;
 				result.regDest <= (others => '0');

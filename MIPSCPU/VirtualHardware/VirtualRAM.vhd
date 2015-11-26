@@ -39,6 +39,7 @@ begin
 			end loop;
 			write(contentLine, content);
 			writeline(file_pointer, contentLine);
+			report content;
 		end procedure;
 		
 		procedure fileReadData(
@@ -79,8 +80,8 @@ begin
 		) is
 			variable contentLine : line;
 		begin
-			file_open(tmpRAMFile, "Z:\\a.txt", READ_MODE);
-			file_open(file_pointer, "Z:\\a_temp.txt", WRITE_MODE);
+			file_open(tmpRAMFile, "/mnt/tmpfs/RAM.txt", READ_MODE);
+			file_open(file_pointer, "/mnt/tmpfs/RAM_temp.txt", WRITE_MODE);
 			for i in 0 to 1024 - 1 loop
 				readline (tmpRAMFile, contentLine);
 				if i /= lineNumber then
@@ -91,8 +92,8 @@ begin
 			end loop;
 			file_close(tmpRAMFile);
 			file_close(file_pointer);
-			file_open(file_pointer, "Z:\\a.txt", WRITE_MODE);
-			file_open(tmpRAMFile, "Z:\\a_temp.txt", READ_MODE);
+			file_open(file_pointer, "/mnt/tmpfs/RAM.txt", WRITE_MODE);
+			file_open(tmpRAMFile, "/mnt/tmpfs/RAM_temp.txt", READ_MODE);
 			for i in 0 to 1024 - 1 loop
 				readline (tmpRAMFile, contentLine);
 				writeline(file_pointer, contentLine);
@@ -109,16 +110,26 @@ begin
 			elsif readEnabled = FUNC_DISABLED and writeEnabled = FUNC_DISABLED then
 				dataBus <= (others => 'Z');
 			elsif readEnabled = FUNC_ENABLED then
-				file_open(file_pointer, "Z:\\a.txt", READ_MODE);
+				file_open(file_pointer, "/mnt/tmpfs/RAM.txt", READ_MODE);
 				lineToRead := to_integer(unsigned(addressBus));
-				fileSeek(lineToRead);
-				fileReadData(readResult);
+				report "Reading:" & integer'image(lineToRead);
+				if lineToRead < 1024 then
+					fileSeek(lineToRead);
+					fileReadData(readResult);
+				else
+					report "RAM out of range";
+				end if;
 				dataBus <= readResult;
 				file_close(file_pointer);
 			elsif writeEnabled = FUNC_ENABLED then
 				lineToRead := to_integer(unsigned(addressBus));
-				writeData := dataBus;
-				fileEditLine(to_integer(unsigned(addressBus)), writeData);
+				report "Wrtiting:" & integer'image(lineToRead);
+				if lineToRead < 1024 then
+					writeData := dataBus;
+					fileEditLine(to_integer(unsigned(addressBus)), writeData);
+				else
+					report "RAM out of range";
+				end if;
 			else
 				report "Warning : Virtual RAM detected Read/Write enabled at same time!";
 			end if;
