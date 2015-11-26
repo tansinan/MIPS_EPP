@@ -32,6 +32,11 @@ begin
 	arithResult.imm <= (others => 'X');
 	arithResult.useImmOperand <= FUNC_ENABLED;
 	arithResult.resultIsRAMAddr <= FUNC_DISABLED;
+	arithResult.immIsPCValue <= FUNC_DISABLED;
+	arithResult.pcControl <= (
+		operation => REGISTER_OPERATION_READ,
+		data => (others => '0')
+	);
 	with funct select arithResult.operation <=
 		ALU_OPERATION_ADD when MIPS_CPU_INSTRUCTION_FUNCT_ADDU,
 		ALU_OPERATION_SUBTRACT when MIPS_CPU_INSTRUCTION_FUNCT_SUBU,
@@ -42,9 +47,10 @@ begin
 		ALU_OPERATION_LESS_THAN_UNSIGNED when MIPS_CPU_INSTRUCTION_FUNCT_SLTU,
 		(others => 'X') when others;
 
+	arithResult.immIsPCValue <= FUNC_DISABLED;
+	
 	with opcode select result <=
 		arithResult when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL,
 		arithResult when others;
 
-	result.immIsPCValue <= FUNC_DISABLED;
 end architecture;

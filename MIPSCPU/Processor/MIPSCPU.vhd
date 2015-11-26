@@ -78,7 +78,15 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL : InstructionOpcode_t := "000000";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_SLTI : InstructionOpcode_t := "001010";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_SLTIU : InstructionOpcode_t := "001011";
-
+	constant MIPS_CPU_INSTRUCTION_OPCODE_REGIMM : InstructionOpcode_t := "000001";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_BGTZ : InstructionOpcode_t := "000111";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_BLEZ : InstructionOpcode_t := "000110";
+	
+	-- MIPS CPU rt for the regimm opcode
+	constant MIPS_CPU_INSTRUCTION_RT_BGEZ :
+		std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0) := "00001";
+	constant MIPS_CPU_INSTRUCTION_RT_BLTZ : 
+		std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0) := "00000";
 
 	-- MIPS CPU funct for the special opcode
 	constant MIPS_CPU_INSTRUCTION_FUNCT_ADDU : InstructionFunct_t := "100001";

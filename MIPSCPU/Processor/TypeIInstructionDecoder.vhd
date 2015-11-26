@@ -1,13 +1,15 @@
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
+--use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all;
 use work.MIPSCPU.all;
 
 entity TypeIInstructionDecoder is
 	port (
 		instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
 		pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		registerFile : in mips_register_file_port;
 		result : out InstructionDecodingResult_t
 	);
 end entity;
@@ -23,10 +25,11 @@ begin
 	rt <= instruction(MIPS_CPU_INSTRUCTION_RT_HI downto MIPS_CPU_INSTRUCTION_RT_LO);
 	imm <= instruction(MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO);
 
-	process(opcode, rs, rt, imm, pcValue, instruction)
+	process(opcode, rs, rt, imm, pcValue, instruction, registerFile)
 		variable zeroExtendedImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		variable signExtendedImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		variable signExtendedAddrImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		variable rsRegisterData : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	begin
 		zeroExtendedImm(MIPS_CPU_DATA_WIDTH - 1 downto MIPS_CPU_INSTRUCTION_IMM_HI + 1)
 			:= (others => '0');
@@ -44,6 +47,8 @@ begin
 			signExtendedImm(MIPS_CPU_DATA_WIDTH - 3 downto 0);
 			
 		signExtendedAddrImm(1 downto 0) := "00";
+		
+		rsRegisterData := registerFile(to_integer(unsigned(rs)));
 
 		case opcode is
 			when MIPS_CPU_INSTRUCTION_OPCODE_ADDIU =>
@@ -146,6 +151,61 @@ begin
 				result.regDest <= (others => '0');
 				result.useImmOperand <= '0';
 				result.immIsPCValue <= FUNC_ENABLED;
+			when MIPS_CPU_INSTRUCTION_OPCODE_REGIMM =>
+				result.operation <= ALU_OPERATION_ADD;
+				result.resultIsRAMAddr <= FUNC_DISABLED;
+				result.pcControl.data <= signExtendedAddrImm + pcValue;
+				result.imm <= (others => '0');
+				result.regAddr1 <= (others => '0');
+				result.regAddr2 <= (others => '0');
+				result.regDest <= (others => '0');
+				result.useImmOperand <= '0';
+				result.immIsPCValue <= FUNC_DISABLED;
+				if rt = MIPS_CPU_INSTRUCTION_RT_BGEZ then
+					if rsRegisterData(MIPS_CPU_DATA_WIDTH - 1) = '0' then
+						result.pcControl.operation <= REGISTER_OPERATION_WRITE;
+					else
+						result.pcControl.operation <= REGISTER_OPERATION_READ;
+					end if;
+				elsif rt = MIPS_CPU_INSTRUCTION_RT_BLTZ then
+					if rsRegisterData(MIPS_CPU_DATA_WIDTH - 1) = '1' then
+						result.pcControl.operation <= REGISTER_OPERATION_WRITE;
+					else
+						result.pcControl.operation <= REGISTER_OPERATION_READ;
+					end if;
+				end if;
+			when MIPS_CPU_INSTRUCTION_OPCODE_BGTZ => 
+				result.operation <= ALU_OPERATION_ADD;
+				result.resultIsRAMAddr <= FUNC_DISABLED;
+				result.pcControl.data <= signExtendedAddrImm + pcValue;
+				result.imm <= (others => '0');
+				result.regAddr1 <= (others => '0');
+				result.regAddr2 <= (others => '0');
+				result.regDest <= (others => '0');
+				result.useImmOperand <= '0';
+				result.immIsPCValue <= FUNC_DISABLED;
+				if rsRegisterData(MIPS_CPU_DATA_WIDTH - 1) = '0' and 
+					rsRegisterData /= "00000000000000000000000000000000" then
+					result.pcControl.operation <= REGISTER_OPERATION_WRITE;
+				else
+					result.pcControl.operation <= REGISTER_OPERATION_READ;
+				end if;
+			when MIPS_CPU_INSTRUCTION_OPCODE_BLEZ =>
+				result.operation <= ALU_OPERATION_ADD;
+				result.resultIsRAMAddr <= FUNC_DISABLED;
+				result.pcControl.data <= signExtendedAddrImm + pcValue;
+				result.imm <= (others => '0');
+				result.regAddr1 <= (others => '0');
+				result.regAddr2 <= (others => '0');
+				result.regDest <= (others => '0');
+				result.useImmOperand <= '0';
+				result.immIsPCValue <= FUNC_DISABLED;
+				if rsRegisterData(MIPS_CPU_DATA_WIDTH - 1) = '1' or 
+					rsRegisterData = "00000000000000000000000000000000" then
+					result.pcControl.operation <= REGISTER_OPERATION_WRITE;
+				else
+					result.pcControl.operation <= REGISTER_OPERATION_READ;
+				end if;
 			when others =>
 				result.operation <= ALU_OPERATION_ADD;
 				result.resultIsRAMAddr <= FUNC_DISABLED;

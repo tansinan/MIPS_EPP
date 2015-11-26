@@ -19,6 +19,7 @@ architecture Behavioral of PipelinePhaseInstructionDecode is
 		port (
 			instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
 			pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
+			registerFile : in mips_register_file_port;
 			result : out InstructionDecodingResult_t
 		);
 	end component;
@@ -59,6 +60,7 @@ begin
 	decoder_I : TypeIInstructionDecoder port map (
 		instruction => instruction,
 		result => decodingResultTypeI,
+		registerFile => register_file,
 		pcValue => pcValue
 	);
 
@@ -83,6 +85,9 @@ begin
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_SW,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_BNE,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_BEQ,
+		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_REGIMM,
+		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_BGTZ,
+		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_BLEZ,
 		decodingResultTypeR when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL,
 		decodingResultTypeJ when MIPS_CPU_INSTRUCTION_OPCODE_J;
 
