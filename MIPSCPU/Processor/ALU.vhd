@@ -17,11 +17,33 @@ end entity;
 
 architecture Behavioral of ALU is
 begin
-	with operation select result <=
-		number1 + number2 when ALU_OPERATION_ADD,
-		number1 - number2 when ALU_OPERATION_SUBTRACT,
-		number1 and number2 when ALU_OPERATION_LOGIC_AND,
-		number1 or number2 when ALU_OPERATION_LOGIC_OR,
-		number1 xor number2 when ALU_OPERATION_LOGIC_XOR,
-		(others => 'X') when others;
+	process(number1, number2, operation)
+	begin
+		case operation is
+			when ALU_OPERATION_ADD =>
+				result <= number1 + number2;
+			when ALU_OPERATION_SUBTRACT =>
+				result <= number1 - number2;
+			when ALU_OPERATION_LOGIC_AND =>
+				result <= number1 and number2;
+			when ALU_OPERATION_LOGIC_OR =>
+				result <= number1 or number2;
+			when ALU_OPERATION_LOGIC_XOR =>
+				result <= number1 or number2;
+			when ALU_OPERATION_EQUAL =>
+				if number1 = number2 then
+					result <= (0 => '1', others => '0');
+				else
+					result <= (others => '0');
+				end if;
+			when ALU_OPERATION_NOT_EQUAL =>
+				if number1 = number2 then
+					result <= (others => '0');
+				else
+					result <= (0 => '1', others => '0');
+				end if;
+			when others =>
+				result <= (others => 'X');
+		end case;
+	end process;
 end architecture;

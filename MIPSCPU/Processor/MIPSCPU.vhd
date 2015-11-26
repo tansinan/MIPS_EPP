@@ -69,6 +69,7 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_OPCODE_XORI : InstructionOpcode_t := "001110";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_LW : InstructionOpcode_t := "100011";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_SW : InstructionOpcode_t := "101011";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_BNE : InstructionOpcode_t := "000101";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_J : InstructionOpcode_t := "000010";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_JAL : InstructionOpcode_t := "000011";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL : InstructionOpcode_t := "000000";
@@ -89,6 +90,10 @@ package MIPSCPU is
 		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "00011";
 	constant ALU_OPERATION_LOGIC_XOR :
 		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "00100";
+	constant ALU_OPERATION_EQUAL :
+		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "00101";
+	constant ALU_OPERATION_NOT_EQUAL :
+		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "00110";
 	constant REGISTER_OPERATION_READ : std_logic := '0';
 	constant REGISTER_OPERATION_WRITE : std_logic := '1';
 
@@ -118,6 +123,7 @@ package MIPSCPU is
 			operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 			useImmOperand : std_logic;
 			resultIsRAMAddr : std_logic;
+			immIsPCValue : std_logic;
 			pcControl : RegisterControl_t;
 		end record;
 
@@ -141,6 +147,13 @@ package MIPSCPU is
 			operation : std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0);
 			targetReg : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 			resultIsRAMAddr : std_logic;
+
+			-- When this is enabled, the result will be an 0/1 value, that will
+			-- determine whether extraImm will be write back to PC register.
+			immIsPCValue : std_logic;
+
+			-- When this is enabled, the result is considered as an immediate
+			-- That will be write back to the mem addr evaluated by the ALU
 			targetIsRAM : std_logic;
 			extraImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		end record;

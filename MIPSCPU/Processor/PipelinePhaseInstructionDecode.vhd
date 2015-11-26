@@ -107,7 +107,10 @@ begin
 	phaseExCtrl.operation <= decodingResult.operation;
 	phaseExCtrl.targetReg <= decodingResult.regDest;
 	phaseExCtrl.resultIsRAMAddr <= decodingResult.resultIsRAMAddr;
-	phaseExCtrl.extraImm <= regData2;
+	phaseExCtrl.immIsPCValue <= decodingResult.immIsPCValue;
+	with decodingResult.immIsPCValue select phaseExCtrl.extraImm <=
+		regData2 when FUNC_DISABLED,
+		decodingResult.imm when FUNC_ENABLED;
 
 	PipelinePhaseInstructionDecode_Process : process (clock, reset)
 	begin

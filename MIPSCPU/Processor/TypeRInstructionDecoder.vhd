@@ -40,4 +40,5 @@ begin
 		arithResult when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL,
 		arithResult when others;
 
+	result.immIsPCValue <= FUNC_DISABLED;
 end architecture;

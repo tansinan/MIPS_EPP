@@ -41,6 +41,7 @@ architecture Behavioral of Processor is
 
 	signal pcControl1 : RegisterControl_t;
 	signal pcControl2 : RegisterControl_t;
+	signal pcControl3 : RegisterControl_t;
 	signal pcValue : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 
 	component SpecialRegister is
@@ -97,6 +98,8 @@ architecture Behavioral of Processor is
 		reset : in std_logic;
 		clock : in std_logic;
 		phaseIDInput : in PipelinePhaseIDEXInterface_t;
+		pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		pcControl : out RegisterControl_t;
 		phaseMACtrlOutput : out PipelinePhaseEXMAInterface_t
 	);
 	end component;
@@ -138,10 +141,7 @@ begin
 		clock => clock,
 		control1 => pcControl1,
 		control2 => pcControl2,
-		control3 => (
-			operation => REGISTER_OPERATION_READ,
-			data => (others => '0')
-		),
+		control3 => pcControl3,
 		output => pcValue
 	);
 
@@ -160,6 +160,8 @@ begin
 		reset => reset,
 		clock => clock,
 		phaseIDInput => pipelinePhaseIDEXInterface,
+		pcValue => pcValue,
+		pcControl => pcControl3,
 		phaseMACtrlOutput => pipelinePhaseEXMAInterface
 	);
 

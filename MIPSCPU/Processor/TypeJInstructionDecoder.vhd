@@ -29,4 +29,5 @@ begin
 
 	result.regDest <= (others => '0');
 	result.resultIsRAMAddr <= FUNC_DISABLED;
+	result.immIsPCValue <= FUNC_DISABLED;
 end architecture;
