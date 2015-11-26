@@ -116,6 +116,16 @@ begin
 				result.regDest <= (others => '0');
 				result.useImmOperand <= '0';
 				result.immIsPCValue <= FUNC_ENABLED;
+			when MIPS_CPU_INSTRUCTION_OPCODE_BEQ =>
+				result.operation <= ALU_OPERATION_EQUAL;
+				result.resultIsRAMAddr <= FUNC_DISABLED;
+				result.pcControl.operation <= REGISTER_OPERATION_READ;
+				result.imm <= signExtendedAddrImm + pcValue;
+				result.regAddr1 <= rs;
+				result.regAddr2 <= rt;
+				result.regDest <= (others => '0');
+				result.useImmOperand <= '0';
+				result.immIsPCValue <= FUNC_ENABLED;
 			when others =>
 				result.operation <= ALU_OPERATION_ADD;
 				result.resultIsRAMAddr <= FUNC_DISABLED;

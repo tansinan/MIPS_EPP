@@ -42,6 +42,8 @@ begin
 				else
 					result <= (0 => '1', others => '0');
 				end if;
+			when ALU_OPERATION_LOGIC_NOR =>
+				result <= number1 nor number2;
 			when others =>
 				result <= (others => 'X');
 		end case;
