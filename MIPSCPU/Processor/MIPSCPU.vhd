@@ -96,6 +96,9 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_FUNCT_NOR : InstructionFunct_t := "100111";
 	constant MIPS_CPU_INSTRUCTION_FUNCT_SLT : InstructionFunct_t := "101010";
 	constant MIPS_CPU_INSTRUCTION_FUNCT_SLTU : InstructionFunct_t := "101011";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_SLLV : InstructionFunct_t := "000100";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_SRLV : InstructionFunct_t := "000110";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_SRAV : InstructionFunct_t := "000111";
 
 	-- General
 	constant ALU_OPERATION_CTRL_WIDTH : integer := 5;
@@ -119,6 +122,12 @@ package MIPSCPU is
 		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "01000";
 	constant ALU_OPERATION_LESS_THAN_UNSIGNED :
 		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "01001";
+	constant ALU_OPERATION_SHIFT_LEFT :
+		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "01010";
+	constant ALU_OPERATION_SHIFT_RIGHT_LOGIC :
+		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "01011";
+	constant ALU_OPERATION_SHIFT_RIGHT_ARITH :
+		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "01100";
 	constant REGISTER_OPERATION_READ : std_logic := '0';
 	constant REGISTER_OPERATION_WRITE : std_logic := '1';
 

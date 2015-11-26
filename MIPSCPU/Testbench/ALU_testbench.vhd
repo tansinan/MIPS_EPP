@@ -161,6 +161,39 @@ begin
 			report "Test case 12 failed";
 		end if;
 
+		report "Testing ALU_OPERATION_SHIFT_LEFT...";
+		operation <= ALU_OPERATION_SHIFT_LEFT;
+		number1 <= "1110";
+		number2 <= "0010";
+		wait for time_delay;
+		if result = "1000" then
+			report "Test case 13 passed";
+		else
+			report "Test case 13 failed";
+		end if;
+		
+		report "Testing ALU_OPERATION_SHIFT_RIGHT_LOGIC...";
+		operation <= ALU_OPERATION_SHIFT_RIGHT_LOGIC;
+		number1 <= "1100";
+		number2 <= "0001";
+		wait for time_delay;
+		if result = "0110" then
+			report "Test case 14 passed";
+		else
+			report "Test case 14 failed";
+		end if;
+		
+		report "Testing ALU_OPERATION_SHIFT_RIGHT_ARITH...";
+		operation <= ALU_OPERATION_SHIFT_RIGHT_ARITH;
+		number1 <= "1100";
+		number2 <= "0001";
+		wait for time_delay;
+		if result = "1110" then
+			report "Test case 15 passed";
+		else
+			report "Test case 15 failed";
+		end if;
+		
 		wait;
 	end process;
 end;

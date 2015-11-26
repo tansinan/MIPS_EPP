@@ -1,7 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_arith.all;
---use ieee.numeric_std.all;
+--use ieee.std_logic_arith.all;
+use ieee.numeric_std.all;
 use ieee.std_logic_unsigned.all;
 use work.MIPSCPU.all;
 
@@ -19,7 +19,9 @@ end entity;
 architecture Behavioral of ALU is
 begin
 	process(number1, number2, operation)
+		variable shiftOperand : integer;
 	begin
+		shiftOperand := to_integer(unsigned(number2(4 downto 0)));
 		case operation is
 			when ALU_OPERATION_ADD =>
 				result <= number1 + number2;
@@ -57,6 +59,12 @@ begin
 				else
 					result <= (others => '0');
 				end if;
+			when ALU_OPERATION_SHIFT_LEFT =>
+				result <= std_logic_vector(unsigned(number1) sll shiftOperand);
+			when ALU_OPERATION_SHIFT_RIGHT_LOGIC =>
+				result <= std_logic_vector(unsigned(number1) srl shiftOperand);
+			when ALU_OPERATION_SHIFT_RIGHT_ARITH =>
+				result <= to_stdlogicvector(to_bitvector(number1) sra shiftOperand);
 			when others =>
 				result <= (others => 'X');
 		end case;
