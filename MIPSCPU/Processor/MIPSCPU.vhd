@@ -83,6 +83,8 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_OPCODE_BLEZ : InstructionOpcode_t := "000110";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_LB : InstructionOpcode_t := "100000";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_LBU : InstructionOpcode_t := "100100";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_LH : InstructionOpcode_t := "100001";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_LHU : InstructionOpcode_t := "100101";
 	
 	-- MIPS CPU rt for the regimm opcode
 	constant MIPS_CPU_INSTRUCTION_RT_BGEZ :
@@ -195,6 +197,7 @@ package MIPSCPU is
 			-- That will be write back to the mem addr evaluated by the ALU
 			targetIsRAM : std_logic;
 			extraImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+			instructionOpcode : InstructionOpcode_t;
 		end record;
 
 	type PipelinePhaseEXMAInterface_t is
@@ -206,6 +209,7 @@ package MIPSCPU is
 			targetIsReg : std_logic;
 			targetRAMAddr : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
 			targetRegAddr : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+			instructionOpcode : InstructionOpcode_t;
 		end record;
 
 	type PipelinePhaseMAWBInterface_t is
@@ -215,6 +219,7 @@ package MIPSCPU is
 			targetIsReg : std_logic;
 			targetRAMAddr : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
 			targetRegAddr : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+			instructionOpcode : InstructionOpcode_t;
 		end record;
 
 	constant FUNC_ENABLED : std_logic := '0';

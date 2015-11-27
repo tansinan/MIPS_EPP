@@ -58,6 +58,7 @@ begin
 	-- TODO: produce an exception when address is not valid.
 	phaseMACtrl.targetRAMAddr <= result(PHYSICS_RAM_ADDRESS_WIDTH + 1 downto 2);
 	phaseMACtrl.targetRegAddr <= phaseIDInput.targetReg;
+	phaseMACtrl.instructionOpcode <= phaseIDInput.instructionOpcode;
 
 	PipelinePhaseExecute_Process : process (clock, reset)
 	begin

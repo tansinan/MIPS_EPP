@@ -18,18 +18,40 @@ end PipelinePhaseMemoryAccess;
 architecture Behavioral of PipelinePhaseMemoryAccess is
 	signal phaseWBCtrl : PipelinePhaseMAWBInterface_t;
 begin
-	ramReadControl.enable <= phaseEXInput.sourceIsRAM;
-	ramReadControl.address <= phaseEXInput.sourceRAMAddr;
-	ramWriteControl.enable <= phaseEXInput.targetIsRAM;
-	ramWriteControl.address <= phaseEXInput.targetRAMAddr;
-	ramWriteControl.data <= phaseWBCtrl.sourceImm;
-	with phaseEXInput.sourceIsRAM select phaseWBCtrl.sourceImm <=
-		ramReadResult when FUNC_ENABLED,
-		phaseEXInput.sourceImm when FUNC_DISABLED;
-	phaseWBCtrl.targetIsRAM <= phaseEXInput.targetIsRAM;
-	phaseWBCtrl.targetIsReg <= phaseEXInput.targetIsReg;
-	phaseWBCtrl.targetRAMAddr <= phaseEXInput.targetRAMAddr;
-	phaseWBCtrl.targetRegAddr <= phaseEXInput.targetRegAddr;
+	process(phaseEXInput, ramReadResult)
+	begin
+		ramReadControl.enable <= phaseEXInput.sourceIsRAM;
+		ramReadControl.address <= phaseEXInput.sourceRAMAddr;
+		ramWriteControl.enable <= phaseEXInput.targetIsRAM;
+		ramWriteControl.address <= phaseEXInput.targetRAMAddr;
+		ramWriteControl.data <= phaseWBCtrl.sourceImm;
+		case phaseExInput.instructionOpcode is
+			when MIPS_CPU_INSTRUCTION_OPCODE_LW =>
+				phaseWBCtrl.sourceImm <= ramReadResult;
+			when MIPS_CPU_INSTRUCTION_OPCODE_LH =>
+				phaseWBCtrl.sourceImm(15 downto 0) <= ramReadResult(15 downto 0);
+				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 16) <=
+					(others => phaseWBCtrl.sourceImm(7));
+			when MIPS_CPU_INSTRUCTION_OPCODE_LHU =>
+				phaseWBCtrl.sourceImm(15 downto 0) <= ramReadResult(15 downto 0);
+				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 16) <= (others => '0');
+			when MIPS_CPU_INSTRUCTION_OPCODE_LB =>
+				phaseWBCtrl.sourceImm(7 downto 0) <= ramReadResult(7 downto 0);
+				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 8) <=
+					(others => phaseWBCtrl.sourceImm(7));
+			when MIPS_CPU_INSTRUCTION_OPCODE_LBU =>
+				phaseWBCtrl.sourceImm(7 downto 0) <= ramReadResult(7 downto 0);
+				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 8) <= (others => '0');
+			when others =>
+				phaseWBCtrl.sourceImm <= phaseEXInput.sourceImm;
+		end case;
+		phaseWBCtrl.targetIsRAM <= phaseEXInput.targetIsRAM;
+		phaseWBCtrl.targetIsReg <= phaseEXInput.targetIsReg;
+		phaseWBCtrl.targetRAMAddr <= phaseEXInput.targetRAMAddr;
+		phaseWBCtrl.targetRegAddr <= phaseEXInput.targetRegAddr;
+		phaseWBCtrl.instructionOpcode <= phaseEXInput.instructionOpcode;
+	end process;
+	
 	process(clock, reset)
 	begin
 		if reset = FUNC_ENABLED then

@@ -56,6 +56,7 @@ architecture Behavioral of PipelinePhaseInstructionDecode is
 	signal phaseExCtrl : PipelinePhaseIDEXInterface_t;
 begin
 	opcode <= instruction (MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
+	phaseExCtrl.instructionOpcode <= opcode;
 
 	decoder_I : TypeIInstructionDecoder port map (
 		instruction => instruction,
