@@ -89,6 +89,7 @@ begin
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_REGIMM,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_BGTZ,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_BLEZ,
+		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_LUI,
 		decodingResultTypeR when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL,
 		decodingResultTypeJ when MIPS_CPU_INSTRUCTION_OPCODE_J;
 
