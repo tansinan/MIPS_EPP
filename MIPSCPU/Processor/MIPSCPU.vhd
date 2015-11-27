@@ -81,6 +81,8 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_OPCODE_REGIMM : InstructionOpcode_t := "000001";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_BGTZ : InstructionOpcode_t := "000111";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_BLEZ : InstructionOpcode_t := "000110";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_LB : InstructionOpcode_t := "100000";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_LBU : InstructionOpcode_t := "100100";
 	
 	-- MIPS CPU rt for the regimm opcode
 	constant MIPS_CPU_INSTRUCTION_RT_BGEZ :
@@ -99,6 +101,9 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_FUNCT_SLLV : InstructionFunct_t := "000100";
 	constant MIPS_CPU_INSTRUCTION_FUNCT_SRLV : InstructionFunct_t := "000110";
 	constant MIPS_CPU_INSTRUCTION_FUNCT_SRAV : InstructionFunct_t := "000111";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_SLL : InstructionFunct_t := "000000";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_SRL : InstructionFunct_t := "000010";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_SRA : InstructionFunct_t := "000011";
 
 	-- General
 	constant ALU_OPERATION_CTRL_WIDTH : integer := 5;
