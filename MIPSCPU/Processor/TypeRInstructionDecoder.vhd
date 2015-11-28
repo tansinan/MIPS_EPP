@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
 use work.MIPSCPU.all;
 
 entity TypeRInstructionDecoder is
@@ -72,6 +73,20 @@ begin
 						result.operation <= (others => 'X');
 				end case;
 			when MIPS_CPU_INSTRUCTION_FUNCT_JR =>
+				result.regAddr1 <= (others => '0');
+				result.regAddr2 <= (others => '0');
+				result.regDest <= rd;
+				result.operation <= ALU_OPERATION_LOGIC_OR;
+				-- !TODO This should be performed by ALU. Need pipeline change.
+				result.imm <= pcValue + 4;
+				result.useImmOperand <= '1';
+				result.resultIsRAMAddr <= FUNC_DISABLED;
+				result.immIsPCValue <= FUNC_DISABLED;
+				result.pcControl <= (
+					operation => REGISTER_OPERATION_WRITE,
+					data => rsData
+				);
+			when MIPS_CPU_INSTRUCTION_FUNCT_JALR =>
 				result.regAddr1 <= (others => '0');
 				result.regAddr2 <= (others => '0');
 				result.regDest <= (others => '0');
