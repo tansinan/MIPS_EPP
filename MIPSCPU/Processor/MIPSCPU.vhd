@@ -230,8 +230,8 @@ package MIPSCPU is
 	constant FUNC_ENABLED : std_logic := '0';
 	constant FUNC_DISABLED : std_logic := '1';
 
-end MIPSCPU;
+end package;
 
 
 package body MIPSCPU is
-end MIPSCPU;
+end package body;
