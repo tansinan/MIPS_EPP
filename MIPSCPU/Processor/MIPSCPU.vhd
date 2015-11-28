@@ -109,6 +109,7 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_FUNCT_SLL : InstructionFunct_t := "000000";
 	constant MIPS_CPU_INSTRUCTION_FUNCT_SRL : InstructionFunct_t := "000010";
 	constant MIPS_CPU_INSTRUCTION_FUNCT_SRA : InstructionFunct_t := "000011";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_JR : InstructionFunct_t := "001000";
 
 	-- General
 	constant ALU_OPERATION_CTRL_WIDTH : integer := 5;

@@ -18,6 +18,7 @@ architecture Behavioral of TypeRInstructionDecoder is
 	signal opcode : std_logic_vector (MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0);
 	signal funct : std_logic_vector (MIPS_CPU_INSTRUCTION_FUNCT_WIDTH - 1 downto 0);
 	signal shamt : std_logic_vector (MIPS_CPU_INSTRUCTION_SHAMT_WIDTH - 1 downto 0);
+	signal rsData : std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 
 	component RegisterFileReader is
 		port (
@@ -34,6 +35,11 @@ begin
 	funct <= instruction(MIPS_CPU_INSTRUCTION_FUNCT_HI downto MIPS_CPU_INSTRUCTION_FUNCT_LO);
 	shamt <= instruction(MIPS_CPU_INSTRUCTION_SHAMT_HI downto MIPS_CPU_INSTRUCTION_SHAMT_LO);
 
+	registerFileReader_e : RegisterFileReader port map (
+		register_file_output => registerFile,
+		readSelect => rs,
+		readResult => rsData
+	);
 	process(rs, rt, rd, opcode, funct, shamt)
 	begin
 		case funct is
@@ -65,7 +71,19 @@ begin
 					when others =>
 						result.operation <= (others => 'X');
 				end case;
-				
+			when MIPS_CPU_INSTRUCTION_FUNCT_JR =>
+				result.regAddr1 <= (others => '0');
+				result.regAddr2 <= (others => '0');
+				result.regDest <= (others => '0');
+				result.operation <= ALU_OPERATION_LOGIC_OR;
+				result.imm <= (others => '0');
+				result.useImmOperand <= '0';
+				result.resultIsRAMAddr <= FUNC_DISABLED;
+				result.immIsPCValue <= FUNC_DISABLED;
+				result.pcControl <= (
+					operation => REGISTER_OPERATION_WRITE,
+					data => rsData
+				);
 			-- Handles general R type arith instructions, where shamt is constant.
 			when others =>
 				result.regAddr1 <= rs;
