@@ -3,11 +3,12 @@ use ieee.std_logic_1164.all;
 use work.MIPSCPU.all;
 
 entity PipelinePhaseWriteBack is
-    port (
+  port (
 		reset : in std_logic;
 		clock : in std_logic;
 		register_file_input : out std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		register_file_operation : out std_logic_vector (MIPS_CPU_REGISTER_COUNT - 1 downto 0);
+		ramWriteControl : out RAMWriteControl_t;
 		phaseMAInput : in PipelinePhaseMAWBInterface_t;
 		instruction_done : out std_logic
 	);
@@ -29,7 +30,9 @@ begin
 		operation_output => register_file_operation,
 		data_output => register_file_input
 	);
-	
+	ramWriteControl.enable <= phaseMAInput.targetIsRAM;
+	ramWriteControl.address <= phaseMAInput.targetRAMAddr;
+	ramWriteControl.data <= phaseMAInput.sourceImm;
 	instruction_done <= '1';
-	
+
 end Behavioral;

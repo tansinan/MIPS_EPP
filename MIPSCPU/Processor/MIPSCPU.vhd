@@ -71,6 +71,8 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_OPCODE_XORI : InstructionOpcode_t := "001110";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_LW : InstructionOpcode_t := "100011";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_SW : InstructionOpcode_t := "101011";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_SH : InstructionOpcode_t := "101001";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_SB : InstructionOpcode_t := "101000";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_BNE : InstructionOpcode_t := "000101";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_BEQ : InstructionOpcode_t := "000100";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_J : InstructionOpcode_t := "000010";

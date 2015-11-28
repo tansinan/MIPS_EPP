@@ -10,7 +10,6 @@ entity PipelinePhaseMemoryAccess is
 		phaseEXInput : in PipelinePhaseEXMAInterface_t;
 		phaseWBCtrlOutput : out PipelinePhaseMAWBInterface_t;
 		ramReadControl : out RAMReadControl_t;
-		ramWriteControl : out RAMWriteControl_t;
 		ramReadResult : in std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0)
 	);
 end PipelinePhaseMemoryAccess;
@@ -22,9 +21,6 @@ begin
 	begin
 		ramReadControl.enable <= phaseEXInput.sourceIsRAM;
 		ramReadControl.address <= phaseEXInput.sourceRAMAddr;
-		ramWriteControl.enable <= phaseEXInput.targetIsRAM;
-		ramWriteControl.address <= phaseEXInput.targetRAMAddr;
-		ramWriteControl.data <= phaseWBCtrl.sourceImm;
 		case phaseExInput.instructionOpcode is
 			when MIPS_CPU_INSTRUCTION_OPCODE_LW =>
 				phaseWBCtrl.sourceImm <= ramReadResult;
@@ -42,6 +38,14 @@ begin
 			when MIPS_CPU_INSTRUCTION_OPCODE_LBU =>
 				phaseWBCtrl.sourceImm(7 downto 0) <= ramReadResult(7 downto 0);
 				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 8) <= (others => '0');
+			when MIPS_CPU_INSTRUCTION_OPCODE_SH =>
+				phaseWBCtrl.sourceImm(15 downto 0) <= phaseExInput.sourceImm(15 downto 0);
+				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 16) <= 
+					ramReadResult(MIPS_CPU_DATA_WIDTH - 1 downto 16);
+			when MIPS_CPU_INSTRUCTION_OPCODE_SB =>
+				phaseWBCtrl.sourceImm(7 downto 0) <= phaseExInput.sourceImm(7 downto 0);
+				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 8) <= 
+					ramReadResult(MIPS_CPU_DATA_WIDTH - 1 downto 8);
 			when others =>
 				phaseWBCtrl.sourceImm <= phaseEXInput.sourceImm;
 		end case;
@@ -51,7 +55,7 @@ begin
 		phaseWBCtrl.targetRegAddr <= phaseEXInput.targetRegAddr;
 		phaseWBCtrl.instructionOpcode <= phaseEXInput.instructionOpcode;
 	end process;
-	
+
 	process(clock, reset)
 	begin
 		if reset = FUNC_ENABLED then

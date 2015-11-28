@@ -140,7 +140,10 @@ begin
 				result.regDest <= rt;
 				result.useImmOperand <= '1';
 				result.immIsPCValue <= FUNC_DISABLED;
-			when MIPS_CPU_INSTRUCTION_OPCODE_SW =>
+			when
+			MIPS_CPU_INSTRUCTION_OPCODE_SW |
+			MIPS_CPU_INSTRUCTION_OPCODE_SH |
+			MIPS_CPU_INSTRUCTION_OPCODE_SB =>
 				result.operation <= ALU_OPERATION_ADD;
 				result.resultIsRAMAddr <= FUNC_ENABLED;
 				result.pcControl.operation <= REGISTER_OPERATION_READ;

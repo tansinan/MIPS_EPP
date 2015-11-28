@@ -88,6 +88,8 @@ begin
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_LB,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_LBU,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_SW,
+		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_SH,
+		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_SB,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_BNE,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_BEQ,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_REGIMM,

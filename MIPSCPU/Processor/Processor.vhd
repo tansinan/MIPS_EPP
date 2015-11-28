@@ -111,7 +111,6 @@ architecture Behavioral of Processor is
 		phaseEXInput : in PipelinePhaseEXMAInterface_t;
 		phaseWBCtrlOutput : out PipelinePhaseMAWBInterface_t;
 		ramReadControl : out RAMReadControl_t;
-		ramWriteControl : out RAMWriteControl_t;
 		ramReadResult : in std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0)
 	);
 	end component;
@@ -123,6 +122,7 @@ architecture Behavioral of Processor is
 		register_file_input : out std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		register_file_operation : out std_logic_vector (MIPS_CPU_REGISTER_COUNT - 1 downto 0);
 		phaseMAInput : in PipelinePhaseMAWBInterface_t;
+		ramWriteControl : out RAMWriteControl_t;
 		instruction_done : out std_logic
 	);
 	end component;
@@ -172,7 +172,6 @@ begin
 		phaseEXInput => pipelinePhaseEXMAInterface,
 		phaseWBCtrlOutput => pipelinePhaseMAWBInterface,
 		ramReadControl => ramReadControl1,
-		ramWriteControl => ramWriteControl,
 		ramReadResult => primaryRAMData
 	);
 
@@ -182,6 +181,7 @@ begin
 		clock => clock,
 		register_file_input => register_file_input,
 		register_file_operation => register_file_operation,
+		ramWriteControl => ramWriteControl,
 		phaseMAInput => pipelinePhaseMAWBInterface,
 		instruction_done => instruction_done
 	);
