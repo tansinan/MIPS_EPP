@@ -125,17 +125,12 @@ begin
 				result.regDest <= rt;
 				result.useImmOperand <= '1';
 				result.immIsPCValue <= FUNC_DISABLED;
-			when MIPS_CPU_INSTRUCTION_OPCODE_XORI =>
-				result.operation <= ALU_OPERATION_LOGIC_XOR;
-				result.resultIsRAMAddr <= FUNC_DISABLED;
-				result.pcControl.operation <= REGISTER_OPERATION_READ;
-				result.imm <= zeroExtendedImm;
-				result.regAddr1 <= rs;
-				result.regAddr2 <= rt;
-				result.regDest <= rt;
-				result.useImmOperand <= '1';
-				result.immIsPCValue <= FUNC_DISABLED;
-			when MIPS_CPU_INSTRUCTION_OPCODE_LW =>
+			when
+			MIPS_CPU_INSTRUCTION_OPCODE_LW |
+			MIPS_CPU_INSTRUCTION_OPCODE_LH |
+			MIPS_CPU_INSTRUCTION_OPCODE_LHU |
+			MIPS_CPU_INSTRUCTION_OPCODE_LB |
+			MIPS_CPU_INSTRUCTION_OPCODE_LBU =>
 				result.operation <= ALU_OPERATION_ADD;
 				result.resultIsRAMAddr <= FUNC_ENABLED;
 				result.pcControl.operation <= REGISTER_OPERATION_READ;
