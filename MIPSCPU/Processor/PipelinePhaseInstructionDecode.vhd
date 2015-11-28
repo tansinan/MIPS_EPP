@@ -27,6 +27,7 @@ architecture Behavioral of PipelinePhaseInstructionDecode is
 		port (
 			instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
 			pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
+			registerFile : in mips_register_file_port;
 			result : out InstructionDecodingResult_t
 		);
 	end component;
@@ -34,16 +35,15 @@ architecture Behavioral of PipelinePhaseInstructionDecode is
 		port (
 			instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
 			pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
+			registerFile : in mips_register_file_port;
 			result : out InstructionDecodingResult_t
 		);
 	end component;
 	component RegisterFileReader is
 		port (
 			register_file_output : in mips_register_file_port;
-			read_select_1 : in std_logic_vector (MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-			read_select_2 : in std_logic_vector (MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-			read_result_1 : out std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
-			read_result_2 : out std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0)
+			readSelect : in std_logic_vector (MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+			readResult : out std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0)
 		);
 	end component;
 	signal regData1 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
@@ -68,12 +68,14 @@ begin
 	decoder_R : TypeRInstructionDecoder port map (
 		instruction => instruction,
 		result => decodingResultTypeR,
+		registerFile => register_file,
 		pcValue => pcValue
 	);
 
 	decoder_J : TypeJInstructionDecoder port map (
 		instruction => instruction,
 		result => decodingResultTypeJ,
+		registerFile => register_file,
 		pcValue => pcValue
 	);
 
@@ -97,7 +99,8 @@ begin
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_BLEZ,
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_LUI,
 		decodingResultTypeR when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL,
-		decodingResultTypeJ when MIPS_CPU_INSTRUCTION_OPCODE_J;
+		decodingResultTypeJ when MIPS_CPU_INSTRUCTION_OPCODE_J,
+		decodingResultTypeJ when MIPS_CPU_INSTRUCTION_OPCODE_JAL;
 
 	pcControl <= decodingResult.pcControl;
 	--TODO I think this is ugly, need to be changed later.
@@ -105,12 +108,15 @@ begin
 		FUNC_ENABLED when MIPS_CPU_INSTRUCTION_OPCODE_SW,
 		FUNC_DISABLED when others;
 
-	register_file_reader : RegisterFileReader port map (
+	registerFileReader1_e : RegisterFileReader port map (
 		register_file_output => register_file,
-		read_select_1 => decodingResult.regAddr1,
-		read_result_1 => regData1,
-		read_select_2 => decodingResult.regAddr2,
-		read_result_2 => regData2
+		readSelect => decodingResult.regAddr1,
+		readResult => regData1
+	);
+	registerFileReader2_e : RegisterFileReader port map (
+		register_file_output => register_file,
+		readSelect => decodingResult.regAddr2,
+		readResult => regData2
 	);
 
 	phaseExCtrl.operand1 <= regData1;
@@ -136,4 +142,4 @@ begin
 			phaseExCtrlOutput <= phaseExCtrl;
 		end if;
 	end process;
-end Behavioral;
+end architecture;

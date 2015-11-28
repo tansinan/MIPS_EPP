@@ -19,6 +19,14 @@ architecture Behavioral of TypeIInstructionDecoder is
 	signal rs : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 	signal rt : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 	signal imm : std_logic_vector(MIPS_CPU_INSTRUCTION_IMM_WIDTH - 1 downto 0);
+
+	component RegisterFileReader is
+		port (
+			register_file_output : in mips_register_file_port;
+			readSelect : in std_logic_vector (MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+			readResult : out std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0)
+		);
+	end component;
 begin
 	opcode <= instruction(MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
 	rs <= instruction(MIPS_CPU_INSTRUCTION_RS_HI downto MIPS_CPU_INSTRUCTION_RS_LO);

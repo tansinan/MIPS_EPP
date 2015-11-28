@@ -6,6 +6,7 @@ entity TypeRInstructionDecoder is
 	port (
 		instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
 		pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		registerFile : in mips_register_file_port;
 		result : out InstructionDecodingResult_t
 	);
 end entity;
@@ -17,6 +18,14 @@ architecture Behavioral of TypeRInstructionDecoder is
 	signal opcode : std_logic_vector (MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0);
 	signal funct : std_logic_vector (MIPS_CPU_INSTRUCTION_FUNCT_WIDTH - 1 downto 0);
 	signal shamt : std_logic_vector (MIPS_CPU_INSTRUCTION_SHAMT_WIDTH - 1 downto 0);
+
+	component RegisterFileReader is
+		port (
+			register_file_output : in mips_register_file_port;
+			readSelect : in std_logic_vector (MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+			readResult : out std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0)
+		);
+	end component;
 begin
 	rs <= instruction(MIPS_CPU_INSTRUCTION_RS_HI downto MIPS_CPU_INSTRUCTION_RS_LO);
 	rt <= instruction(MIPS_CPU_INSTRUCTION_RT_HI downto MIPS_CPU_INSTRUCTION_RT_LO);
