@@ -89,9 +89,12 @@ impact_impact.xwbt
 # netgen
 netgen
 
-# Generated simulation testbench
+# Generated simulation testbench & others
 Simulator/*.txt
 *.obj
+*.o
+*.layout
+*.win
 
 #Generated translator file/Translator test file
 Translator/*.txt
