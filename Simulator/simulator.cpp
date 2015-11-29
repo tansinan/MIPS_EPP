@@ -414,13 +414,13 @@ Simulator::~Simulator()
 	delete memory;
 }
 
-void Simulator::executeCommand()
+int Simulator::executeCommand()
 {
 	commandNum ++;
 	string command = "";
 	inputFileStream >> command;
 	if (command == "E" || command == "")
-		return;
+		return 1;
 	else if (command == "add")
 	{
 		string s1,s2,s3;
@@ -837,4 +837,5 @@ void Simulator::executeCommand()
 	
 	cache[0] = 0;
 	printCache('C', cache);
+	return 0;
 }

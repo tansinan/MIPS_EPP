@@ -1,5 +1,5 @@
 [Project]
-FileName=Simulator.dev
+FileName=Simulator_Bin.dev
 Name=ÏîÄ¿1
 Type=1
 Ver=2
@@ -61,7 +61,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit2]
-FileName=simulator.cpp
+FileName=simulator_bin.h
 CompileCpp=1
 Folder=
 Compile=1
@@ -71,7 +71,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit3]
-FileName=simulator.h
+FileName=simulator_bin.cpp
 CompileCpp=1
 Folder=
 Compile=1

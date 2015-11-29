@@ -33,5 +33,5 @@ public:
 	void printCache(char output, int cache[]);
 	void printTestbench(ofstream &testbench, string commandBin);
 	void printCommandBin(ofstream &testbench, string command, int p1, int p2 = 0, int p3 = 0);
-	int executeCommand();
+	void executeCommand();
 };

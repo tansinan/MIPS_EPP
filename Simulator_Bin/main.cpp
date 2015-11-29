@@ -13,8 +13,7 @@ int main(int argc, char* argv[])
 	
 	while (true)
 	{
-		if (simulator->executeCommand())
-			break;
+		simulator->executeCommand();
 	}
 	
 	delete simulator;
