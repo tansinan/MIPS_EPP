@@ -41,7 +41,7 @@ begin
 		readSelect => rs,
 		readResult => rsData
 	);
-	process(rs, rt, rd, opcode, funct, shamt)
+	process(rs, rt, rd, opcode, funct, shamt, pcValue, rsData)
 	begin
 		case funct is
 			

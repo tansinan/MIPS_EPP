@@ -27,14 +27,14 @@ begin
 			when MIPS_CPU_INSTRUCTION_OPCODE_LH =>
 				phaseWBCtrl.sourceImm(15 downto 0) <= ramReadResult(15 downto 0);
 				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 16) <=
-					(others => phaseWBCtrl.sourceImm(7));
+					(others => ramReadResult(15));
 			when MIPS_CPU_INSTRUCTION_OPCODE_LHU =>
 				phaseWBCtrl.sourceImm(15 downto 0) <= ramReadResult(15 downto 0);
 				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 16) <= (others => '0');
 			when MIPS_CPU_INSTRUCTION_OPCODE_LB =>
 				phaseWBCtrl.sourceImm(7 downto 0) <= ramReadResult(7 downto 0);
 				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 8) <=
-					(others => phaseWBCtrl.sourceImm(7));
+					(others => ramReadResult(7));
 			when MIPS_CPU_INSTRUCTION_OPCODE_LBU =>
 				phaseWBCtrl.sourceImm(7 downto 0) <= ramReadResult(7 downto 0);
 				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 8) <= (others => '0');

@@ -6,9 +6,13 @@ package MIPSCPU is
 	-- General numerical properties of the processor
 	-- The data width of register
 	constant MIPS_CPU_DATA_WIDTH : integer := 32;
+	subtype CPUData_t is
+		std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 
 	-- The address width of the registers in primary processor
 	constant MIPS_CPU_REGISTER_ADDRESS_WIDTH: integer := 5;
+	subtype RegisterAddress_t is
+		std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 
 	-- The number of registers in primarty processor
 	constant MIPS_CPU_REGISTER_COUNT: integer := 2**MIPS_CPU_REGISTER_ADDRESS_WIDTH;

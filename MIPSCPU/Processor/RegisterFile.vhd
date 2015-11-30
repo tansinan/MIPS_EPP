@@ -1,3 +1,5 @@
+-- !The entity RegisterFile defines a register file containing 32 registers
+
 library ieee;
 use ieee.std_logic_1164.all;
 use work.MIPSCPU.all;
@@ -30,6 +32,7 @@ begin
 	begin
 		black_hole_register: if i = 0 generate
 		begin
+			output(i) <= (others => '0');
 			black_hole_register: component SingleRegister
 				port map (reset, clock, input, REGISTER_OPERATION_READ, output(i));
 		end generate black_hole_register;

@@ -100,7 +100,8 @@ begin
 		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_LUI,
 		decodingResultTypeR when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL,
 		decodingResultTypeJ when MIPS_CPU_INSTRUCTION_OPCODE_J,
-		decodingResultTypeJ when MIPS_CPU_INSTRUCTION_OPCODE_JAL;
+		decodingResultTypeJ when MIPS_CPU_INSTRUCTION_OPCODE_JAL,
+		decodingResultTypeI when others; --TODO :report error!
 
 	pcControl <= decodingResult.pcControl;
 	--TODO I think this is ugly, need to be changed later.
