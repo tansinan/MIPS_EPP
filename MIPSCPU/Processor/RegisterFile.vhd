@@ -19,7 +19,7 @@ architecture Behavioral of RegisterFile is
 	generic (
 		width : integer := MIPS_CPU_DATA_WIDTH
 	);
-	port ( 
+	port (
 		reset : in std_logic;
 		clock : in std_logic;
 		input : in  std_logic_vector (width - 1 downto 0);
@@ -33,10 +33,10 @@ begin
 		black_hole_register: if i = 0 generate
 		begin
 			output(i) <= (others => '0');
-			black_hole_register: component SingleRegister
-				port map (reset, clock, input, REGISTER_OPERATION_READ, output(i));
+			--black_hole_register: component SingleRegister
+				--port map (reset, clock, input, REGISTER_OPERATION_READ, output(i));
 		end generate black_hole_register;
-		
+
 		single_register: if i > 0 generate
 		begin
 			single_register: component SingleRegister
@@ -45,4 +45,3 @@ begin
 	end generate generate_single_register;
 
 end Behavioral;
-

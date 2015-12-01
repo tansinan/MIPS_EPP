@@ -3,6 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 use work.MIPSCPU.all;
+use work.MIPSCP0.all;
 
 entity Processor is
 	port (
@@ -35,6 +36,9 @@ architecture Behavioral of Processor is
 
 	signal primaryRAMData : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 
+	signal cp0RegisterFileControl: CP0RegisterFileControl_t;
+	signal cp0RegisterFileOutput : CP0RegisterFileOutput_t;
+
 	signal ramReadControl1 : RAMReadControl_t;
 	signal ramReadControl2 : RAMReadControl_t;
 	signal ramWriteControl : RAMWriteControl_t;
@@ -62,6 +66,15 @@ architecture Behavioral of Processor is
 		input : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		operation : in std_logic_vector (MIPS_CPU_REGISTER_COUNT - 1 downto 0);
 		output : out mips_register_file_port
+	);
+	end component;
+
+	component CP0RegisterFile_c is
+    Port (
+		reset : in std_logic;
+		clock : in std_logic;
+        control: in CP0RegisterFileControl_t;
+		output : out CP0RegisterFileOutput_t
 	);
 	end component;
 
@@ -199,6 +212,14 @@ begin
 		phyRAMReadEnable => phyRAMReadEnable,
 		phyAddressBus => phyAddressBus,
 		phyDataBus => phyDataBus
+	);
+
+	cp0RegisterFile_e: CP0RegisterFile_c
+    port map(
+		reset => reset,
+		clock => clock,
+        control => cp0RegisterFileControl,
+		output => cp0RegisterFileOutput
 	);
 
 	register_file_debug <= register_file_output;
