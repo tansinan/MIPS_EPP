@@ -3,10 +3,10 @@ use ieee.std_logic_1164.all;
 use work.MIPSCPU.all;
 use work.MIPSCP0.all;
 
-entity CPOPipeline is
-end CPOPipeline;
+entity CP0Pipeline is
+end entity;
 
-architecture Behavioral of CPOPipeline is
+architecture Behavioral of CP0Pipeline is
 begin
 
 

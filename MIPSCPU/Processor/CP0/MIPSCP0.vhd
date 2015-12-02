@@ -34,7 +34,7 @@ package MIPSCP0 is
 			entryLow1 : CPUData_t;
 		end record;
 
-	type CP0TLBOutput_t is
+	type CP0TLBData_t is
 		array(0 to MIPS_CP0_TLB_ENTRY_COUNT - 1) of CP0TLBEntry_t;
 
 	type CP0TLBControl_t is
