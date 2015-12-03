@@ -103,6 +103,7 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_OPCODE_LH : InstructionOpcode_t := "100001";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_LHU : InstructionOpcode_t := "100101";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_LUI : InstructionOpcode_t := "001111";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_CP0 : InstructionOpcode_t := "010000";
 
 	-- MIPS CPU rt for the regimm opcode
 	constant MIPS_CPU_INSTRUCTION_RT_BGEZ :

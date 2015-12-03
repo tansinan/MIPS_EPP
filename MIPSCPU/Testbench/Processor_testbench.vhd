@@ -50,16 +50,14 @@ architecture behavior of Processor_Testbench is
 	signal phyAddressBus : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
 	signal phyDataBus : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 
-	signal instruction : std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
-
  	--outputs
-   signal register_file_debug : mips_register_file_port;
-   signal current_test_success : boolean;
+	signal register_file_debug : mips_register_file_port;
+	signal current_test_success : boolean;
 
-   -- clock period definitions
-   constant CLOCK_PERIOD : time := 20 ns;
-   constant CPU_CLOCK_PERIOD : time := 20 ns;
-   constant RAM_CLOCK_PERIOD : time := 10 ns;
+	-- clock period definitions
+	constant CLOCK_PERIOD : time := 20 ns;
+	constant CPU_CLOCK_PERIOD : time := 20 ns;
+	constant RAM_CLOCK_PERIOD : time := 10 ns;
 begin
 	-- instantiate the unit under test (uut)
 	uut: Processor port map (

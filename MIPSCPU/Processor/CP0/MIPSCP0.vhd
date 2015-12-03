@@ -11,7 +11,7 @@ package MIPSCP0 is
 	-- The number of registers in CP0
 	constant MIPS_CP0_REGISTER_COUNT: integer := 2**MIPS_CPU_REGISTER_ADDRESS_WIDTH;
 	subtype CP0RegisterAddress_t is
-		std_logic_vector(MIPS_CP0_REGISTER_COUNT - 1 downto 0);
+		std_logic_vector(MIPS_CP0_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 
 	type CP0RegisterFileOutput_t is
 		array(0 to MIPS_CP0_REGISTER_COUNT - 1) of CPUData_t;

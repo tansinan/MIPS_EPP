@@ -15,7 +15,8 @@ entity Processor is
 		phyAddressBus : out std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
 		phyDataBus : inout std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 		register_file_debug : out mips_register_file_port;
-		pcValueDebug : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0)
+		pcValueDebug : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		debugCP0RegisterFileData : out CP0RegisterFileOutput_t
 	);
 end entity;
 
@@ -30,15 +31,14 @@ architecture Behavioral of Processor is
 	signal pipelinePhaseEXMAInterface : PipelinePhaseEXMAInterface_t;
 	signal pipelinePhaseMAWBInterface : PipelinePhaseMAWBInterface_t;
 
-	signal actual_instruction : std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
+	signal instructionToCP0 : Instruction_t;
+	signal instructionToPrimary : Instruction_t;
+	signal instructionExecutionEnabledCP0 : EnablingControl_t;
 	signal instruction_done : std_logic;
 
 	signal current_pipeline_phase : std_logic_vector(3 downto 0) := "0000";
 
 	signal primaryRAMData : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
-
-	signal cp0RegisterFileControl: CP0RegisterFileControl_t;
-	signal cp0RegisterFileOutput : CP0RegisterFileOutput_t;
 
 	signal ramReadControl1 : RAMReadControl_t;
 	signal ramReadControl2 : RAMReadControl_t;
@@ -67,15 +67,6 @@ architecture Behavioral of Processor is
 		input : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		operation : in std_logic_vector (MIPS_CPU_REGISTER_COUNT - 1 downto 0);
 		output : out mips_register_file_port
-	);
-	end component;
-
-	component CP0RegisterFile_c is
-    Port (
-		reset : in std_logic;
-		clock : in std_logic;
-        control: in CP0RegisterFileControl_t;
-		output : out CP0RegisterFileOutput_t
 	);
 	end component;
 
@@ -152,7 +143,7 @@ begin
 		reset => reset,
 		clock => clock,
 		register_file => register_file_output,
-		instruction => actual_instruction,
+		instruction => instructionToPrimary,
 		phaseExCtrlOutput => pipelinePhaseIDEXInterface,
 		pcValue => pcValue,
 		pcControl => pcControl1
@@ -203,14 +194,6 @@ begin
 		phyDataBus => phyDataBus
 	);
 
-	cp0RegisterFile_e: CP0RegisterFile_c
-    port map(
-		reset => reset,
-		clock => clock,
-        control => cp0RegisterFileControl,
-		output => cp0RegisterFileOutput
-	);
-
 	registerFileWriter_i: entity work.RegisterFileWriter
 	port map
 	(
@@ -229,16 +212,41 @@ begin
 		pcValueDebug <= pcValue;
 		ramReadControl2.address <= pcValue(PHYSICS_RAM_ADDRESS_WIDTH + 1 downto 2);
 	end process;
+	
+	Coprocessor0_i : entity work.Coprocessor0_e
+	port map
+	(
+		reset => reset,
+		clock => clock,
+		instruction => instructionToCP0,
+		instructionExecutionEnabled => instructionExecutionEnabledCP0,
+		primaryRegisterFileData => register_file_output,
+		primaryRegisterFileControl => registerFileControl2,
+		debugCP0RegisterFileData => debugCP0RegisterFileData
+	);
 
 	Processor_Process : process (clock, reset, phyDataBus)
+		variable opcode : InstructionOpcode_t;
+		variable instruction : Instruction_t;
 	begin
 		if reset = '0' then
-			actual_instruction <= MIPS_CPU_INSTRUCTION_NOP;
+			instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
 			current_pipeline_phase <= "0100";
 		elsif rising_edge(clock) then
 			if current_pipeline_phase = "0000" then
+				instruction := primaryRAMData;
+				opcode :=
+					instruction(MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
+				if opcode = MIPS_CPU_INSTRUCTION_OPCODE_CP0 then
+					instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
+					instructionToCP0 <= instruction;
+					instructionExecutionEnabledCP0 <= FUNC_ENABLED;
+				else
+					instructionToPrimary <= instruction;
+					instructionToCP0 <= MIPS_CPU_INSTRUCTION_NOP;
+					instructionExecutionEnabledCP0 <= FUNC_DISABLED;
+				end if;
 				pcControl2.operation <= REGISTER_OPERATION_READ;
-				actual_instruction <= primaryRAMData;
 				current_pipeline_phase <= current_pipeline_phase + 1;
 				ramReadControl2.enable <= FUNC_DISABLED;
 			elsif current_pipeline_phase = "0100" then
@@ -248,7 +256,7 @@ begin
 				ramReadControl2.enable <= FUNC_ENABLED;
 			else
 				pcControl2.operation <= REGISTER_OPERATION_READ;
-				actual_instruction <= MIPS_CPU_INSTRUCTION_NOP;
+				instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
 				current_pipeline_phase <= current_pipeline_phase + 1;
 				ramReadControl2.enable <= FUNC_DISABLED;
 			end if;

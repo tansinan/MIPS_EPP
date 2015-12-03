@@ -9,6 +9,7 @@ entity CP0PipelinePhaseInstructionDecode is
 		reset : in std_logic;
 		clock : in std_logic;
 		instruction : in Instruction_t;
+		instructionExecutionEnabled : in EnablingControl_t;
 		primaryRegisterFileData : in mips_register_file_port;
 		primaryRegisterFileControl : out RegisterFileControl_t;
 		cp0RegisterFileData : in CP0RegisterFileOutput_t;
@@ -29,7 +30,14 @@ begin
 		rd := instruction(MIPS_CPU_INSTRUCTION_RD_HI downto MIPS_CPU_INSTRUCTION_RD_LO);
 		moveAddressPrimaryInt := to_integer(unsigned(rt));
 		moveAddressCP0Int := to_integer(unsigned(rd));
-		if rs = MIPS_CP0_INSTRUCTION_RS_MT then
+		if instructionExecutionEnabled = FUNC_DISABLED then
+			primaryRegisterFileControl.address <= (others => '0');
+			primaryRegisterFileControl.data <= (others => '0');
+			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
+				cp0RegisterFileControl(i).data <= (others => '0');
+				cp0RegisterFileControl(i).operation <= REGISTER_OPERATION_READ;
+			end loop;
+		elsif rs = MIPS_CP0_INSTRUCTION_RS_MT then
 			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
 				if i = moveAddressCP0Int then
 					cp0RegisterFileControl(i).data <= primaryRegisterFileData(moveAddressPrimaryInt);
