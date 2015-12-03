@@ -9,6 +9,5 @@ end entity;
 architecture Behavioral of CP0Pipeline is
 begin
 
-
 end architecture;
 

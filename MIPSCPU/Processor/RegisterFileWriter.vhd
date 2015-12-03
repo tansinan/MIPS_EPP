@@ -4,49 +4,32 @@ use ieee.numeric_std.all;
 use work.MIPSCPU.all;
 
 entity RegisterFileWriter is
-    port (
-		write_select : in std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-		write_data : in std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+  port (
+		control1 : in RegisterFileControl_t;
+		control2 : in RegisterFileControl_t;
 		operation_output : out std_logic_vector(MIPS_CPU_REGISTER_COUNT - 1 downto 0);
 		data_output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0)
 	);
-end RegisterFileWriter;
+end entity;
 
 architecture Behavioral of RegisterFileWriter is
 begin
-	with write_select select operation_output <=
-		"00000000000000000000000000000001" when "00000",
-		"00000000000000000000000000000010" when "00001",
-		"00000000000000000000000000000100" when "00010",
-		"00000000000000000000000000001000" when "00011",
-		"00000000000000000000000000010000" when "00100",
-		"00000000000000000000000000100000" when "00101",
-		"00000000000000000000000001000000" when "00110",
-		"00000000000000000000000010000000" when "00111",
-		"00000000000000000000000100000000" when "01000",
-		"00000000000000000000001000000000" when "01001",
-		"00000000000000000000010000000000" when "01010",
-		"00000000000000000000100000000000" when "01011",
-		"00000000000000000001000000000000" when "01100",
-		"00000000000000000010000000000000" when "01101",
-		"00000000000000000100000000000000" when "01110",
-		"00000000000000001000000000000000" when "01111",
-		"00000000000000010000000000000000" when "10000",
-		"00000000000000100000000000000000" when "10001",
-		"00000000000001000000000000000000" when "10010",
-		"00000000000010000000000000000000" when "10011",
-		"00000000000100000000000000000000" when "10100",
-		"00000000001000000000000000000000" when "10101",
-		"00000000010000000000000000000000" when "10110",
-		"00000000100000000000000000000000" when "10111",
-		"00000001000000000000000000000000" when "11000",
-		"00000010000000000000000000000000" when "11001",
-		"00000100000000000000000000000000" when "11010",
-		"00001000000000000000000000000000" when "11011",
-		"00010000000000000000000000000000" when "11100",
-		"00100000000000000000000000000000" when "11101",
-		"01000000000000000000000000000000" when "11110",
-		"10000000000000000000000000000000" when "11111",
-	(others => 'X') when others;
-	data_output <= write_data;
+	process(control1, control2)
+		variable validControl : RegisterFileControl_t;
+	begin
+		if control1.address /= "00000" then
+			validControl := control1;
+		else
+			validControl := control2;
+		end if;
+
+		for i in 0 to MIPS_CPU_REGISTER_COUNT - 1 loop
+			if i = to_integer(unsigned(validControl.address)) then
+				operation_output(i) <= '1';
+			else
+				operation_output(i) <= '0';
+			end if;
+		end loop;
+		data_output <= validControl.data;
+	end process;
 end Behavioral;

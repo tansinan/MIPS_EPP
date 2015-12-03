@@ -43,6 +43,10 @@ package MIPSCP0 is
 			index : CP0TLBEntryIndex_t;
 			writeEnabled : std_logic;
 		end record;
+		
+	-- Constants related to CP0 instructions
+	constant MIPS_CP0_INSTRUCTION_RS_MF : RegisterAddress_t := "00100";
+	constant MIPS_CP0_INSTRUCTION_RS_MT : RegisterAddress_t := "00000";
 
 end package;
 

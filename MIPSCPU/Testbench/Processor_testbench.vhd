@@ -3,7 +3,6 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.numeric_std.all;
 use work.MIPSCPU.all;
-use std.textio.all;
 
 entity Processor_Testbench is
 end Processor_Testbench;
@@ -15,7 +14,6 @@ architecture behavior of Processor_Testbench is
 		port (
 			reset : in std_logic;
 			clock : in std_logic;
-			instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
 			phyRAMEnable : out std_logic;
 			phyRAMWriteEnable : out std_logic;
 			phyRAMReadEnable : out std_logic;
@@ -57,7 +55,6 @@ architecture behavior of Processor_Testbench is
  	--outputs
    signal register_file_debug : mips_register_file_port;
    signal current_test_success : boolean;
-   file file_pointer : text;
 
    -- clock period definitions
    constant CLOCK_PERIOD : time := 20 ns;
@@ -68,7 +65,6 @@ begin
 	uut: Processor port map (
 		reset => reset,
 		clock => clock,
-		instruction => instruction,
 		phyRAMEnable => phyRAMEnable,
 		phyRAMWriteEnable => phyRAMWriteEnable,
 		phyRAMReadEnable => phyRAMReadEnable,
@@ -110,11 +106,12 @@ begin
 	stim_proc: process
 		procedure systemReset is
 		begin
-			reset <= '0';
+			reset <= FUNC_ENABLED;
 			wait for clock_period * 10;
 		end procedure;
 	begin
 		systemReset;
+		reset <= FUNC_DISABLED;
 		wait;
    end process;
 end;

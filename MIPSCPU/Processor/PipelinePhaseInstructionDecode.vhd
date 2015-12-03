@@ -7,8 +7,8 @@ entity PipelinePhaseInstructionDecode is
 		reset : in std_logic;
 		clock : in std_logic;
 		register_file : in mips_register_file_port;
-		instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
-		pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		instruction : in Instruction_t;
+		pcValue : in CPUData_t;
 		pcControl : out RegisterControl_t;
 		phaseExCtrlOutput : out PipelinePhaseIDEXInterface_t
 	);

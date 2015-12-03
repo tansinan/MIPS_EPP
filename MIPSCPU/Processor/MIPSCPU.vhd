@@ -3,6 +3,13 @@ use ieee.std_logic_1164.all;
 
 package MIPSCPU is
 
+	-- Define clock, reset and enable/disable control related constants and subtypes.
+	subtype Clock_t is std_logic;
+	subtype Reset_t is std_logic;
+	subtype EnablingControl_t is std_logic;
+	constant FUNC_ENABLED : std_logic := '0';
+	constant FUNC_DISABLED : std_logic := '1';
+
 	-- General numerical properties of the processor
 	-- The data width of register
 	constant MIPS_CPU_DATA_WIDTH : integer := 32;
@@ -16,7 +23,11 @@ package MIPSCPU is
 
 	-- The number of registers in primarty processor
 	constant MIPS_CPU_REGISTER_COUNT: integer := 2**MIPS_CPU_REGISTER_ADDRESS_WIDTH;
-
+	type RegisterFileControl_t is
+		record
+			address : RegisterAddress_t;
+			data : CPUData_t;
+		end record;
 
 	-- Data width constants related to the MIPS instructions
 	-- The instruction width of the CPU
@@ -92,11 +103,11 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_OPCODE_LH : InstructionOpcode_t := "100001";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_LHU : InstructionOpcode_t := "100101";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_LUI : InstructionOpcode_t := "001111";
-	
+
 	-- MIPS CPU rt for the regimm opcode
 	constant MIPS_CPU_INSTRUCTION_RT_BGEZ :
 		std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0) := "00001";
-	constant MIPS_CPU_INSTRUCTION_RT_BLTZ : 
+	constant MIPS_CPU_INSTRUCTION_RT_BLTZ :
 		std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0) := "00000";
 
 	-- MIPS CPU funct for the special opcode
@@ -230,9 +241,6 @@ package MIPSCPU is
 			targetRegAddr : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 			instructionOpcode : InstructionOpcode_t;
 		end record;
-
-	constant FUNC_ENABLED : std_logic := '0';
-	constant FUNC_DISABLED : std_logic := '1';
 
 end package;
 

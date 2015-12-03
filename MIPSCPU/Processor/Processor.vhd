@@ -9,7 +9,6 @@ entity Processor is
 	port (
 		reset : in std_logic;
 		clock : in std_logic;
-		instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
 		phyRAMEnable : out std_logic;
 		phyRAMWriteEnable : out std_logic;
 		phyRAMReadEnable : out std_logic;
@@ -24,6 +23,8 @@ architecture Behavioral of Processor is
 	signal register_file_input: std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal register_file_operation: std_logic_vector (MIPS_CPU_REGISTER_COUNT - 1 downto 0);
 	signal register_file_output : mips_register_file_port;
+	signal registerFileControl1 : RegisterFileControl_t;
+	signal registerFileControl2 : RegisterFileControl_t;
 
 	signal pipelinePhaseIDEXInterface : PipelinePhaseIDEXInterface_t;
 	signal pipelinePhaseEXMAInterface : PipelinePhaseEXMAInterface_t;
@@ -52,10 +53,10 @@ architecture Behavioral of Processor is
 		port (
 			reset : in std_logic;
 			clock : in std_logic;
-	        control1 : in RegisterControl_t;
-	        control2 : in RegisterControl_t;
-	        control3 : in RegisterControl_t;
-	        output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0)
+			control1 : in RegisterControl_t;
+			control2 : in RegisterControl_t;
+			control3 : in RegisterControl_t;
+			output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0)
 		);
 	end component;
 
@@ -128,17 +129,6 @@ architecture Behavioral of Processor is
 	);
 	end component;
 
-	component PipelinePhaseWriteBack is
-    port (
-		reset : in std_logic;
-		clock : in std_logic;
-		register_file_input : out std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		register_file_operation : out std_logic_vector (MIPS_CPU_REGISTER_COUNT - 1 downto 0);
-		phaseMAInput : in PipelinePhaseMAWBInterface_t;
-		ramWriteControl : out RAMWriteControl_t;
-		instruction_done : out std_logic
-	);
-	end component;
 begin
 
 	register_file : RegisterFile port map (
@@ -188,17 +178,16 @@ begin
 		ramReadResult => primaryRAMData
 	);
 
-	pipeline_phase_write_back: PipelinePhaseWriteBack
+	pipelinePhaseWirteBack_i: entity work.PipelinePhaseWriteBack
 	port map (
 		reset => reset,
 		clock => clock,
-		register_file_input => register_file_input,
-		register_file_operation => register_file_operation,
 		ramWriteControl => ramWriteControl,
+		registerFileControl => registerFileControl1,
 		phaseMAInput => pipelinePhaseMAWBInterface,
 		instruction_done => instruction_done
 	);
-
+	
 	primaryRamController_e: RAMController_c
 	port map (
 		clock => clock,
@@ -222,11 +211,26 @@ begin
 		output => cp0RegisterFileOutput
 	);
 
-	register_file_debug <= register_file_output;
-	pcValueDebug <= pcValue;
-	ramReadControl2.address <= pcValue(PHYSICS_RAM_ADDRESS_WIDTH + 1 downto 2);
+	registerFileWriter_i: entity work.RegisterFileWriter
+	port map
+	(
+		control1 => registerFileControl1,
+		control2 => (
+			address => (others => '0'),
+			data => (others => '0')
+		),
+		operation_output => register_file_operation,
+		data_output => register_file_input
+	);
 
-	Processor_Process : process (clock, reset)
+	process(register_file_output, pcValue)
+	begin
+		register_file_debug <= register_file_output;
+		pcValueDebug <= pcValue;
+		ramReadControl2.address <= pcValue(PHYSICS_RAM_ADDRESS_WIDTH + 1 downto 2);
+	end process;
+
+	Processor_Process : process (clock, reset, phyDataBus)
 	begin
 		if reset = '0' then
 			actual_instruction <= MIPS_CPU_INSTRUCTION_NOP;
