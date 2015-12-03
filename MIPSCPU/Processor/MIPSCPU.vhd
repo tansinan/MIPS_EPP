@@ -242,6 +242,9 @@ package MIPSCPU is
 			targetRegAddr : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 			instructionOpcode : InstructionOpcode_t;
 		end record;
+	
+	constant ISA_ADDRESS_BEGIN : CPUData_t := x"b4000000";
+	constant ISA_ADDRESS_UART1 : CPUData_t := x"b40003f8";
 
 end package;
 

@@ -16,7 +16,8 @@ entity Processor is
 		phyDataBus : inout std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 		register_file_debug : out mips_register_file_port;
 		pcValueDebug : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		debugCP0RegisterFileData : out CP0RegisterFileOutput_t
+		debugCP0RegisterFileData : out CP0RegisterFileOutput_t;
+		debugInstructionToPrimary : out Instruction_t
 	);
 end entity;
 
@@ -210,6 +211,7 @@ begin
 	begin
 		register_file_debug <= register_file_output;
 		pcValueDebug <= pcValue;
+		debugInstructionToPrimary <= instructionToPrimary;
 		ramReadControl2.address <= pcValue(PHYSICS_RAM_ADDRESS_WIDTH + 1 downto 2);
 	end process;
 	

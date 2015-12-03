@@ -130,6 +130,7 @@ begin
 					when MIPS_CPU_INSTRUCTION_FUNCT_SRAV =>
 						result.operation <= ALU_OPERATION_SHIFT_RIGHT_ARITH;
 					when others =>
+						--TODO: use exception.
 						result.operation <= (others => 'X');
 				end case;
 		end case;
