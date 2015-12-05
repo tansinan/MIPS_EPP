@@ -21,17 +21,20 @@ class Simulator
 {
 protected:
 	int cache[32];
-	int commandNum;
+	int commandNum, initStatus;
 	ifstream inputFileStream;
 	ofstream testbench;
 	MemoryModule* memory;
+	int programCounter;
 
 public:
 	Simulator(string InputFileName);
 	~Simulator();
+	int loadCommand(&inputFileStream, address);
+	int decimalConvert(string origin);
 	string binaryConvert(int origin, int width, bool trueForm);
 	void printCache(char output, int cache[]);
 	void printTestbench(ofstream &testbench, string commandBin);
 	void printCommandBin(ofstream &testbench, string command, int p1, int p2 = 0, int p3 = 0);
-	void executeCommand();
+	int executeCommand();
 };
