@@ -8,7 +8,7 @@ entity CP0TLB_c is
     Port (
 		reset : in std_logic;
 		clock : in std_logic;
-        control: in CP0TLBControl_t;
+		control: in CP0TLBControl_t;
 		output : out CP0TLBData_t
 	);
 end entity;

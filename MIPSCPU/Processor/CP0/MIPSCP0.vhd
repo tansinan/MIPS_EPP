@@ -39,7 +39,7 @@ package MIPSCP0 is
 
 	type CP0TLBControl_t is
 		record
-			data : CPUData_t;
+			data : CP0TLBEntry_t;
 			index : CP0TLBEntryIndex_t;
 			writeEnabled : std_logic;
 		end record;
