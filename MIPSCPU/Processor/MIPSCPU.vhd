@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use work.HardwareController.all;
 
 package MIPSCPU is
 
@@ -166,8 +167,8 @@ package MIPSCPU is
 		end record;
 
 	--! Parameters related to physics RAM bus.
-	constant PHYSICS_RAM_ADDRESS_WIDTH : integer := 20;
-	constant PHYSICS_RAM_DATA_WIDTH : integer := 32;
+	--constant PHYSICS_RAM_ADDRESS_WIDTH : integer := 20;
+	--constant PHYSICS_RAM_DATA_WIDTH : integer := 32;
 
 	type mips_register_file_port is
 		array(0 to MIPS_CPU_REGISTER_COUNT - 1) of std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
@@ -245,6 +246,14 @@ package MIPSCPU is
 	
 	constant ISA_ADDRESS_BEGIN : CPUData_t := x"b4000000";
 	constant ISA_ADDRESS_UART1 : CPUData_t := x"b40003f8";
+	
+	-- Memory-mapping related constants.
+	constant ISA_ADDRESS_SPACE : CPUData_t := x"b4000000";
+	constant ISA_ADDRESS_SPACE_MASK : CPUData_t := x"FFFFF000";
+	constant KERNEL_ADDRESS_SPACE : CPUData_t := x"80000000";
+	constant KERNEL_ADDRESS_MASK : CPUData_t := x"FFC00000";
+	constant USER_ADDRESS_SPACE : CPUData_t := x"00000000";
+	constant USER_ADDRESS_MASK : CPUData_t := x"FFC00000";
 
 end package;
 
