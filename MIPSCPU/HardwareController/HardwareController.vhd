@@ -26,7 +26,10 @@ package HardwareController is
 	constant ISA_REGISTER_EFFECTIVE_WIDTH : integer := 12;
 	subtype ISAHardwareRegisterAddress_t is
 		std_logic_vector(ISA_REGISTER_EFFECTIVE_WIDTH - 1 downto 0);
-	constant UART1_REGISTER_DATA : ISAHardwareRegisterAddress_t := x"3f8";
+	constant UART1_REGISTER_DATA : ISAHardwareRegisterAddress_t := x"3F8";
+	constant UART1_REGISTER_STATUS : ISAHardwareRegisterAddress_t := x"40C";
+	constant UART1_REGISTER_STATUS_BIT_CAN_READ : integer := 0;
+	constant UART1_REGISTER_STATUS_BIT_CAN_WRITE : integer := 0;
 	
 end package;
 

@@ -259,6 +259,13 @@ package MIPSCPU is
 	constant KERNEL_ADDRESS_SPACE_MASK : CPUData_t := x"FFC00000";
 	constant USER_ADDRESS_SPACE : CPUData_t := x"00000000";
 	constant USER_ADDRESS_SPACE_MASK : CPUData_t := x"FFC00000";
+	
+	type CPUDebugData_t is
+	record
+		pcValue : CPUData_t;
+		primaryRegisterFile : mips_register_file_port;
+		currentInstruction : Instruction_t;
+	end record;
 
 end package;
 

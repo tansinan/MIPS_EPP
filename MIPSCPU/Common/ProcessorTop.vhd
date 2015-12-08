@@ -16,7 +16,8 @@ entity ProcessorTop is
 		secondaryPhysicsRAMAddressBus : out PhysicsRAMAddress_t;
 		secondaryPhysicsRAMDataBus : inout PhysicsRAMData_t;
 		uart1Transmit : out std_logic;
-		uart1Receive : in std_logic
+		uart1Receive : in std_logic;
+		debugData : out CPUDebugData_t
 	);
 end entity;
 
@@ -62,10 +63,7 @@ begin
 	port map (
 		reset => reset,
 		clock => clockDivided,
-		register_file_debug => open,
-		pcValueDebug => open,
-		debugCP0RegisterFileData => open,
-		debugInstructionToPrimary => open,
+		debugData => debugData,
 		primaryRAMControl => primaryRAMControl,
 		primaryRAMResult => primaryRAMResult,
 		secondaryRAMControl => secondaryRAMControl,

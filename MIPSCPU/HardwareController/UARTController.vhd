@@ -51,15 +51,33 @@ begin
 		if reset = FUNC_ENABLED then
 			output <= (others => '0');
 		elsif rising_edge(clock) then
+			-- Handles the signals of the UART module
+			if writeACK = '1' then
+				writeSTB <= '0';
+			end if;
+			if readSTB = '0' then
+				readACK <= '0';
+			end if;
 			if hardwareRegisterAddress = UART1_REGISTER_DATA then
 				if control.operation = REGISTER_OPERATION_READ then
 					if writeSTB = '0' and writeACK = '0' then
 						dataWrite <= control.data(7 downto 0);
 						writeSTB <= '1';
 					end if;
-				else
+				elsif control.operation = REGISTER_OPERATION_WRITE then
 					output(MIPS_CPU_DATA_WIDTH - 1 downto 8) <= (others => '0');
 					output(7 downto 0) <= dataRead;
+					readACK <= '1';
+				end if;
+			elsif hardwareRegisterAddress = UART1_REGISTER_STATUS then
+				if control.operation = REGISTER_OPERATION_READ then
+					output(MIPS_CPU_DATA_WIDTH - 1 downto 0) <= (others => '0');
+					if readSTB = '1' then
+						output(UART1_REGISTER_STATUS_BIT_CAN_READ) <= '1';
+					end if;
+					if writeSTB = '0' and writeACK = '0' then
+						output(UART1_REGISTER_STATUS_BIT_CAN_WRITE) <= '1';
+					end if;
 				end if;
 			end if;
 		end if;

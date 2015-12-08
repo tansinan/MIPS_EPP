@@ -10,10 +10,7 @@ entity Processor is
 	port (
 		reset : in std_logic;
 		clock : in std_logic;
-		register_file_debug : out mips_register_file_port;
-		pcValueDebug : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		debugCP0RegisterFileData : out CP0RegisterFileOutput_t;
-		debugInstructionToPrimary : out Instruction_t;
+		debugData : out CPUDebugData_t;
 		primaryRAMControl : out HardwareRAMControl_t;
 		primaryRAMResult : in RAMData_t;
 		secondaryRAMControl : out HardwareRAMControl_t;
@@ -165,9 +162,6 @@ begin
 
 	process(register_file_output, pcValue)
 	begin
-		register_file_debug <= register_file_output;
-		pcValueDebug <= pcValue;
-		debugInstructionToPrimary <= instructionToPrimary;
 		ramControl3.address <= pcValue;
 	end process;
 	
@@ -180,7 +174,7 @@ begin
 		instructionExecutionEnabled => instructionExecutionEnabledCP0,
 		primaryRegisterFileData => register_file_output,
 		primaryRegisterFileControl => registerFileControl2,
-		debugCP0RegisterFileData => debugCP0RegisterFileData
+		debugCP0RegisterFileData => open
 	);
 	
 	hardwareAddressMapper : entity work.HardwareAddressMapper
@@ -196,6 +190,13 @@ begin
 		primaryRAMResult => primaryRAMResult,
 		secondaryRAMHardwareControl => secondaryRAMControl,
 		secondaryRAMResult => secondaryRAMResult
+	);
+	
+	-- Output internal debug data.
+	debugData <= (
+		pcValue => pcValue,
+		primaryRegisterFile => register_file_output,
+		currentInstruction => instructionToPrimary
 	);
 
 	Processor_Process : process (clock, reset)
