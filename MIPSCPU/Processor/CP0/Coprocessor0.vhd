@@ -50,7 +50,7 @@ begin
 		reset => reset,
 		clock => clock,
 		control => cp0TLBControl,
-		output => cp0TLBData_t
+		output => cp0TLBData
 	);
 
 end architecture;
