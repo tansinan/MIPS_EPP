@@ -3,45 +3,36 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.numeric_std.all;
 use work.MIPSCPU.all;
+use work.MIPSCP0.all;
+use work.HardwareController.all;
+use work.VirtualHardware.all;
 
 entity Processor_Testbench is
 end Processor_Testbench;
 
 architecture behavior of Processor_Testbench is
 
-	-- Declare our processor to test.
-	component Processor is
-		port (
-			reset : in std_logic;
-			clock : in std_logic;
-			phyRAMEnable : out std_logic;
-			phyRAMWriteEnable : out std_logic;
-			phyRAMReadEnable : out std_logic;
-			phyAddressBus : out std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
-			phyDataBus : inout std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
-			register_file_debug : out mips_register_file_port
-		);
-	end component;
-
-	component VirtualRAM_c is
-		port (
-			clock : in std_logic;
-			reset : in std_logic;
-			enabled : in std_logic;
-			readEnabled : in std_logic;
-			writeEnabled : in std_logic;
-			addressBus : in std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
-			dataBus : inout std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0)
-		);
-	end component;
-
 	-- CPU Clock.
 	signal reset : std_logic := '0';
-	signal clock : std_logic := '0';
+	signal clock50M : std_logic := '0';
 
 	-- RAM Clock, they need to be slightly faster than the CPU clock
 	-- for in our board it's always done in one clock cycle.
 	signal ramClock : std_logic := '0';
+
+	-- Primary SRAM ports
+	signal primaryPhysicsRAMControl : PhysicsRAMControl_t;
+	signal primaryPhysicsRAMAddressBus : PhysicsRAMAddress_t;
+	signal primaryPhysicsRAMDataBus : PhysicsRAMData_t;
+	
+	-- Secondary SRAM ports
+	signal secondaryPhysicsRAMControl : PhysicsRAMControl_t;
+	signal secondaryPhysicsRAMAddressBus : PhysicsRAMAddress_t;
+	signal secondaryPhysicsRAMDataBus : PhysicsRAMData_t;
+	
+	-- First UART ports
+	signal uart1Transmit : std_logic;
+	signal uart1Receive : std_logic;
 
 	-- Bus interface
 	signal phyRAMEnable : std_logic;
@@ -51,7 +42,7 @@ architecture behavior of Processor_Testbench is
 	signal phyDataBus : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 
  	--outputs
-	signal register_file_debug : mips_register_file_port;
+	signal debugData : CPUDebugData_t;
 	signal current_test_success : boolean;
 
 	-- clock period definitions
@@ -59,34 +50,69 @@ architecture behavior of Processor_Testbench is
 	constant CPU_CLOCK_PERIOD : time := 20 ns;
 	constant RAM_CLOCK_PERIOD : time := 10 ns;
 begin
-	-- instantiate the unit under test (uut)
-	uut: Processor port map (
+	processorTop_i : entity work.ProcessorTop
+	port map
+	(
+		clock50M => clock50M,
 		reset => reset,
-		clock => clock,
-		phyRAMEnable => phyRAMEnable,
-		phyRAMWriteEnable => phyRAMWriteEnable,
-		phyRAMReadEnable => phyRAMReadEnable,
-		phyAddressBus => phyAddressBus,
-		phyDataBus => phyDataBus,
-		register_file_debug => register_file_debug
+		primaryPhysicsRAMControl => primaryPhysicsRAMControl,
+		primaryPhysicsRAMAddressBus => primaryPhysicsRAMAddressBus,
+		primaryPhysicsRAMDataBus => primaryPhysicsRAMDataBus,
+		secondaryPhysicsRAMControl => secondaryPhysicsRAMControl,
+		secondaryPhysicsRAMAddressBus => secondaryPhysicsRAMAddressBus,
+		secondaryPhysicsRAMDataBus => secondaryPhysicsRAMDataBus,
+		uart1Transmit => uart1Transmit,
+		uart1Receive => uart1Receive,
+		debugData => debugData
 	);
-
-	virtualRam_e : VirtualRam_c port map (
+	
+	virtualPrimaryRam_i :entity work.VirtualRam_c
+	generic map(
+		virtualRAMFileName => VIRTUAL_HARDWARE_PRIMARY_RAM_FILE,
+		virtualRAMTempFileName => VIRTUAL_HARDWARE_PRIMARY_RAM_TEMP_FILE
+	)
+	port map (
 		reset => reset,
 		clock => ramClock,
-		enabled => phyRAMEnable,
-		writeEnabled => phyRAMWriteEnable,
-		readEnabled => phyRAMReadEnable,
-		addressBus => phyAddressBus,
-		dataBus => phyDataBus
+		enabled => primaryPhysicsRAMControl.enabled,
+		writeEnabled => primaryPhysicsRAMControl.writeEnabled,
+		readEnabled => primaryPhysicsRAMControl.readEnabled,
+		addressBus => primaryPhysicsRAMAddressBus,
+		dataBus => primaryPhysicsRAMDataBus
+	);
+	
+	virtualSecondaryRam_i : entity work.VirtualRam_c
+	generic map(
+		virtualRAMFileName => VIRTUAL_HARDWARE_SECONDARY_RAM_FILE,
+		virtualRAMTempFileName => VIRTUAL_HARDWARE_SECONDARY_RAM_TEMP_FILE
+	)
+	port map (
+		reset => reset,
+		clock => ramClock,
+		enabled => secondaryPhysicsRAMControl.enabled,
+		writeEnabled => secondaryPhysicsRAMControl.writeEnabled,
+		readEnabled => secondaryPhysicsRAMControl.readEnabled,
+		addressBus => secondaryPhysicsRAMAddressBus,
+		dataBus => secondaryPhysicsRAMDataBus
+	);
+	
+	virtualUART1 : entity work.VirtualUART
+	generic map
+	(
+		baudRate => 115200
+	)
+    port map
+	(
+		uartReceive => uart1Transmit,
+		uartTransmit => uart1Receive
 	);
 
 	-- CPU clock
 	cpuClockProcess : process
 	begin
-		clock <= '0';
+		clock50M <= '0';
 		wait for CPU_CLOCK_PERIOD/2;
-		clock <= '1';
+		clock50M <= '1';
 		wait for CPU_CLOCK_PERIOD/2;
 	end process;
 
@@ -100,7 +126,7 @@ begin
 	end process;
 
 
-   -- stimulus process
+	-- stimulus process
 	stim_proc: process
 		procedure systemReset is
 		begin
@@ -111,5 +137,5 @@ begin
 		systemReset;
 		reset <= FUNC_DISABLED;
 		wait;
-   end process;
+	end process;
 end;
