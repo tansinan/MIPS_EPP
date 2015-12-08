@@ -190,19 +190,6 @@ package MIPSCPU is
 			pcControl : RegisterControl_t;
 		end record;
 
-	type RAMWriteControl_t is
-		record
-			enable : std_logic;
-			address : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
-			data: std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
-		end record;
-
-	type RAMReadControl_t is
-		record
-			enable : std_logic;
-			address : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
-		end record;
-
 	type PipelinePhaseIDEXInterface_t is
 		record
 			operand1 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
@@ -243,17 +230,26 @@ package MIPSCPU is
 			targetRegAddr : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 			instructionOpcode : InstructionOpcode_t;
 		end record;
-	
-	constant ISA_ADDRESS_BEGIN : CPUData_t := x"b4000000";
-	constant ISA_ADDRESS_UART1 : CPUData_t := x"b40003f8";
-	
-	-- Memory-mapping related constants.
+
+	-- Memory access and mapping related (sub)types and constants
+	constant MIPS_RAM_ADDRESS_WIDTH : integer := 32;
+	constant MIPS_RAM_DATA_WIDTH : integer := 32;
+	subtype RAMData_t is std_logic_vector(MIPS_RAM_DATA_WIDTH - 1 downto 0);
+	subtype RAMAddress_t is std_logic_vector(MIPS_RAM_ADDRESS_WIDTH - 1 downto 0);
+	type RAMControl_t is
+		record
+			writeEnabled : EnablingControl_t;
+			readEnabled : EnablingControl_t;
+			address : RAMAddress_t;
+			data : RAMData_t;
+		end record;
+
 	constant ISA_ADDRESS_SPACE : CPUData_t := x"b4000000";
 	constant ISA_ADDRESS_SPACE_MASK : CPUData_t := x"FFFFF000";
 	constant KERNEL_ADDRESS_SPACE : CPUData_t := x"80000000";
-	constant KERNEL_ADDRESS_MASK : CPUData_t := x"FFC00000";
+	constant KERNEL_ADDRESS_SPACE_MASK : CPUData_t := x"FFC00000";
 	constant USER_ADDRESS_SPACE : CPUData_t := x"00000000";
-	constant USER_ADDRESS_MASK : CPUData_t := x"FFC00000";
+	constant USER_ADDRESS_SPACE_MASK : CPUData_t := x"FFC00000";
 
 end package;
 

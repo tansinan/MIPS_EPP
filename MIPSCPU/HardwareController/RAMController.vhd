@@ -7,7 +7,7 @@ entity RAMController_e is
 	port (
 		clock : in Clock_t;
 		reset : in Reset_t;
-		control : in RAMControl_t;
+		control : in HardwareRAMControl_t;
 		result : out PhysicsRAMData_t;
 		physicsRAMControl : out PhysicsRAMControl_t;
 		physicsAddressBus : out PhysicsRAMAddress_t;
@@ -22,7 +22,7 @@ end entity;
 
 architecture Behavioral of RAMController_e is
 	signal state : RAMControllerState;
-	signal lastControl : RAMControl_t;
+	signal lastControl : HardwareRAMControl_t;
 begin
 	physicsRAMControl.enabled <= FUNC_ENABLED;
 	process(clock, reset)

@@ -8,7 +8,7 @@ package HardwareController is
 	constant PHYSICS_RAM_DATA_WIDTH : integer := 32;
 	subtype PhysicsRAMData_t is std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 	subtype PhysicsRAMAddress_t is std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
-	type RAMControl_t is
+	type HardwareRAMControl_t is
 		record
 			writeEnabled : std_logic;
 			readEnabled : std_logic;
