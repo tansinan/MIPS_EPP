@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 use work.MIPSCPU.all;
 use work.MIPSCP0.all;
 
-entity CP0TLB_c is
+entity CP0TLB_e is
     Port (
 		reset : in std_logic;
 		clock : in std_logic;
@@ -13,7 +13,7 @@ entity CP0TLB_c is
 	);
 end entity;
 
-architecture Behavioral of CP0TLB_c is
+architecture Behavioral of CP0TLB_e is
 	signal tlbData : CP0TLBData_t;
 begin
 	process(clock, reset)

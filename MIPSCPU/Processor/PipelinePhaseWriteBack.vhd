@@ -4,24 +4,28 @@ use work.MIPSCPU.all;
 
 entity PipelinePhaseWriteBack is
 	port (
-		reset : in std_logic;
-		clock : in std_logic;
-		ramWriteControl : out RAMWriteControl_t;
+		ramControl : out RAMControl_t;
 		registerFileControl : out RegisterFileControl_t;
-		phaseMAInput : in PipelinePhaseMAWBInterface_t;
-		instruction_done : out std_logic
+		phaseMAInput : in PipelinePhaseMAWBInterface_t
 	);
 end entity;
 
 architecture Behavioral of PipelinePhaseWriteBack is
 begin
+	-- If target is register file, this will trigger the
+	-- register data to be updated at next cycle.
 	registerFileControl <= (
 		address => phaseMAInput.targetRegAddr,
 		data => phaseMAInput.sourceImm
 	);
-	ramWriteControl.enable <= phaseMAInput.targetIsRAM;
-	ramWriteControl.address <= phaseMAInput.targetRAMAddr;
-	ramWriteControl.data <= phaseMAInput.sourceImm;
-	instruction_done <= '1';
+	
+	-- If target is RAM, this will trigger RAM data to be
+	-- updated in next cycle.
+	ramControl <= (
+		writeEnabled => phaseMAInput.targetIsRAM,
+		readEnabled => FUNC_DISABLED,
+		address => phaseMAInput.targetRAMAddr,
+		data => phaseMAInput.sourceImm
+	);
 
 end Behavioral;

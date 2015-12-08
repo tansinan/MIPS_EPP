@@ -43,7 +43,7 @@ begin
 	pcControl.data <= phaseIDInput.extraImm;
 
 	-- TODO: produce an exception when address is not valid.
-	phaseMACtrl.sourceRAMAddr <= result(PHYSICS_RAM_ADDRESS_WIDTH + 1 downto 2);
+	phaseMACtrl.sourceRAMAddr <= result;
 
 	with phaseIDInput.targetIsRAM select phaseMACtrl.sourceImm <=
 		result when FUNC_DISABLED,
@@ -56,7 +56,7 @@ begin
 		FUNC_DISABLED when FUNC_ENABLED;
 
 	-- TODO: produce an exception when address is not valid.
-	phaseMACtrl.targetRAMAddr <= result(PHYSICS_RAM_ADDRESS_WIDTH + 1 downto 2);
+	phaseMACtrl.targetRAMAddr <= result;
 	phaseMACtrl.targetRegAddr <= phaseIDInput.targetReg;
 	phaseMACtrl.instructionOpcode <= phaseIDInput.instructionOpcode;
 

@@ -18,6 +18,8 @@ end entity;
 architecture Behavioral of Coprocessor0_e is
 	signal cp0RegisterFileControl : CP0RegisterFileControl_t;
 	signal cp0RegisterFileData : CP0RegisterFileOutput_t;
+	signal cp0TLBControl : CP0TLBControl_t;
+	signal cp0TLBData : CP0TLBData_t;
 begin
 	cp0PipelinePhaseInstructionDecode_i: entity work.CP0PipelinePhaseInstructionDecode
 	port map
@@ -29,7 +31,9 @@ begin
 		primaryRegisterFileData => primaryRegisterFileData,
 		primaryRegisterFileControl => primaryRegisterFileControl,
 		cp0RegisterFileData => cp0RegisterFileData,
-		cp0RegisterFileControl => cp0RegisterFileControl
+		cp0RegisterFileControl => cp0RegisterFileControl,
+		cp0TLBData => cp0TLBData,
+		cp0TLBControl => cp0TLBControl
 	);
 	
 	cp0RegisterFile_i: entity work.CP0RegisterFile_c
@@ -39,6 +43,14 @@ begin
 		clock => clock,
         control => cp0RegisterFileControl,
 		output => cp0RegisterFileData
+	);
+	
+	cp0TLB_i : entity work.CP0TLB_e
+    port map (
+		reset => reset,
+		clock => clock,
+		control => cp0TLBControl,
+		output => cp0TLBData_t
 	);
 
 end architecture;

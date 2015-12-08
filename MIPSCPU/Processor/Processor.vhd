@@ -4,6 +4,7 @@ use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 use work.MIPSCPU.all;
 use work.MIPSCP0.all;
+use work.HardwareController.all;
 
 entity Processor is
 	port (
@@ -94,17 +95,6 @@ architecture Behavioral of Processor is
 	);
 	end component;
 
-	component PipelinePhaseMemoryAccess is
-	port (
-		clock : in std_logic;
-		reset : in std_logic;
-		phaseEXInput : in PipelinePhaseEXMAInterface_t;
-		phaseWBCtrlOutput : out PipelinePhaseMAWBInterface_t;
-		ramReadControl : out RAMReadControl_t;
-		ramReadResult : in std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0)
-	);
-	end component;
-
 begin
 
 	register_file : RegisterFile port map (
@@ -144,24 +134,21 @@ begin
 		phaseMACtrlOutput => pipelinePhaseEXMAInterface
 	);
 
-	pipelinePhaseMemoryAccess_e: PipelinePhaseMemoryAccess
+	pipelinePhaseMemoryAccess_e: entity work.PipelinePhaseMemoryAccess
 	port map (
 		reset => reset,
 		clock => clock,
 		phaseEXInput => pipelinePhaseEXMAInterface,
 		phaseWBCtrlOutput => pipelinePhaseMAWBInterface,
-		ramReadControl => ramReadControl1,
+		ramControl => ramControl1,
 		ramReadResult => primaryRAMData
 	);
 
 	pipelinePhaseWirteBack_i: entity work.PipelinePhaseWriteBack
 	port map (
-		reset => reset,
-		clock => clock,
-		ramWriteControl => ramWriteControl,
+		ramControl => ramControl2,
 		registerFileControl => registerFileControl1,
-		phaseMAInput => pipelinePhaseMAWBInterface,
-		instruction_done => instruction_done
+		phaseMAInput => pipelinePhaseMAWBInterface
 	);
 	
 	registerFileWriter_i: entity work.RegisterFileWriter
@@ -181,7 +168,7 @@ begin
 		register_file_debug <= register_file_output;
 		pcValueDebug <= pcValue;
 		debugInstructionToPrimary <= instructionToPrimary;
-		ramReadControl2.address <= pcValue(PHYSICS_RAM_ADDRESS_WIDTH + 1 downto 2);
+		ramControl3.address <= pcValue;
 	end process;
 	
 	Coprocessor0_i : entity work.Coprocessor0_e
@@ -211,7 +198,7 @@ begin
 		secondaryRAMResult => secondaryRAMResult
 	);
 
-	Processor_Process : process (clock, reset, phyDataBus)
+	Processor_Process : process (clock, reset)
 		variable opcode : InstructionOpcode_t;
 		variable instruction : Instruction_t;
 	begin
@@ -234,17 +221,20 @@ begin
 				end if;
 				pcControl2.operation <= REGISTER_OPERATION_READ;
 				current_pipeline_phase <= current_pipeline_phase + 1;
-				ramReadControl2.enable <= FUNC_DISABLED;
+				ramControl3.writeEnabled <= FUNC_DISABLED;
+				ramControl3.readEnabled <= FUNC_DISABLED;
 			elsif current_pipeline_phase = "0100" then
 				pcControl2.operation <= REGISTER_OPERATION_WRITE;
 				pcControl2.data <= pcValue + 4;
 				current_pipeline_phase <= "0000";
-				ramReadControl2.enable <= FUNC_ENABLED;
+				ramControl3.writeEnabled <= FUNC_DISABLED;
+				ramControl3.readEnabled <= FUNC_ENABLED;
 			else
 				pcControl2.operation <= REGISTER_OPERATION_READ;
 				instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
 				current_pipeline_phase <= current_pipeline_phase + 1;
-				ramReadControl2.enable <= FUNC_DISABLED;
+				ramControl3.writeEnabled <= FUNC_DISABLED;
+				ramControl3.readEnabled <= FUNC_DISABLED;
 			end if;
 		end if;
 	end process;

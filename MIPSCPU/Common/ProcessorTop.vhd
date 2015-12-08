@@ -15,8 +15,8 @@ entity ProcessorTop is
 		secondaryPhysicsRAMControl : out PhysicsRAMControl_t;
 		secondaryPhysicsRAMAddressBus : out PhysicsRAMAddress_t;
 		secondaryPhysicsRAMDataBus : inout PhysicsRAMData_t;
-		uart1Transmit : in std_logic_vector;
-		uart1Receive : out std_logic_vector
+		uart1Transmit : out std_logic;
+		uart1Receive : in std_logic
 	);
 end entity;
 
@@ -26,6 +26,8 @@ architecture Behavioral of ProcessorTop is
 	signal secondaryRAMControl : HardwareRAMControl_t;
 	signal primaryRAMResult : RAMData_t;
 	signal secondaryRAMResult : RAMData_t;
+	signal uartControl : HardwareRegisterControl_t;
+	signal uartOutput : CPUData_t;
 begin
 	primaryRAMController_i : entity work.RAMController_e
 	port map (
@@ -75,9 +77,9 @@ begin
 	(
 		reset => reset,
 		clock => clockDivided,
-		clock50M => clock,
-		control => open,
-		output => open,
+		clock50M => clock50M,
+		control => uartControl,
+		output => uartOutput,
 		uartTransmit => uart1Transmit,
 		uartReceive => uart1Receive
 	);

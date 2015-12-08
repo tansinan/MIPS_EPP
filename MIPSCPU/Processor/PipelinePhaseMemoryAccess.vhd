@@ -9,8 +9,8 @@ entity PipelinePhaseMemoryAccess is
 		reset : in std_logic;
 		phaseEXInput : in PipelinePhaseEXMAInterface_t;
 		phaseWBCtrlOutput : out PipelinePhaseMAWBInterface_t;
-		ramReadControl : out RAMReadControl_t;
-		ramReadResult : in std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0)
+		ramControl : out RAMControl_t;
+		ramReadResult : in std_logic_vector(MIPS_RAM_DATA_WIDTH - 1 downto 0)
 	);
 end PipelinePhaseMemoryAccess;
 
@@ -19,8 +19,12 @@ architecture Behavioral of PipelinePhaseMemoryAccess is
 begin
 	process(phaseEXInput, ramReadResult)
 	begin
-		ramReadControl.enable <= phaseEXInput.sourceIsRAM;
-		ramReadControl.address <= phaseEXInput.sourceRAMAddr;
+		ramControl <= (
+			readEnabled => phaseEXInput.sourceIsRAM,
+			writeEnabled => FUNC_DISABLED,
+			address => phaseEXInput.sourceRAMAddr,
+			data => (others => '0')
+		);
 		case phaseExInput.instructionOpcode is
 			when MIPS_CPU_INSTRUCTION_OPCODE_LW =>
 				phaseWBCtrl.sourceImm <= ramReadResult;
