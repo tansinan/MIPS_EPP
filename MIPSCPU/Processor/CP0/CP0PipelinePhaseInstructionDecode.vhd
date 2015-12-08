@@ -64,19 +64,36 @@ begin
 			end loop;
 			cp0TLBControl.writeEnabled <= FUNC_DISABLED;
 		elsif func = "000010" then
+			--Execute TLBWI
 			primaryRegisterFileControl.address <= (others => '0');
 			primaryRegisterFileControl.data <= (others => '0');
 			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
 				cp0RegisterFileControl(i).data <= (others => '0');
 				cp0RegisterFileControl(i).operation <= REGISTER_OPERATION_READ;
 			end loop;
-			--Execute TLBWI
 			cp0TLBControl.writeEnabled <= FUNC_ENABLED;
 			cp0TLBControl.index <= cp0RegisterFileData(0);
 			cp0TLBControl.data.pageMask <= cp0RegisterFileData(5);
 			cp0TLBControl.data.entryHigh <= cp0RegisterFileData(10);
 			cp0TLBControl.data.entryLow0 <= cp0RegisterFileData(2);
 			cp0TLBControl.data.entryLow1 <= cp0RegisterFileData(3);
+		elsif func = "000001" then
+			--Execute TLBR
+			primaryRegisterFileControl.address <= (others => '0');
+			primaryRegisterFileControl.data <= (others => '0');
+			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
+				cp0RegisterFileControl(i).data <= (others => '0');
+				cp0RegisterFileControl(i).operation <= REGISTER_OPERATION_READ;
+			end loop;
+			cp0RegisterFileControl(5).operation <= REGISTER_OPERATION_WRITE;
+			cp0RegisterFileControl(5).data <= cp0TLBData(to_integer(unsigned(cp0RegisterFileData(0)))).pageMask;
+			cp0RegisterFileControl(10).operation <= REGISTER_OPERATION_WRITE;
+			cp0RegisterFileControl(10).data <= cp0TLBData(to_integer(unsigned(cp0RegisterFileData(0)))).entryHigh;
+			cp0RegisterFileControl(2).operation <= REGISTER_OPERATION_WRITE;
+			cp0RegisterFileControl(2).data <= cp0TLBData(to_integer(unsigned(cp0RegisterFileData(0)))).entryLow0;
+			cp0RegisterFileControl(3).operation <= REGISTER_OPERATION_WRITE;
+			cp0RegisterFileControl(3).data <= cp0TLBData(to_integer(unsigned(cp0RegisterFileData(0)))).entryLow1;
+			cp0TLBControl.writeEnabled <= FUNC_DISABLED;
 		end if;
 	end process;
 end architecture;
