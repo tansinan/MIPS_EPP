@@ -21,6 +21,13 @@ package HardwareController is
 			writeEnabled : std_logic;
 			readEnabled : std_logic;
 		end record;
+		
+	-- Constants and (sub)types related to ISA registers.
+	constant ISA_REGISTER_EFFECTIVE_WIDTH : integer := 12;
+	subtype ISAHardwareRegisterAddress_t is
+		std_logic_vector(ISA_REGISTER_EFFECTIVE_WIDTH - 1 downto 0);
+	constant UART1_REGISTER_DATA : ISAHardwareRegisterAddress_t := x"3f8";
+	
 end package;
 
 package body HardwareController is

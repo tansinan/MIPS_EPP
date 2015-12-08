@@ -157,6 +157,8 @@ package MIPSCPU is
 		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "01011";
 	constant ALU_OPERATION_SHIFT_RIGHT_ARITH :
 		std_logic_vector(ALU_OPERATION_CTRL_WIDTH - 1 downto 0) := "01100";
+		
+	-- Register and hardware register related (sub)types and constants.
 	constant REGISTER_OPERATION_READ : std_logic := '0';
 	constant REGISTER_OPERATION_WRITE : std_logic := '1';
 
@@ -164,6 +166,13 @@ package MIPSCPU is
 		record
 			operation : std_logic;
 			data : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		end record;
+	
+	type HardwareRegisterControl_t is
+		record
+			operation : std_logic;
+			address : CPUData_t;
+			data : CPUData_t;
 		end record;
 
 	--! Parameters related to physics RAM bus.

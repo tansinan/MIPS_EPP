@@ -9,15 +9,14 @@ entity Processor is
 	port (
 		reset : in std_logic;
 		clock : in std_logic;
-		phyRAMEnable : out std_logic;
-		phyRAMWriteEnable : out std_logic;
-		phyRAMReadEnable : out std_logic;
-		phyAddressBus : out std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
-		phyDataBus : inout std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 		register_file_debug : out mips_register_file_port;
 		pcValueDebug : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		debugCP0RegisterFileData : out CP0RegisterFileOutput_t;
-		debugInstructionToPrimary : out Instruction_t
+		debugInstructionToPrimary : out Instruction_t;
+		primaryRAMControl : out HardwareRAMControl_t;
+		primaryRAMResult : in RAMData_t;
+		secondaryRAMControl : out HardwareRAMControl_t;
+		secondaryRAMResult : in RAMData_t
 	);
 end entity;
 
@@ -41,9 +40,10 @@ architecture Behavioral of Processor is
 
 	signal primaryRAMData : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 
-	signal ramReadControl1 : RAMReadControl_t;
-	signal ramReadControl2 : RAMReadControl_t;
-	signal ramWriteControl : RAMWriteControl_t;
+	signal ramControl1 : RAMControl_t;
+	signal ramControl2 : RAMControl_t;
+	signal ramControl3 : RAMControl_t;
+	signal memoryAccessResult : RAMData_t;
 
 	signal pcControl1 : RegisterControl_t;
 	signal pcControl2 : RegisterControl_t;
@@ -68,22 +68,6 @@ architecture Behavioral of Processor is
 		input : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		operation : in std_logic_vector (MIPS_CPU_REGISTER_COUNT - 1 downto 0);
 		output : out mips_register_file_port
-	);
-	end component;
-
-	component RAMController_c is
-	port (
-		clock : in std_logic;
-		reset : in std_logic;
-		readControl1 : in RAMReadControl_t;
-		readControl2 : in RAMReadControl_t;
-		writeControl : in RAMWriteControl_t;
-		result : out std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
-		phyRAMEnable : out std_logic;
-		phyRAMWriteEnable : out std_logic;
-		phyRAMReadEnable : out std_logic;
-		phyAddressBus : out std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
-		phyDataBus : inout std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0)
 	);
 	end component;
 
@@ -180,21 +164,6 @@ begin
 		instruction_done => instruction_done
 	);
 	
-	primaryRamController_e: RAMController_c
-	port map (
-		clock => clock,
-		reset => reset,
-		readControl1 => ramReadControl1,
-		readControl2 => ramReadControl2,
-		writeControl => ramWriteControl,
-		result => primaryRAMData,
-		phyRAMEnable => phyRAMEnable,
-		phyRAMWriteEnable => phyRAMWriteEnable,
-		phyRAMReadEnable => phyRAMReadEnable,
-		phyAddressBus => phyAddressBus,
-		phyDataBus => phyDataBus
-	);
-
 	registerFileWriter_i: entity work.RegisterFileWriter
 	port map
 	(
@@ -225,6 +194,21 @@ begin
 		primaryRegisterFileData => register_file_output,
 		primaryRegisterFileControl => registerFileControl2,
 		debugCP0RegisterFileData => debugCP0RegisterFileData
+	);
+	
+	hardwareAddressMapper : entity work.HardwareAddressMapper
+	port map
+	(
+		clock => clock,
+		reset => reset,
+		ramControl1 => ramControl1,
+		ramControl2 => ramControl2,
+		ramControl3 => ramControl3,
+		result => memoryAccessResult,
+		primaryRAMHardwareControl => primaryRAMControl,
+		primaryRAMResult => primaryRAMResult,
+		secondaryRAMHardwareControl => secondaryRAMControl,
+		secondaryRAMResult => secondaryRAMResult
 	);
 
 	Processor_Process : process (clock, reset, phyDataBus)

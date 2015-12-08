@@ -4,7 +4,7 @@ use work.HardwareController.all;
 use work.MIPSCPU.all;
 use work.MIPSCP0.all;
 
-entity HardwareRegisterMapper is
+entity HardwareAddressMapper is
 	port
 	(
 		clock : in Clock_t;
@@ -27,7 +27,7 @@ entity HardwareRegisterMapper is
 	);
 end entity;
 
-architecture Behavioral of HardwareRegisterMapper is
+architecture Behavioral of HardwareAddressMapper is
 	signal addressType : AddressType_t;
 	signal usedRAMControl : RAMControl_t;
 begin
