@@ -6,6 +6,8 @@ MIPSCPU/Build
 iseconfig/
 CPLDShortcut/Shortcut_html
 *.log
+CPLDShortcut/*.html
+MIPSCPU/*.html
 
 # project-wide generated files
 *.gise
@@ -53,7 +55,11 @@ Simulator/*.txt
 *.o
 *.layout
 *.win
+*.exe
 
 #Generated translator file/Translator test file
 Translator/*.txt
 Translator/*.asm
+
+# Linux temporary files
+.directory
