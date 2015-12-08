@@ -1,4 +1,4 @@
-#include "simulator.h"
+#include "simulator_bin.h"
 
 int main(int argc, char* argv[])
 {

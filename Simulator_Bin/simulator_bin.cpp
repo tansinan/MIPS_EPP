@@ -1,9 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <stdlib.h>
-
-#include "simulator.h"
+#include "simulator_bin.h"
 
 using namespace std;
 
@@ -34,7 +29,7 @@ void Simulator::printCache(char output, int cache[])
 	}
 }
 
-int MemoryModule::write(unsigned int address, char value)
+int MemoryModule::write(int address, char value)
 {
 	if (address >= 0x80000000)
 	{
@@ -65,7 +60,7 @@ int MemoryModule::write(unsigned int address, char value)
 	return 0;
 }
 	
-int MemoryModule::read(unsigned int address, char* value)
+int MemoryModule::read(int address, char* value)
 {
 	if (address >= 0x80000000)
 	{
@@ -122,7 +117,7 @@ Simulator::~Simulator()
 	delete memory;
 }
 
-int Simulator::loadCommand(&inputFileStream, address)
+void Simulator::loadCommand(ifstream &inputFileStream, int address)
 {
 	string command;
 	int ramCounter = 0;
@@ -134,29 +129,287 @@ int Simulator::loadCommand(&inputFileStream, address)
 			initStatus = 1;
 			return;
 		}
-		if (ramCounter >= ramSize - 4)
+		if (ramCounter >= memory->ramSize - 4)
 		{
 			initStatus = 2;
 			return;
 		}
 		for (int i = 0; i < 4; ++i)
 		{
-			memory->write(ramCounter,(char)decimalConvert(command.substr(i*8,8)))
-			++ramCounter;
+			memory->write(ramCounter,(char)decimalConvert(command.substr(i*8,8), true));
+			ramCounter++;
 		}
-	} while (string != "")
+	} while (command != "");
 }
 
-int Simulator::decimalConvert(string origin)
+int Simulator::executeCommand()
+{
+	string commandBin = "";
+	for (int i = 0; i < 4; i++)
+	{
+		char temp;
+		memory->read(programCounter + i, &temp);
+		commandBin += binaryConvert((int)temp, 8, true);
+	}
+	
+	string op,rs,rt,rd,shamt,func;
+	op = commandBin.substr(0,6);
+	rs = commandBin.substr(6,5);
+	rt = commandBin.substr(11,5);
+	rd = commandBin.substr(16,5);
+	shamt = commandBin.substr(21,5);
+	func = commandBin.substr(26,6);
+
+	if (func == "100000" && op == "000000" && shamt == "00000")
+	{
+		//add
+		cache[decimalConvert(rd, true)] = cache[decimalConvert(rs, true)] + cache[decimalConvert(rt, true)];
+		programCounter += 4;
+	}
+	else if (func == "100001" && op == "000000" && shamt == "00000")
+	{
+		//addu
+		cache[decimalConvert(rd, true)] = (unsigned int)((unsigned int)cache[decimalConvert(rs, true)] + (unsigned int)cache[decimalConvert(rt, true)]);
+		programCounter += 4;
+	}
+	else if (func == "100010" && op == "000000" && shamt == "00000")
+	{
+		//sub
+		cache[decimalConvert(rd, true)] = cache[decimalConvert(rs, true)] - cache[decimalConvert(rt, true)];
+		programCounter += 4;
+	}
+	else if (func == "100011" && op == "000000" && shamt == "00000")
+	{
+		//subu
+		cache[decimalConvert(rd, true)] = (unsigned int)((unsigned int)cache[decimalConvert(rs, true)] - (unsigned int)cache[decimalConvert(rt, true)]);
+		programCounter += 4;
+	}
+	else if (func == "100100" && op == "000000" && shamt == "00000")
+	{
+		//and
+		cache[decimalConvert(rd, true)] = cache[decimalConvert(rs, true)] - cache[decimalConvert(rt, true)];
+		programCounter += 4;
+	}
+	else if (func == "100101" && op == "000000" && shamt == "00000")
+	{
+		//or
+		cache[decimalConvert(rd, true)] = cache[decimalConvert(rs, true)] | cache[decimalConvert(rt, true)];
+		programCounter += 4;
+	}
+	else if (func == "100110" && op == "000000" && shamt == "00000")
+	{
+		//xor
+		cache[decimalConvert(rd, true)] = cache[decimalConvert(rs, true)] ^ cache[decimalConvert(rt, true)];
+		programCounter += 4;
+	}
+	else if (func == "100111" && op == "000000" && shamt == "00000")
+	{
+		//nor
+		cache[decimalConvert(rd, true)] = ~(cache[decimalConvert(rs, true)] | cache[decimalConvert(rt, true)]);
+		programCounter += 4;
+	}
+	else if (func == "101010" && op == "000000" && shamt == "00000")
+	{
+		//slt
+		if (cache[decimalConvert(rs, true)] < cache[decimalConvert(rt, true)])
+			cache[decimalConvert(rd, true)] = 1;
+		else
+			cache[decimalConvert(rd, true)] = 0;
+		programCounter += 4;
+	}
+	else if (func == "101011" && op == "000000" && shamt == "00000")
+	{
+		//sltu
+		if ((unsigned int)(cache[decimalConvert(rs, true)] < (unsigned int)cache[decimalConvert(rt, true)]))
+			cache[decimalConvert(rd, true)] = 1;
+		else
+			cache[decimalConvert(rd, true)] = 0;
+		programCounter += 4;
+	}
+	else if (func == "000000" && op == "000000" && rs == "00000")
+	{
+		//sll
+		cache[decimalConvert(rd, true)] = cache[decimalConvert(rs, true)] << decimalConvert(shamt, true);
+		programCounter += 4;
+	}
+	else if (func == "000010" && op == "000000" && rs == "00000")
+	{
+		//srl
+		cache[decimalConvert(rd, true)] = (unsigned int)cache[decimalConvert(rs, true)] >> (unsigned int)decimalConvert(shamt, true);
+		programCounter += 4;
+	}
+	else if (func == "000011" && op == "000000" && rs == "00000")
+	{
+		//sra
+		cache[decimalConvert(rd, true)] = cache[decimalConvert(rs, true)] >> decimalConvert(shamt, true);
+		programCounter += 4;
+	}
+	else if (func == "000100" && op == "000000" && shamt == "00000")
+	{
+		//sllv
+		cache[decimalConvert(rd, true)] = cache[decimalConvert(rs, true)] << cache[decimalConvert(rs, true)];
+		programCounter += 4;
+	}
+	else if (func == "000110" && op == "000000" && shamt == "00000")
+	{
+		//srlv
+		cache[decimalConvert(rd, true)] = (unsigned int)cache[decimalConvert(rs, true)] >> (unsigned int)cache[decimalConvert(rs, true)];
+		programCounter += 4;
+	}
+	else if (func == "000111" && op == "000000" && shamt == "00000")
+	{
+		//srav
+		cache[decimalConvert(rd, true)] = cache[decimalConvert(rs, true)] >> cache[decimalConvert(rs, true)];
+		programCounter += 4;
+	}
+	else if (func == "001000" && op == "000000" && rd == "00000" && rt == "00000" && shamt == "00000")
+	{
+		//jr
+		programCounter = cache[decimalConvert(rs, true)];
+	}
+	else if (op == "001000")
+	{
+		//addi
+		string imm = rd + shamt + func;
+		cache[decimalConvert(rt, true)] = cache[decimalConvert(rs, true)] + decimalConvert(imm, false);
+		programCounter += 4;
+	}
+	else if (op == "001001")
+	{
+		//addiu
+		string imm = rd + shamt + func;
+		cache[decimalConvert(rt, true)] = cache[decimalConvert(rs, true)] + (unsigned int)decimalConvert(imm, true);
+		programCounter += 4;
+	}
+	else if (op == "001100")
+	{
+		//andi
+		string imm = rd + shamt + func;
+		cache[decimalConvert(rt, true)] = cache[decimalConvert(rs, true)] & (unsigned int)decimalConvert(imm, true);
+		programCounter += 4;
+	}
+	else if (op == "001101")
+	{
+		//ori
+		string imm = rd + shamt + func;
+		cache[decimalConvert(rt, true)] = cache[decimalConvert(rs, true)] | (unsigned int)decimalConvert(imm, true);
+		programCounter += 4;
+	}
+	else if (op == "001110")
+	{
+		//xori
+		string imm = rd + shamt + func;
+		cache[decimalConvert(rt, true)] = cache[decimalConvert(rs, true)] ^ (unsigned int)decimalConvert(imm, true);
+		programCounter += 4;
+	}
+	else if (op == "001111" && rs == "00000")
+	{
+		//lui
+		string imm = rd + shamt + func;
+		cache[decimalConvert(rt, true)] = decimalConvert(imm, false) * 65536;
+		programCounter += 4;
+	}
+	else if (op == "100011")
+	{
+		//lw
+		string imm = rd + shamt + func;
+		int address = cache[decimalConvert(rs, true)] + decimalConvert(imm, false);
+		char word[4];
+		for (unsigned int i = 0; i < 4; i++)
+			memory->read(address + i, &word[i]);
+		cache[decimalConvert(rt, true)] = *((int*)word);
+		programCounter += 4;
+	}
+	else if (op == "101011")
+	{
+		//sw
+		string imm = rd + shamt + func;
+		int address = cache[decimalConvert(rs, true)] + decimalConvert(imm, false);
+		char* word = (char*)&cache[decimalConvert(rt, true)];
+		for (unsigned int i = 0; i < 4; i++)
+			memory->write(address + i, word[i]);
+		programCounter += 4;
+	}
+	else if (op == "000100")
+	{
+		//beq
+		string imm = rd + shamt + func;
+		if (cache[decimalConvert(rs, true)] == cache[decimalConvert(rt, true)])
+			programCounter += (decimalConvert(imm, false) << 2);
+		programCounter += 4;
+	}
+	else if (op == "000101")
+	{
+		//bne
+		string imm = rd + shamt + func;
+		if (cache[decimalConvert(rs, true)] != cache[decimalConvert(rt, true)])
+			programCounter += (decimalConvert(imm, false) << 2);
+		programCounter += 4;
+	}
+	else if (op == "001010")
+	{
+		//slti
+		string imm = rd + shamt + func;
+		if (cache[decimalConvert(rs, true)] < decimalConvert(imm, false))
+			cache[decimalConvert(rt, true)] = 1;
+		else
+			cache[decimalConvert(rt, true)] = 0;
+		programCounter += 4;
+	}
+	else if (op == "001011")
+	{
+		//sltiu
+		string imm = rd + shamt + func;
+		if (cache[decimalConvert(rs, true)] < (unsigned int)decimalConvert(imm, false))
+			cache[decimalConvert(rt, true)] = 1;
+		else
+			cache[decimalConvert(rt, true)] = 0;
+		programCounter += 4;
+	}
+	else if (op == "000010")
+	{
+		//j
+		
+	}
+	else if (op == "000011")
+	{
+		//jal
+	}
+	
+	cache[0] = 0;
+	printTestbench(testbench, commandBin);
+}
+
+int Simulator::decimalConvert(string origin, bool trueForm)
 {
 	int ret = 0;
+	if (!trueForm && origin[0] == '1')
+	{
+		for (int i = 0; i < origin.length(); i++)
+			if (origin[i] == '0')
+				origin[i] = '1';
+			else origin[i] = '0';
+		for (int i = origin.length() - 1; i >= 0; i--)
+			if (origin[i] == '0')
+			{
+				origin[i] = '1';
+				break;
+			}
+			else
+				origin[i] = '0';
+	}
+		
 	for (int i = 0; i < origin.length(); i++)
 	{
 		ret = ret * 2;
 		if (origin[i] == '1')
 			ret += 1;
 	}
-	return ret;
+	
+	if (trueForm)
+		return ret;
+	else
+		return -ret;
 }
 
 string Simulator::binaryConvert(int origin, int width, bool trueForm)
@@ -220,6 +473,8 @@ void Simulator::printTestbench(ofstream &testbench, string commandBin)
 	testbench << '\n';
 }
 
+//Wasted code, do not use.
+/*
 void Simulator::printCommandBin(ofstream &testbench, string command, int p1, int p2, int p3)
 {
 	string commandBin = "";
@@ -452,19 +707,25 @@ void Simulator::printCommandBin(ofstream &testbench, string command, int p1, int
 	}
 	printTestbench(testbench, commandBin);
 }
+*/
 
+//Wasted code, do not use.
+/*
 int Simulator::executeCommand()
 {
+	stringstream commandStream;
+	commandStream.str("");
+	commandStream << decodeCommand(programCounter);
 	commandNum ++;
 	string command = "";
-	inputFileStream >> command;
+	commandStream >> command;
 	if (command == "E" || command == "")
 		return 1;
 	else if (command == "add")
 	{
 		string s1,s2,s3;
 		int c1,c2,c3;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		s3 = s3.substr(1);
@@ -474,12 +735,13 @@ int Simulator::executeCommand()
 		cache[c1] = cache[c2] + cache[c3];
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, c3);
+		programCounter += 4;
 	}
 	else if (command == "addu")
 	{
 		string s1,s2,s3;
 		int c1,c2,c3;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		s3 = s3.substr(1);
@@ -489,12 +751,13 @@ int Simulator::executeCommand()
 		cache[c1] = (unsigned int)(((unsigned int)cache[c2]) + ((unsigned int)cache[c3]));
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, c3);
+		programCounter += 4;
 	}
 	else if (command == "sub")
 	{
 		string s1,s2,s3;
 		int c1,c2,c3;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		s3 = s3.substr(1);
@@ -504,12 +767,13 @@ int Simulator::executeCommand()
 		cache[c1] = cache[c2] - cache[c3];
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, c3);
+		programCounter += 4;
 	}
 	else if (command == "subu")
 	{
 		string s1,s2,s3;
 		int c1,c2,c3;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		s3 = s3.substr(1);
@@ -519,12 +783,13 @@ int Simulator::executeCommand()
 		cache[c1] = (unsigned int)(((unsigned int)cache[c2]) - ((unsigned int)cache[c3]));
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, c3);
+		programCounter += 4;
 	}
 	else if (command == "and")
 	{
 		string s1,s2,s3;
 		int c1,c2,c3;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		s3 = s3.substr(1);
@@ -534,12 +799,13 @@ int Simulator::executeCommand()
 		cache[c1] = cache[c2] & cache[c3];
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, c3);
+		programCounter += 4;
 	}
 	else if (command == "or")
 	{
 		string s1,s2,s3;
 		int c1,c2,c3;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		s3 = s3.substr(1);
@@ -549,12 +815,13 @@ int Simulator::executeCommand()
 		cache[c1] = cache[c2] | cache[c3];
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, c3);
+		programCounter += 4;
 	}
 	else if (command == "xor")
 	{
 		string s1,s2,s3;
 		int c1,c2,c3;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		s3 = s3.substr(1);
@@ -564,12 +831,13 @@ int Simulator::executeCommand()
 		cache[c1] = cache[c2] ^ cache[c3];
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, c3);
+		programCounter += 4;
 	}
 	else if (command == "nor")
 	{
 		string s1,s2,s3;
 		int c1,c2,c3;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		s3 = s3.substr(1);
@@ -579,12 +847,13 @@ int Simulator::executeCommand()
 		cache[c1] = ~(cache[c2] | cache[c3]);
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, c3);
+		programCounter += 4;
 	}
 	else if (command == "slt")
 	{
 		string s1,s2,s3;
 		int c1,c2,c3;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		s3 = s3.substr(1);
@@ -597,12 +866,13 @@ int Simulator::executeCommand()
 			cache[c1] = 0;
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, c3);
+		programCounter += 4;
 	}
 	else if (command == "sltu")
 	{
 		string s1,s2,s3;
 		int c1,c2,c3;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		s3 = s3.substr(1);
@@ -615,12 +885,13 @@ int Simulator::executeCommand()
 			cache[c1] = 0;
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, c3);
+		programCounter += 4;
 	}
 	else if (command == "sll")
 	{
 		string s1,s2,s3;
 		int c1,c2,shamt;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		c1 = atoi(s1.c_str());
@@ -629,12 +900,13 @@ int Simulator::executeCommand()
 		cache[c1] = cache[c2] << shamt;
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, shamt);
+		programCounter += 4;
 	}
 	else if (command == "srl")
 	{
 		string s1,s2,s3;
 		int c1,c2,shamt;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		c1 = atoi(s1.c_str());
@@ -643,12 +915,13 @@ int Simulator::executeCommand()
 		cache[c1] = (unsigned int)cache[c2] >> (unsigned int)shamt;
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, shamt);
+		programCounter += 4;
 	}
 	else if (command == "sra")
 	{
 		string s1,s2,s3;
 		int c1,c2,shamt;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		c1 = atoi(s1.c_str());
@@ -657,12 +930,13 @@ int Simulator::executeCommand()
 		cache[c1] = cache[c2] >> shamt;
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, shamt);
+		programCounter += 4;
 	}
 	else if (command == "sllv")
 	{
 		string s1,s2,s3;
 		int c1,c2,c3;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		s3 = s3.substr(1);
@@ -672,12 +946,13 @@ int Simulator::executeCommand()
 		cache[c1] = cache[c2] << cache[c3];
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, c3);
+		programCounter += 4;
 	}
 	else if (command == "srlv")
 	{
 		string s1,s2,s3;
 		int c1,c2,c3;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		s3 = s3.substr(1);
@@ -687,12 +962,13 @@ int Simulator::executeCommand()
 		cache[c1] = (unsigned int)cache[c2] >> (unsigned int)cache[c3];
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, c3);
+		programCounter += 4;
 	}
 	else if (command == "srav")
 	{
 		string s1,s2,s3;
 		int c1,c2,c3;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		s3 = s3.substr(1);
@@ -702,6 +978,7 @@ int Simulator::executeCommand()
 		cache[c1] = cache[c2] >> cache[c3];
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, c3);
+		programCounter += 4;
 	}
 	else if (command == "jr")
 	{
@@ -711,7 +988,7 @@ int Simulator::executeCommand()
 	{
 		string s1,s2,s3;
 		int c1,c2,imm;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		c1 = atoi(s1.c_str());
@@ -720,12 +997,13 @@ int Simulator::executeCommand()
 		cache[c1] = cache[c2] + imm;
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, imm);
+		programCounter += 4;
 	}
 	else if (command == "addiu")
 	{
 		string s1,s2,s3;
 		int c1,c2,imm;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		c1 = atoi(s1.c_str());
@@ -734,12 +1012,13 @@ int Simulator::executeCommand()
 		cache[c1] = (unsigned int)(((unsigned int)cache[c2]) + ((unsigned int)imm));
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, imm);
+		programCounter += 4;
 	}
 	else if (command == "andi")
 	{
 		string s1,s2,s3;
 		int c1,c2,imm;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		c1 = atoi(s1.c_str());
@@ -748,12 +1027,13 @@ int Simulator::executeCommand()
 		cache[c1] = (unsigned int)(((unsigned int)cache[c2]) & ((unsigned int)imm));
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, imm);
+		programCounter += 4;
 	}
 	else if (command == "ori")
 	{
 		string s1,s2,s3;
 		int c1,c2,imm;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		c1 = atoi(s1.c_str());
@@ -762,12 +1042,13 @@ int Simulator::executeCommand()
 		cache[c1] = (unsigned int)(((unsigned int)cache[c2]) | ((unsigned int)imm));
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, imm);
+		programCounter += 4;
 	}
 	else if (command == "xori")
 	{
 		string s1,s2,s3;
 		int c1,c2,imm;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		c1 = atoi(s1.c_str());
@@ -776,24 +1057,26 @@ int Simulator::executeCommand()
 		cache[c1] = (unsigned int)(((unsigned int)cache[c2]) ^ ((unsigned int)imm));
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, imm);
+		programCounter += 4;
 	}
 	else if (command == "lui")
 	{
 		string s1,s2;
 		int c1,imm;
-		inputFileStream >> s1 >> s2;
+		commandStream >> s1 >> s2;
 		s1 = s1.substr(1);
 		c1 = atoi(s1.c_str());
 		imm = atoi(s2.c_str());
 		cache[c1] = ((unsigned int)imm) * 65536;
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, imm);
+		programCounter += 4;
 	}
 	else if (command == "lw")
 	{
 		string s1,s2,s3;
 		int c1,c2,imm;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		c1 = atoi(s1.c_str());
@@ -805,12 +1088,13 @@ int Simulator::executeCommand()
 			memory->read(address + i, &word[i]);
 		cache[c1] = *((int*)word);
 		printCommandBin(testbench, command, c1, c2, imm);
+		programCounter += 4;
 	}
 	else if (command == "sw")
 	{
 		string s1,s2,s3;
 		int c1,c2,imm;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		c1 = atoi(s1.c_str());
@@ -821,6 +1105,7 @@ int Simulator::executeCommand()
 		for (unsigned int i = 0; i < 4; i++)
 			memory->write(address + i, word[i]);
 		printCommandBin(testbench, command, c1, c2, imm);
+		programCounter += 4;
 	}
 	else if (command == "beq")
 	{
@@ -834,7 +1119,7 @@ int Simulator::executeCommand()
 	{
 		string s1,s2,s3;
 		int c1,c2,imm;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		c1 = atoi(s1.c_str());
@@ -846,12 +1131,13 @@ int Simulator::executeCommand()
 			cache[c1] = 0;
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, imm);
+		programCounter += 4;
 	}
 	else if (command == "sltiu")
 	{
 		string s1,s2,s3;
 		int c1,c2,imm;
-		inputFileStream >> s1 >> s2 >> s3;
+		commandStream >> s1 >> s2 >> s3;
 		s1 = s1.substr(1);
 		s2 = s2.substr(1);
 		c1 = atoi(s1.c_str());
@@ -863,6 +1149,7 @@ int Simulator::executeCommand()
 			cache[c1] = 0;
 		cache[0] = 0;
 		printCommandBin(testbench, command, c1, c2, imm);
+		programCounter += 4;
 	}
 	else if (command == "j")
 	{
@@ -878,3 +1165,4 @@ int Simulator::executeCommand()
 	printCache('C', cache);
 	return 0;
 }
+*/

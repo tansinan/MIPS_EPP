@@ -2,36 +2,38 @@
 #include <fstream>
 #include <string>
 #include <stdlib.h>
+#include <sstream>
 
 using namespace std;
 
 class MemoryModule
 {
-protected:
-	static const int ramSize = 8388608, romSize = 16777216;
-	char ram[ramSize], rom[romSize];
-
 public:
+	static const int ramSize = 8388608, romSize = 16777216;
 	MemoryModule();
-	int write(unsigned int address, char value);
-	int read(unsigned int address, char* value);
+	int write(int address, char value);
+	int read(int address, char* value);
+	
+protected:
+	char ram[ramSize], rom[romSize];
 };
 
 class Simulator
 {
 protected:
 	int cache[32];
-	int commandNum, initStatus;
+	int commandNum;
 	ifstream inputFileStream;
 	ofstream testbench;
 	MemoryModule* memory;
 	int programCounter;
 
 public:
+	int initStatus;
 	Simulator(string InputFileName);
 	~Simulator();
-	int loadCommand(&inputFileStream, address);
-	int decimalConvert(string origin);
+	void loadCommand(ifstream &inputFileStream, int address);
+	int decimalConvert(string origin, bool trueForm);
 	string binaryConvert(int origin, int width, bool trueForm);
 	void printCache(char output, int cache[]);
 	void printTestbench(ofstream &testbench, string commandBin);
