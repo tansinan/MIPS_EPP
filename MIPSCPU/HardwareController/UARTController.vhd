@@ -20,8 +20,8 @@ end entity;
 architecture Behavioral of UARTController is
 	signal canRead : CPUData_t;
 	signal canWrite : CPUData_t;
-	signal dataWrite : CPUData_t;
-	signal dataRead : CPUData_t;
+	signal dataWrite : std_logic_vector(7 downto 0);
+	signal dataRead : std_logic_vector(7 downto 0);
 	signal writeSTB : std_logic;
 	signal writeACK : std_logic;
 	signal readSTB : std_logic;

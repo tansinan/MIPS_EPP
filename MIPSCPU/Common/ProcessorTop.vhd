@@ -27,8 +27,8 @@ architecture Behavioral of ProcessorTop is
 	signal secondaryRAMControl : HardwareRAMControl_t;
 	signal primaryRAMResult : RAMData_t;
 	signal secondaryRAMResult : RAMData_t;
-	signal uartControl : HardwareRegisterControl_t;
-	signal uartOutput : CPUData_t;
+	signal uart1Control : HardwareRegisterControl_t;
+	signal uart1Output : CPUData_t;
 begin
 	primaryRAMController_i : entity work.RAMController_e
 	port map (
@@ -67,7 +67,9 @@ begin
 		primaryRAMControl => primaryRAMControl,
 		primaryRAMResult => primaryRAMResult,
 		secondaryRAMControl => secondaryRAMControl,
-		secondaryRAMResult => secondaryRAMResult
+		secondaryRAMResult => secondaryRAMResult,
+		uart1control => uart1Control,
+		uart1result => uart1Output
 	);
 	
 	uartController : entity work.UARTController
@@ -76,8 +78,8 @@ begin
 		reset => reset,
 		clock => clockDivided,
 		clock50M => clock50M,
-		control => uartControl,
-		output => uartOutput,
+		control => uart1Control,
+		output => uart1Output,
 		uartTransmit => uart1Transmit,
 		uartReceive => uart1Receive
 	);

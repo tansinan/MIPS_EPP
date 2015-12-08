@@ -67,7 +67,8 @@ begin
 				when X"57" => report "w";
 				when X"58" => report "x";
 				when X"59" => report "y";
-				when X"5A" => report "z";				
+				when X"5A" => report "z";
+				when others => report "unknown char";
 			end case;
 		end if;
 	end process;

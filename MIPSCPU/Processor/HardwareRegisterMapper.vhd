@@ -16,7 +16,9 @@ entity HardwareAddressMapper is
 		primaryRAMHardwareControl : out HardwareRAMControl_t;
 		primaryRAMResult : in PhysicsRAMData_t;
 		secondaryRAMHardwareControl : out HardwareRAMControl_t;
-		secondaryRAMResult : in PhysicsRAMData_t
+		secondaryRAMResult : in PhysicsRAMData_t;
+		uart1Control : out HardwareRegisterControl_t;
+		uart1Result : in CPUData_t
 	);
 	type AddressType_t is
 	(
@@ -85,6 +87,34 @@ begin
 				);
 				secondaryRAMHardwareControl.readEnabled <= FUNC_DISABLED;
 				secondaryRAMHardwareControl.writeEnabled <= FUNC_DISABLED;
+			when ISA_ADDRESS =>
+				if usedRAMControl.readEnabled = FUNC_ENABLED then
+					uart1Control.operation <= REGISTER_OPERATION_READ;
+				elsif usedRAMControl.writeEnabled = FUNC_ENABLED then
+					uart1Control.operation <= REGISTER_OPERATION_WRITE;
+				end if;
+				uart1Control.address <= usedRAMControl.address;
+			when others =>
+				primaryRAMHardwareControl.readEnabled <= FUNC_DISABLED;
+				primaryRAMHardwareControl.writeEnabled <= FUNC_DISABLED;
+				secondaryRAMHardwareControl.readEnabled <= FUNC_DISABLED;
+				secondaryRAMHardwareControl.writeEnabled <= FUNC_DISABLED;
+				uart1Control.address <= (others => '0');
+		end case;
+	end process;
+	
+	-- Determine the result
+	process(addressType)
+	begin
+		case addressType is
+			when USER_SPACE_ADDRESS =>
+				result <= secondaryRAMResult;
+			when KERNEL_SPACE_ADDRESS =>
+				result <= primaryRAMResult;
+			when ISA_ADDRESS =>
+				result <= uart1Result;
+			when others =>
+				result <= (others => '0');
 		end case;
 	end process;
 

@@ -14,7 +14,9 @@ entity Processor is
 		primaryRAMControl : out HardwareRAMControl_t;
 		primaryRAMResult : in RAMData_t;
 		secondaryRAMControl : out HardwareRAMControl_t;
-		secondaryRAMResult : in RAMData_t
+		secondaryRAMResult : in RAMData_t;
+		uart1Control : out HardwareRegisterControl_t;
+		uart1Result : in CPUData_t
 	);
 end entity;
 
@@ -35,8 +37,6 @@ architecture Behavioral of Processor is
 	signal instruction_done : std_logic;
 
 	signal current_pipeline_phase : std_logic_vector(3 downto 0) := "0000";
-
-	signal primaryRAMData : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
 
 	signal ramControl1 : RAMControl_t;
 	signal ramControl2 : RAMControl_t;
@@ -94,7 +94,7 @@ architecture Behavioral of Processor is
 
 begin
 
-	register_file : RegisterFile port map (
+	registerFile_i : RegisterFile port map (
 		reset => reset,
 		clock => clock,
 		input => register_file_input,
@@ -102,7 +102,7 @@ begin
 		output => register_file_output
 	);
 
-	pcRegister : SpecialRegister port map (
+	pcRegister_i : SpecialRegister port map (
 		reset => reset,
 		clock => clock,
 		control1 => pcControl1,
@@ -131,14 +131,14 @@ begin
 		phaseMACtrlOutput => pipelinePhaseEXMAInterface
 	);
 
-	pipelinePhaseMemoryAccess_e: entity work.PipelinePhaseMemoryAccess
+	pipelinePhaseMemoryAccess_i: entity work.PipelinePhaseMemoryAccess
 	port map (
 		reset => reset,
 		clock => clock,
 		phaseEXInput => pipelinePhaseEXMAInterface,
 		phaseWBCtrlOutput => pipelinePhaseMAWBInterface,
 		ramControl => ramControl1,
-		ramReadResult => primaryRAMData
+		ramReadResult => memoryAccessResult
 	);
 
 	pipelinePhaseWirteBack_i: entity work.PipelinePhaseWriteBack
@@ -189,7 +189,9 @@ begin
 		primaryRAMHardwareControl => primaryRAMControl,
 		primaryRAMResult => primaryRAMResult,
 		secondaryRAMHardwareControl => secondaryRAMControl,
-		secondaryRAMResult => secondaryRAMResult
+		secondaryRAMResult => secondaryRAMResult,
+		uart1Control => uart1Control,
+		uart1Result => uart1Result
 	);
 	
 	-- Output internal debug data.
@@ -208,7 +210,7 @@ begin
 			current_pipeline_phase <= "0100";
 		elsif rising_edge(clock) then
 			if current_pipeline_phase = "0000" then
-				instruction := primaryRAMData;
+				instruction := memoryAccessResult;
 				opcode :=
 					instruction(MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
 				if opcode = MIPS_CPU_INSTRUCTION_OPCODE_CP0 then

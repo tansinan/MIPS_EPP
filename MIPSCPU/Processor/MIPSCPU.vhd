@@ -10,12 +10,32 @@ package MIPSCPU is
 	subtype EnablingControl_t is std_logic;
 	constant FUNC_ENABLED : std_logic := '0';
 	constant FUNC_DISABLED : std_logic := '1';
-
+	
 	-- General numerical properties of the processor
 	-- The data width of register
 	constant MIPS_CPU_DATA_WIDTH : integer := 32;
 	subtype CPUData_t is
 		std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		
+	-- Memory access and mapping related (sub)types and constants
+	constant MIPS_RAM_ADDRESS_WIDTH : integer := 32;
+	constant MIPS_RAM_DATA_WIDTH : integer := 32;
+	subtype RAMData_t is std_logic_vector(MIPS_RAM_DATA_WIDTH - 1 downto 0);
+	subtype RAMAddress_t is std_logic_vector(MIPS_RAM_ADDRESS_WIDTH - 1 downto 0);
+	type RAMControl_t is
+		record
+			writeEnabled : EnablingControl_t;
+			readEnabled : EnablingControl_t;
+			address : RAMAddress_t;
+			data : RAMData_t;
+		end record;
+
+	constant ISA_ADDRESS_SPACE : CPUData_t := x"b4000000";
+	constant ISA_ADDRESS_SPACE_MASK : CPUData_t := x"FFFFF000";
+	constant KERNEL_ADDRESS_SPACE : CPUData_t := x"80000000";
+	constant KERNEL_ADDRESS_SPACE_MASK : CPUData_t := x"FFC00000";
+	constant USER_ADDRESS_SPACE : CPUData_t := x"00000000";
+	constant USER_ADDRESS_SPACE_MASK : CPUData_t := x"FFC00000";
 
 	-- The address width of the registers in primary processor
 	constant MIPS_CPU_REGISTER_ADDRESS_WIDTH: integer := 5;
@@ -221,11 +241,11 @@ package MIPSCPU is
 	type PipelinePhaseEXMAInterface_t is
 		record
 			sourceIsRAM : std_logic;
-			sourceRAMAddr : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
+			sourceRAMAddr : RAMAddress_t;
 			sourceImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 			targetIsRAM : std_logic;
 			targetIsReg : std_logic;
-			targetRAMAddr : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
+			targetRAMAddr : RAMAddress_t;
 			targetRegAddr : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 			instructionOpcode : InstructionOpcode_t;
 		end record;
@@ -235,30 +255,10 @@ package MIPSCPU is
 			sourceImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 			targetIsRAM : std_logic;
 			targetIsReg : std_logic;
-			targetRAMAddr : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
+			targetRAMAddr : RAMAddress_t;
 			targetRegAddr : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 			instructionOpcode : InstructionOpcode_t;
 		end record;
-
-	-- Memory access and mapping related (sub)types and constants
-	constant MIPS_RAM_ADDRESS_WIDTH : integer := 32;
-	constant MIPS_RAM_DATA_WIDTH : integer := 32;
-	subtype RAMData_t is std_logic_vector(MIPS_RAM_DATA_WIDTH - 1 downto 0);
-	subtype RAMAddress_t is std_logic_vector(MIPS_RAM_ADDRESS_WIDTH - 1 downto 0);
-	type RAMControl_t is
-		record
-			writeEnabled : EnablingControl_t;
-			readEnabled : EnablingControl_t;
-			address : RAMAddress_t;
-			data : RAMData_t;
-		end record;
-
-	constant ISA_ADDRESS_SPACE : CPUData_t := x"b4000000";
-	constant ISA_ADDRESS_SPACE_MASK : CPUData_t := x"FFFFF000";
-	constant KERNEL_ADDRESS_SPACE : CPUData_t := x"80000000";
-	constant KERNEL_ADDRESS_SPACE_MASK : CPUData_t := x"FFC00000";
-	constant USER_ADDRESS_SPACE : CPUData_t := x"00000000";
-	constant USER_ADDRESS_SPACE_MASK : CPUData_t := x"FFC00000";
 	
 	type CPUDebugData_t is
 	record
