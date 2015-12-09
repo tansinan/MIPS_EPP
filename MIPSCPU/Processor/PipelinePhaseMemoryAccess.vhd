@@ -9,7 +9,6 @@ entity PipelinePhaseMemoryAccess is
 		reset : in std_logic;
 		phaseEXInput : in PipelinePhaseEXMAInterface_t;
 		phaseWBCtrlOutput : out PipelinePhaseMAWBInterface_t;
-		ramControl : out RAMControl_t;
 		ramReadResult : in std_logic_vector(MIPS_RAM_DATA_WIDTH - 1 downto 0)
 	);
 end PipelinePhaseMemoryAccess;
@@ -18,13 +17,20 @@ architecture Behavioral of PipelinePhaseMemoryAccess is
 	signal phaseWBCtrl : PipelinePhaseMAWBInterface_t;
 begin
 	process(phaseEXInput, ramReadResult)
+		variable loadByteResult : std_logic_vector(7 downto 0);
 	begin
-		ramControl <= (
-			readEnabled => phaseEXInput.sourceIsRAM,
-			writeEnabled => FUNC_DISABLED,
-			address => phaseEXInput.sourceRAMAddr,
-			data => (others => '0')
-		);
+		case phaseEXInput.sourceRAMAddr(1 downto 0) is
+			when "00" =>
+				loadByteResult := ramReadResult(7 downto 0);
+			when "01" =>
+				loadByteResult := ramReadResult(15 downto 8);
+			when "10" =>
+				loadByteResult := ramReadResult(23 downto 16);
+			when "11" =>
+				loadByteResult := ramReadResult(MIPS_CPU_DATA_WIDTH - 1 downto 24);
+			when others =>
+				report "Warning: meta value detected for the LBU address";
+		end case;
 		case phaseExInput.instructionOpcode is
 			when MIPS_CPU_INSTRUCTION_OPCODE_LW =>
 				phaseWBCtrl.sourceImm <= ramReadResult;
@@ -36,12 +42,12 @@ begin
 				phaseWBCtrl.sourceImm(15 downto 0) <= ramReadResult(15 downto 0);
 				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 16) <= (others => '0');
 			when MIPS_CPU_INSTRUCTION_OPCODE_LB =>
-				phaseWBCtrl.sourceImm(7 downto 0) <= ramReadResult(7 downto 0);
-				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 8) <=
-					(others => ramReadResult(7));
+				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 8)
+					<= (others => loadByteResult(7));
+				phaseWBCtrl.sourceImm(7 downto 0) <= loadByteResult;
 			when MIPS_CPU_INSTRUCTION_OPCODE_LBU =>
-				phaseWBCtrl.sourceImm(7 downto 0) <= ramReadResult(7 downto 0);
 				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 8) <= (others => '0');
+				phaseWBCtrl.sourceImm(7 downto 0) <= loadByteResult;
 			when MIPS_CPU_INSTRUCTION_OPCODE_SH =>
 				phaseWBCtrl.sourceImm(15 downto 0) <= phaseExInput.sourceImm(15 downto 0);
 				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 16) <= 

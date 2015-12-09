@@ -121,13 +121,14 @@ begin
 		pcControl => pcControl1
 	);
 
-	pipeline_phase_execute: PipelinePhaseExecute
+	pipeline_phase_execute: entity work.PipelinePhaseExecute
 	port map (
 		reset => reset,
 		clock => clock,
 		phaseIDInput => pipelinePhaseIDEXInterface,
 		pcValue => pcValue,
 		pcControl => pcControl3,
+		ramControl => ramControl1,
 		phaseMACtrlOutput => pipelinePhaseEXMAInterface
 	);
 
@@ -137,7 +138,6 @@ begin
 		clock => clock,
 		phaseEXInput => pipelinePhaseEXMAInterface,
 		phaseWBCtrlOutput => pipelinePhaseMAWBInterface,
-		ramControl => ramControl1,
 		ramReadResult => memoryAccessResult
 	);
 

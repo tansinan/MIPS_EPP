@@ -11,6 +11,7 @@ entity PipelinePhaseExecute is
 		phaseIDInput : in PipelinePhaseIDEXInterface_t;
 		pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		pcControl : out RegisterControl_t;
+		ramControl : out RAMControl_t;
 		phaseMACtrlOutput : out PipelinePhaseEXMAInterface_t
 	);
 end entity;
@@ -60,22 +61,28 @@ begin
 	phaseMACtrl.targetRegAddr <= phaseIDInput.targetReg;
 	phaseMACtrl.instructionOpcode <= phaseIDInput.instructionOpcode;
 
-	phaseMACtrlOutput.sourceIsRAM <= phaseMACtrl.sourceIsRAM;
-	phaseMACtrlOutput.sourceRAMAddr <= phaseMACtrl.sourceRAMAddr;
+	--phaseMACtrlOutput.sourceIsRAM <= phaseMACtrl.sourceIsRAM;
+	--phaseMACtrlOutput.sourceRAMAddr <= phaseMACtrl.sourceRAMAddr;
+	ramControl <= (
+		readEnabled => phaseMACtrl.sourceIsRAM,
+		writeEnabled => FUNC_DISABLED,
+		address => phaseMACtrl.sourceRAMAddr,
+		data => (others => '0')
+	);
 	PipelinePhaseExecute_Process : process (clock, reset)
 	begin
 		if reset = '0' then
-			--phaseMACtrlOutput.targetIsRAM <= FUNC_DISABLED;
-			--phaseMACtrlOutput.sourceIsRAM <= FUNC_DISABLED;
+			phaseMACtrlOutput.targetIsRAM <= FUNC_DISABLED;
+			phaseMACtrlOutput.sourceIsRAM <= FUNC_DISABLED;
 			phaseMACtrlOutput.targetIsReg <= FUNC_DISABLED;
 		elsif rising_edge(clock) then
-			--phaseMACtrlOutput <= phaseMACtrl;
-			phaseMACtrlOutput.sourceImm <= phaseMACtrl.sourceImm;
-			phaseMACtrlOutput.targetIsRAM <= phaseMACtrl.targetIsRAM;
-			phaseMACtrlOutput.targetIsReg <= phaseMACtrl.targetIsReg;
-			phaseMACtrlOutput.targetRAMAddr <= phaseMACtrl.targetRAMAddr;
-			phaseMACtrlOutput.targetRegAddr <= phaseMACtrl.targetRegAddr;
-			phaseMACtrlOutput.instructionOpcode <= phaseMACtrl.instructionOpcode;
+			phaseMACtrlOutput <= phaseMACtrl;
+			--phaseMACtrlOutput.sourceImm <= phaseMACtrl.sourceImm;
+			--phaseMACtrlOutput.targetIsRAM <= phaseMACtrl.targetIsRAM;
+			--phaseMACtrlOutput.targetIsReg <= phaseMACtrl.targetIsReg;
+			--phaseMACtrlOutput.targetRAMAddr <= phaseMACtrl.targetRAMAddr;
+			--phaseMACtrlOutput.targetRegAddr <= phaseMACtrl.targetRegAddr;
+			--phaseMACtrlOutput.instructionOpcode <= phaseMACtrl.instructionOpcode;
 		end if;
 	end process;
 end Behavioral;
