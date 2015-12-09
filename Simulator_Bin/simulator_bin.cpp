@@ -141,11 +141,9 @@ void Simulator::loadCommand(ifstream &inputFileStream, int address)
 		}
 		for (int i = 0; i < 4; ++i)
 		{
-			cout << decimalConvert(command.substr(i*8,8), true) << ' ';
 			memory->write(ramCounter,(unsigned char)decimalConvert(command.substr(i*8,8), true));
 			ramCounter++;
 		}
-		cout << endl;
 	} while (command != "" && !inputFileStream.eof());
 	initStatus = 0;
 }
@@ -158,12 +156,7 @@ int Simulator::executeCommand()
 		unsigned char temp;
 		memory->read(programCounter + i, &temp);
 		commandBin += binaryConvert((unsigned int)temp, 8, true);
-		cout <<(unsigned int)temp << ' ';
 	}
-	cout << '\n' << commandBin << '\n';
-	
-	if (commandBin == "00000000000000000000000000000000")
-		return 1;
 	
 	string op,rs,rt,rd,shamt,func;
 	op = commandBin.substr(0,6);
@@ -382,11 +375,17 @@ int Simulator::executeCommand()
 	else if (op == "000010")
 	{
 		//j
-		
+		string address = rs + rt + rd + shamt + func;
+		if (programCounter == decimalConvert(address, true))
+			return 1;
+		programCounter = decimalConvert(address, true) * 4;
 	}
 	else if (op == "000011")
 	{
 		//jal
+		cache[31] = programCounter + 4;
+		string address = rs + rt + rd + shamt + func;
+		programCounter = decimalConvert(address, true) * 4;
 	}
 	
 	commandNum++;
