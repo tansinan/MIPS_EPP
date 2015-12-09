@@ -314,6 +314,7 @@ int main(int argc, char* argv[])
 			inputFileStream >> s1 >> s2 >> s3;
 			s1 = s1.substr(1);
 			s2 = s2.substr(1);
+			s3 = s3.substr(1);
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			c3 = atoi(s3.c_str());
@@ -326,6 +327,7 @@ int main(int argc, char* argv[])
 			inputFileStream >> s1 >> s2 >> s3;
 			s1 = s1.substr(1);
 			s2 = s2.substr(1);
+			s3 = s3.substr(1);
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			c3 = atoi(s3.c_str());
@@ -338,6 +340,7 @@ int main(int argc, char* argv[])
 			inputFileStream >> s1 >> s2 >> s3;
 			s1 = s1.substr(1);
 			s2 = s2.substr(1);
+			s3 = s3.substr(1);
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			c3 = atoi(s3.c_str());
@@ -350,6 +353,7 @@ int main(int argc, char* argv[])
 			inputFileStream >> s1 >> s2 >> s3;
 			s1 = s1.substr(1);
 			s2 = s2.substr(1);
+			s3 = s3.substr(1);
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			c3 = atoi(s3.c_str());
@@ -362,6 +366,7 @@ int main(int argc, char* argv[])
 			inputFileStream >> s1 >> s2 >> s3;
 			s1 = s1.substr(1);
 			s2 = s2.substr(1);
+			s3 = s3.substr(1);
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			c3 = atoi(s3.c_str());
@@ -374,6 +379,7 @@ int main(int argc, char* argv[])
 			inputFileStream >> s1 >> s2 >> s3;
 			s1 = s1.substr(1);
 			s2 = s2.substr(1);
+			s3 = s3.substr(1);
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			c3 = atoi(s3.c_str());
@@ -386,6 +392,7 @@ int main(int argc, char* argv[])
 			inputFileStream >> s1 >> s2 >> s3;
 			s1 = s1.substr(1);
 			s2 = s2.substr(1);
+			s3 = s3.substr(1);
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			c3 = atoi(s3.c_str());
@@ -398,6 +405,7 @@ int main(int argc, char* argv[])
 			inputFileStream >> s1 >> s2 >> s3;
 			s1 = s1.substr(1);
 			s2 = s2.substr(1);
+			s3 = s3.substr(1);
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			c3 = atoi(s3.c_str());
@@ -410,6 +418,7 @@ int main(int argc, char* argv[])
 			inputFileStream >> s1 >> s2 >> s3;
 			s1 = s1.substr(1);
 			s2 = s2.substr(1);
+			s3 = s3.substr(1);
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			c3 = atoi(s3.c_str());
@@ -422,6 +431,7 @@ int main(int argc, char* argv[])
 			inputFileStream >> s1 >> s2 >> s3;
 			s1 = s1.substr(1);
 			s2 = s2.substr(1);
+			s3 = s3.substr(1);
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			c3 = atoi(s3.c_str());
@@ -470,6 +480,7 @@ int main(int argc, char* argv[])
 			inputFileStream >> s1 >> s2 >> s3;
 			s1 = s1.substr(1);
 			s2 = s2.substr(1);
+			s3 = s3.substr(1);
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			c3 = atoi(s3.c_str());
@@ -482,6 +493,7 @@ int main(int argc, char* argv[])
 			inputFileStream >> s1 >> s2 >> s3;
 			s1 = s1.substr(1);
 			s2 = s2.substr(1);
+			s3 = s3.substr(1);
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			c3 = atoi(s3.c_str());
@@ -494,6 +506,7 @@ int main(int argc, char* argv[])
 			inputFileStream >> s1 >> s2 >> s3;
 			s1 = s1.substr(1);
 			s2 = s2.substr(1);
+			s3 = s3.substr(1);
 			c1 = atoi(s1.c_str());
 			c2 = atoi(s2.c_str());
 			c3 = atoi(s3.c_str());

@@ -10,26 +10,26 @@ MemoryModule::MemoryModule()
 		rom[i] = 0;
 }
 
-void Simulator::printCache(char output, int cache[])
+void Simulator::printCache(string commandBin)
 {
-	if (output == 'C')
+	cacheOutput << "CommandNum:" << commandNum << endl;
+	cacheOutput << "Command(Bin):" << commandBin << endl;
+	for (int i = 0; i < 4; i++)
 	{
-		for (int i = 0; i < 8; i++)
+		for (int j = 0; j < 8; j++)
 		{
-			for (int j = 0; j < 4; j++)
-			{
-				cout << "Cache[" << i*4+j << "] = " << cache[i*4+j] << ' ';
-			}
-			cout << endl;
+			cacheOutput << "Cache[" << i*8+j << "] = " << cache[i*8+j] << ' ';
 		}
-		for (int i = 0; i < 32; i++)
-		{
-			cout << "Cache(Bin)[" << i << "] = " << binaryConvert((unsigned)cache[i], 32, true) <<endl;
-		}
+		cacheOutput << endl;
 	}
+	for (int i = 0; i < 32; i++)
+	{
+		cacheOutput << "Cache(Bin)[" << i << "] = " << binaryConvert((unsigned)cache[i], 32, true) << endl;
+	}
+	cacheOutput << endl;
 }
 
-int MemoryModule::write(int address, char value)
+int MemoryModule::write(int address, unsigned char value)
 {
 	if (address >= 0x80000000)
 	{
@@ -60,7 +60,7 @@ int MemoryModule::write(int address, char value)
 	return 0;
 }
 	
-int MemoryModule::read(int address, char* value)
+int MemoryModule::read(int address, unsigned char* value)
 {
 	if (address >= 0x80000000)
 	{
@@ -102,6 +102,9 @@ Simulator::Simulator(string InputFileName)
 	string outputFileName = InputFileName;
 	outputFileName += "_Testbench_Body.txt";
 	testbench.open(outputFileName.c_str(), ios::out);
+	string cacheFileName = InputFileName;
+	cacheFileName += "_Cache_Status.txt";
+	cacheOutput.open(cacheFileName.c_str(), ios::out);
 	commandNum = 0;
 	for (int i = 0; i < 32; i++)
 		cache[i] = 0;
@@ -112,8 +115,10 @@ Simulator::Simulator(string InputFileName)
 
 Simulator::~Simulator()
 {
+	cout << "Simulation Finished.\nTotal executed command: " << commandNum << '\n';
 	inputFileStream.close();
 	testbench.close();
+	cacheOutput.close();
 	delete memory;
 }
 
@@ -136,10 +141,13 @@ void Simulator::loadCommand(ifstream &inputFileStream, int address)
 		}
 		for (int i = 0; i < 4; ++i)
 		{
-			memory->write(ramCounter,(char)decimalConvert(command.substr(i*8,8), true));
+			cout << decimalConvert(command.substr(i*8,8), true) << ' ';
+			memory->write(ramCounter,(unsigned char)decimalConvert(command.substr(i*8,8), true));
 			ramCounter++;
 		}
-	} while (command != "");
+		cout << endl;
+	} while (command != "" && !inputFileStream.eof());
+	initStatus = 0;
 }
 
 int Simulator::executeCommand()
@@ -147,10 +155,15 @@ int Simulator::executeCommand()
 	string commandBin = "";
 	for (int i = 0; i < 4; i++)
 	{
-		char temp;
+		unsigned char temp;
 		memory->read(programCounter + i, &temp);
-		commandBin += binaryConvert((int)temp, 8, true);
+		commandBin += binaryConvert((unsigned int)temp, 8, true);
+		cout <<(unsigned int)temp << ' ';
 	}
+	cout << '\n' << commandBin << '\n';
+	
+	if (commandBin == "00000000000000000000000000000000")
+		return 1;
 	
 	string op,rs,rt,rd,shamt,func;
 	op = commandBin.substr(0,6);
@@ -314,7 +327,7 @@ int Simulator::executeCommand()
 		//lw
 		string imm = rd + shamt + func;
 		int address = cache[decimalConvert(rs, true)] + decimalConvert(imm, false);
-		char word[4];
+		unsigned char word[4];
 		for (unsigned int i = 0; i < 4; i++)
 			memory->read(address + i, &word[i]);
 		cache[decimalConvert(rt, true)] = *((int*)word);
@@ -376,8 +389,11 @@ int Simulator::executeCommand()
 		//jal
 	}
 	
+	commandNum++;
 	cache[0] = 0;
-	printTestbench(testbench, commandBin);
+	printCache(commandBin);
+	printTestbench(commandBin);
+	return 0;
 }
 
 int Simulator::decimalConvert(string origin, bool trueForm)
@@ -455,7 +471,7 @@ string Simulator::binaryConvert(int origin, int width, bool trueForm)
 	return ret;
 }
 
-void Simulator::printTestbench(ofstream &testbench, string commandBin)
+void Simulator::printTestbench(string commandBin)
 {
 	testbench << "current_test_success <= true;\nreset <= '1';\ninstruction <= \""
 	<< commandBin << "\";\nwait for clock_period * 5;\n\n";
@@ -705,7 +721,7 @@ void Simulator::printCommandBin(ofstream &testbench, string command, int p1, int
 		commandBin += "000011";
 		commandBin += binaryConvert(p1/4, 26, true);
 	}
-	printTestbench(testbench, commandBin);
+	printTestbench(commandBin);
 }
 */
 
@@ -1162,7 +1178,7 @@ int Simulator::executeCommand()
 	else ;
 	
 	cache[0] = 0;
-	printCache('C', cache);
+	printCache();
 	return 0;
 }
 */

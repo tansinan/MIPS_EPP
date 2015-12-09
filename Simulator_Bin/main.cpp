@@ -10,6 +10,18 @@ int main(int argc, char* argv[])
 	
 	string inputFileName = argv[1];
 	Simulator* simulator = new Simulator(inputFileName);
+	
+	/*cout << simulator->binaryConvert((unsigned int)((unsigned char)simulator->decimalConvert("10000011", true)), 8, true);
+	
+	
+	
+	
+	system("pause");
+	return 0;*/
+	
+	
+	
+	
 	switch (simulator->initStatus)
 	{
 		case 0:
@@ -26,10 +38,12 @@ int main(int argc, char* argv[])
 	
 	while (true)
 	{
-		if (simulator->executeCommand())
+		if (simulator->executeCommand() != 0)
 			break;
 	}
-	
 	delete simulator;
+	
+	system("pause");
+	
 	return 0;
 }

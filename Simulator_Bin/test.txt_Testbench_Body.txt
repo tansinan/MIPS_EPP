@@ -1,0 +1,1398 @@
+current_test_success <= true;
+reset <= '1';
+instruction <= "00100100000000010000000000000001";
+wait for clock_period * 5;
+
+if current_test_success = true then
+  if register_file_debug(0) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(1) /= "00000000000000000000000000000001" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(2) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(3) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(4) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(5) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(6) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(7) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(8) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(9) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(10) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(11) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(12) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(13) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(14) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(15) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(16) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(17) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(18) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(19) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(20) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(21) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(22) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(23) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(24) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(25) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(26) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(27) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(28) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(29) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(30) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(31) /= "00000000000000000000000000000000" then
+    report "Test case 1 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  report "Test case 1 succeeded";
+end if;
+
+current_test_success <= true;
+reset <= '1';
+instruction <= "00100100000000100000000000000001";
+wait for clock_period * 5;
+
+if current_test_success = true then
+  if register_file_debug(0) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(1) /= "00000000000000000000000000000001" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(2) /= "00000000000000000000000000000001" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(3) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(4) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(5) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(6) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(7) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(8) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(9) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(10) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(11) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(12) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(13) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(14) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(15) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(16) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(17) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(18) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(19) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(20) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(21) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(22) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(23) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(24) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(25) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(26) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(27) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(28) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(29) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(30) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(31) /= "00000000000000000000000000000000" then
+    report "Test case 2 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  report "Test case 2 succeeded";
+end if;
+
+current_test_success <= true;
+reset <= '1';
+instruction <= "00000000010000010001100000100000";
+wait for clock_period * 5;
+
+if current_test_success = true then
+  if register_file_debug(0) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(1) /= "00000000000000000000000000000001" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(2) /= "00000000000000000000000000000001" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(3) /= "00000000000000000000000000000010" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(4) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(5) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(6) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(7) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(8) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(9) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(10) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(11) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(12) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(13) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(14) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(15) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(16) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(17) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(18) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(19) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(20) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(21) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(22) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(23) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(24) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(25) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(26) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(27) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(28) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(29) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(30) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(31) /= "00000000000000000000000000000000" then
+    report "Test case 3 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  report "Test case 3 succeeded";
+end if;
+
+current_test_success <= true;
+reset <= '1';
+instruction <= "00000000011000100010000000100000";
+wait for clock_period * 5;
+
+if current_test_success = true then
+  if register_file_debug(0) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(1) /= "00000000000000000000000000000001" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(2) /= "00000000000000000000000000000001" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(3) /= "00000000000000000000000000000010" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(4) /= "00000000000000000000000000000011" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(5) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(6) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(7) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(8) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(9) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(10) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(11) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(12) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(13) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(14) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(15) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(16) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(17) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(18) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(19) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(20) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(21) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(22) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(23) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(24) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(25) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(26) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(27) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(28) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(29) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(30) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(31) /= "00000000000000000000000000000000" then
+    report "Test case 4 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  report "Test case 4 succeeded";
+end if;
+
+current_test_success <= true;
+reset <= '1';
+instruction <= "00000000100000110010100000100000";
+wait for clock_period * 5;
+
+if current_test_success = true then
+  if register_file_debug(0) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(1) /= "00000000000000000000000000000001" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(2) /= "00000000000000000000000000000001" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(3) /= "00000000000000000000000000000010" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(4) /= "00000000000000000000000000000011" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(5) /= "00000000000000000000000000000101" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(6) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(7) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(8) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(9) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(10) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(11) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(12) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(13) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(14) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(15) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(16) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(17) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(18) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(19) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(20) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(21) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(22) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(23) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(24) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(25) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(26) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(27) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(28) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(29) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(30) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(31) /= "00000000000000000000000000000000" then
+    report "Test case 5 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  report "Test case 5 succeeded";
+end if;
+
+current_test_success <= true;
+reset <= '1';
+instruction <= "00000000100000110010100000100000";
+wait for clock_period * 5;
+
+if current_test_success = true then
+  if register_file_debug(0) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(1) /= "00000000000000000000000000000001" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(2) /= "00000000000000000000000000000001" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(3) /= "00000000000000000000000000000010" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(4) /= "00000000000000000000000000000011" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(5) /= "00000000000000000000000000000101" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(6) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(7) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(8) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(9) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(10) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(11) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(12) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(13) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(14) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(15) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(16) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(17) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(18) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(19) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(20) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(21) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(22) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(23) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(24) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(25) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(26) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(27) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(28) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(29) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(30) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  if register_file_debug(31) /= "00000000000000000000000000000000" then
+    report "Test case 6 failed";
+  current_test_success <= false;
+  end if;
+end if;
+
+if current_test_success = true then
+  report "Test case 6 succeeded";
+end if;
+
