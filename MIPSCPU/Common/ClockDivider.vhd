@@ -23,6 +23,6 @@ begin
 			counter <= counter + 1;
 		end if;
 	end process;
-	clockOut <= counter(1);
+	clockOut <= counter(0);
 end architecture;
 

@@ -34,13 +34,6 @@ architecture behavior of Processor_Testbench is
 	signal uart1Transmit : std_logic;
 	signal uart1Receive : std_logic;
 
-	-- Bus interface
-	signal phyRAMEnable : std_logic;
-	signal phyRAMWriteEnable : std_logic;
-	signal phyRAMReadEnable : std_logic;
-	signal phyAddressBus : std_logic_vector(PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 0);
-	signal phyDataBus : std_logic_vector(PHYSICS_RAM_DATA_WIDTH - 1 downto 0);
-
  	--outputs
 	signal debugData : CPUDebugData_t;
 	signal current_test_success : boolean;

@@ -51,8 +51,10 @@ begin
 						physicsAddressBus <= control.address;
 						if control.readEnabled = FUNC_ENABLED then
 							physicsDataBus <= (others => 'Z');
-						else
+						elsif control.writeEnabled = FUNC_ENABLED then
 							physicsDataBus <= control.data;
+						else
+							physicsDataBus <= (others => 'Z');
 						end if;
 						state <= RAM_CONTROLLER_STATE_ACTIVE;
 					end if;
@@ -60,7 +62,8 @@ begin
 			elsif state = RAM_CONTROLLER_STATE_ACTIVE then
 				result <= physicsDataBus;
 				physicsRAMControl.writeEnabled <= FUNC_DISABLED;
-				physicsRAMControl.readEnabled <= FUNC_ENABLED;
+				--TODO: This need to be verified on board!
+				physicsRAMControl.readEnabled <= FUNC_DISABLED;
 				physicsAddressBus <= (others => '0');
 				physicsDataBus <= (others => 'Z');
 				state <= RAM_CONTROLLER_STATE_IDLE;

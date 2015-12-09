@@ -28,12 +28,15 @@ architecture Behavioral of TypeIInstructionDecoder is
 		);
 	end component;
 begin
-	opcode <= instruction(MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
-	rs <= instruction(MIPS_CPU_INSTRUCTION_RS_HI downto MIPS_CPU_INSTRUCTION_RS_LO);
-	rt <= instruction(MIPS_CPU_INSTRUCTION_RT_HI downto MIPS_CPU_INSTRUCTION_RT_LO);
-	imm <= instruction(MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO);
+	process(instruction)
+	begin
+		opcode <= instruction(MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
+		rs <= instruction(MIPS_CPU_INSTRUCTION_RS_HI downto MIPS_CPU_INSTRUCTION_RS_LO);
+		rt <= instruction(MIPS_CPU_INSTRUCTION_RT_HI downto MIPS_CPU_INSTRUCTION_RT_LO);
+		imm <= instruction(MIPS_CPU_INSTRUCTION_IMM_HI downto MIPS_CPU_INSTRUCTION_IMM_LO);
+	end process;
 
-	process(opcode, rs, rt, imm, pcValue, instruction, registerFile)
+	process(opcode, rs, rt, imm, instruction, registerFile, pcValue)
 		variable zeroExtendedImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		variable signExtendedImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		variable signExtendedAddrImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);

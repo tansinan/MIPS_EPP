@@ -160,11 +160,6 @@ begin
 		data_output => register_file_input
 	);
 
-	process(register_file_output, pcValue)
-	begin
-		ramControl3.address <= pcValue;
-	end process;
-	
 	Coprocessor0_i : entity work.Coprocessor0_e
 	port map
 	(
@@ -207,6 +202,10 @@ begin
 	begin
 		if reset = '0' then
 			instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
+			instructionExecutionEnabledCP0 <= FUNC_DISABLED;
+			ramControl3.address <= (others => '0');
+			ramControl3.writeEnabled <= FUNC_DISABLED;
+			ramControl3.readEnabled <= FUNC_ENABLED;
 			current_pipeline_phase <= "0100";
 		elsif rising_edge(clock) then
 			if current_pipeline_phase = "0000" then
@@ -230,11 +229,15 @@ begin
 				pcControl2.operation <= REGISTER_OPERATION_WRITE;
 				pcControl2.data <= pcValue + 4;
 				current_pipeline_phase <= "0000";
+				instructionExecutionEnabledCP0 <= FUNC_DISABLED;
+				ramControl3.address <= pcValue;
 				ramControl3.writeEnabled <= FUNC_DISABLED;
 				ramControl3.readEnabled <= FUNC_ENABLED;
+				ramControl3.data <= (others => '0');
 			else
 				pcControl2.operation <= REGISTER_OPERATION_READ;
 				instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
+				instructionExecutionEnabledCP0 <= FUNC_DISABLED;
 				current_pipeline_phase <= current_pipeline_phase + 1;
 				ramControl3.writeEnabled <= FUNC_DISABLED;
 				ramControl3.readEnabled <= FUNC_DISABLED;

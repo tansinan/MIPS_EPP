@@ -60,13 +60,14 @@ begin
 		phaseWBCtrl.instructionOpcode <= phaseEXInput.instructionOpcode;
 	end process;
 
+	phaseWBCtrlOutput <= phaseWBCtrl;
 	process(clock, reset)
 	begin
 		if reset = FUNC_ENABLED then
-			phaseWBCtrlOutput.targetIsReg <= FUNC_DISABLED;
-			phaseWBCtrlOutput.targetIsRAM <= FUNC_DISABLED;
+			--phaseWBCtrlOutput.targetIsReg <= FUNC_DISABLED;
+			--phaseWBCtrlOutput.targetIsRAM <= FUNC_DISABLED;
 		elsif rising_edge(clock) then
-			phaseWBCtrlOutput <= phaseWBCtrl;
+			
 		end if;
 	end process;
 end Behavioral;

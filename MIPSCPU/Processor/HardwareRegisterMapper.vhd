@@ -31,20 +31,28 @@ end entity;
 
 architecture Behavioral of HardwareAddressMapper is
 	signal addressType : AddressType_t;
+	signal savedAddressType : AddressType_t;
 	signal usedRAMControl : RAMControl_t;
 begin
 	-- Determine the actual used RAM Control signal
 	-- TODO: add simulation debugging statement to check RAM access violation.
 	process(ramControl1, ramControl2, ramControl3)
 	begin
-		if ramControl1.readEnabled = FUNC_ENABLED or 
-		ramControl1.writeEnabled = FUNC_ENABLED then
-			usedRAMControl <= ramControl1;
+		if ramControl3.readEnabled = FUNC_ENABLED or 
+		ramControl3.writeEnabled = FUNC_ENABLED then
+			usedRAMControl <= ramControl3;
 		elsif ramControl2.readEnabled = FUNC_ENABLED or 
 		ramControl2.writeEnabled = FUNC_ENABLED then
 			usedRAMControl <= ramControl2;
 		else
-			usedRAMControl <= ramControl3;
+			usedRAMControl <= ramControl1;
+		end if;
+	end process;
+	
+	process(clock,reset)
+	begin
+		if rising_edge(clock) then
+			savedAddressType <= addressType;
 		end if;
 	end process;
 	
@@ -66,7 +74,7 @@ begin
 	end process;
 	
 	-- According to the address type, determine control signals
-	process(addressType)
+	process(addressType, usedRAMControl)
 	begin
 		case addressType is
 			when USER_SPACE_ADDRESS =>
@@ -104,9 +112,9 @@ begin
 	end process;
 	
 	-- Determine the result
-	process(addressType)
+	process(savedAddressType, primaryRAMResult, secondaryRAMResult, uart1Result)
 	begin
-		case addressType is
+		case savedAddressType is
 			when USER_SPACE_ADDRESS =>
 				result <= secondaryRAMResult;
 			when KERNEL_SPACE_ADDRESS =>
