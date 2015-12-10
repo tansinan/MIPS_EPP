@@ -107,6 +107,8 @@ begin
 	--TODO I think this is ugly, need to be changed later.
 	with opcode select phaseExCtrl.targetIsRAM <=
 		FUNC_ENABLED when MIPS_CPU_INSTRUCTION_OPCODE_SW,
+		FUNC_ENABLED when MIPS_CPU_INSTRUCTION_OPCODE_SB,
+		FUNC_ENABLED when MIPS_CPU_INSTRUCTION_OPCODE_SH,
 		FUNC_DISABLED when others;
 
 	registerFileReader1_e : RegisterFileReader port map (

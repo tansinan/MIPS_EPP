@@ -63,12 +63,25 @@ begin
 
 	--phaseMACtrlOutput.sourceIsRAM <= phaseMACtrl.sourceIsRAM;
 	--phaseMACtrlOutput.sourceRAMAddr <= phaseMACtrl.sourceRAMAddr;
-	ramControl <= (
-		readEnabled => phaseMACtrl.sourceIsRAM,
-		writeEnabled => FUNC_DISABLED,
-		address => phaseMACtrl.sourceRAMAddr,
-		data => (others => '0')
-	);
+	process(phaseMACtrl)
+	begin
+		if phaseMACtrl.instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SB or
+		phaseMACtrl.instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SH then
+			ramControl <= (
+				readEnabled => FUNC_ENABLED,
+				writeEnabled => FUNC_DISABLED,
+				address => phaseMACtrl.sourceRAMAddr,
+				data => (others => '0')
+			);
+		else
+			ramControl <= (
+				readEnabled => phaseMACtrl.sourceIsRAM,
+				writeEnabled => FUNC_DISABLED,
+				address => phaseMACtrl.sourceRAMAddr,
+				data => (others => '0')
+			);
+		end if;
+	end process;
 	PipelinePhaseExecute_Process : process (clock, reset)
 	begin
 		if reset = '0' then

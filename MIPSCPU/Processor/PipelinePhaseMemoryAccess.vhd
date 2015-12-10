@@ -18,29 +18,52 @@ architecture Behavioral of PipelinePhaseMemoryAccess is
 begin
 	process(phaseEXInput, ramReadResult)
 		variable loadByteResult : std_logic_vector(7 downto 0);
+		variable loadHalfWordResult : std_logic_vector(15 downto 0);
+		variable storeByteResult : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		variable storeHalfwordResult : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	begin
+		storeByteResult := ramReadResult;
 		case phaseEXInput.sourceRAMAddr(1 downto 0) is
 			when "00" =>
 				loadByteResult := ramReadResult(7 downto 0);
+				storeByteResult(7 downto 0) := phaseEXInput.sourceImm(7 downto 0);
 			when "01" =>
 				loadByteResult := ramReadResult(15 downto 8);
+				storeByteResult(15 downto 8) := phaseEXInput.sourceImm(7 downto 0);
 			when "10" =>
 				loadByteResult := ramReadResult(23 downto 16);
+				storeByteResult(23 downto 16) := phaseEXInput.sourceImm(7 downto 0);
 			when "11" =>
 				loadByteResult := ramReadResult(MIPS_CPU_DATA_WIDTH - 1 downto 24);
+				storeByteResult(MIPS_CPU_DATA_WIDTH - 1 downto 24)
+					:= phaseEXInput.sourceImm(7 downto 0);
 			when others =>
-				report "Warning: meta value detected for the LBU address";
+				report "Warning: meta value detected for the LB/LBU address";
+		end case;
+		case phaseEXInput.sourceRAMAddr(1) is
+			when '0' =>
+				loadHalfWordResult := ramReadResult(15 downto 0);
+				storeHalfWordResult(MIPS_CPU_DATA_WIDTH - 1 downto 16) :=
+					ramReadResult(MIPS_CPU_DATA_WIDTH - 1 downto 16);
+				storeHalfWordResult(15 downto 0) := phaseEXInput.sourceImm(15 downto 0);
+			when '1' =>
+				loadHalfWordResult := ramReadResult(MIPS_CPU_DATA_WIDTH - 1 downto 16);
+				storeHalfWordResult(MIPS_CPU_DATA_WIDTH - 1 downto 16)
+					:= phaseEXInput.sourceImm(15 downto 0);
+				storeHalfWordResult(15 downto 0) := ramReadResult(15 downto 0);
+			when others =>
+				report "Warning: meta value detected for the LH/LHU address";
 		end case;
 		case phaseExInput.instructionOpcode is
 			when MIPS_CPU_INSTRUCTION_OPCODE_LW =>
 				phaseWBCtrl.sourceImm <= ramReadResult;
 			when MIPS_CPU_INSTRUCTION_OPCODE_LH =>
-				phaseWBCtrl.sourceImm(15 downto 0) <= ramReadResult(15 downto 0);
-				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 16) <=
-					(others => ramReadResult(15));
+				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 16)
+					<= (others => loadHalfWordResult(15));
+				phaseWBCtrl.sourceImm(15 downto 0) <= loadHalfWordResult;
 			when MIPS_CPU_INSTRUCTION_OPCODE_LHU =>
-				phaseWBCtrl.sourceImm(15 downto 0) <= ramReadResult(15 downto 0);
 				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 16) <= (others => '0');
+				phaseWBCtrl.sourceImm(15 downto 0) <= loadHalfWordResult;
 			when MIPS_CPU_INSTRUCTION_OPCODE_LB =>
 				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 8)
 					<= (others => loadByteResult(7));
@@ -49,20 +72,21 @@ begin
 				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 8) <= (others => '0');
 				phaseWBCtrl.sourceImm(7 downto 0) <= loadByteResult;
 			when MIPS_CPU_INSTRUCTION_OPCODE_SH =>
-				phaseWBCtrl.sourceImm(15 downto 0) <= phaseExInput.sourceImm(15 downto 0);
-				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 16) <= 
-					ramReadResult(MIPS_CPU_DATA_WIDTH - 1 downto 16);
+				phaseWBCtrl.sourceImm <= storeHalfWordResult;
 			when MIPS_CPU_INSTRUCTION_OPCODE_SB =>
-				phaseWBCtrl.sourceImm(7 downto 0) <= phaseExInput.sourceImm(7 downto 0);
-				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 8) <= 
-					ramReadResult(MIPS_CPU_DATA_WIDTH - 1 downto 8);
+				phaseWBCtrl.sourceImm <= storeByteResult;
 			when others =>
 				phaseWBCtrl.sourceImm <= phaseEXInput.sourceImm;
 		end case;
 		phaseWBCtrl.targetIsRAM <= phaseEXInput.targetIsRAM;
 		phaseWBCtrl.targetIsReg <= phaseEXInput.targetIsReg;
 		phaseWBCtrl.targetRAMAddr <= phaseEXInput.targetRAMAddr;
-		phaseWBCtrl.targetRegAddr <= phaseEXInput.targetRegAddr;
+		if phaseExInput.instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SH or
+		phaseExInput.instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SB then
+			phaseWBCtrl.targetRegAddr <= (others => '0');
+		else
+			phaseWBCtrl.targetRegAddr <= phaseEXInput.targetRegAddr;
+		end if;
 		phaseWBCtrl.instructionOpcode <= phaseEXInput.instructionOpcode;
 	end process;
 
