@@ -113,6 +113,8 @@ begin
 						result.operation <= ALU_OPERATION_ADD;
 					when MIPS_CPU_INSTRUCTION_FUNCT_SUBU =>
 						result.operation <= ALU_OPERATION_SUBTRACT;
+					when MIPS_CPU_INSTRUCTION_FUNCT_AND =>
+						result.operation <= ALU_OPERATION_LOGIC_AND;
 					when MIPS_CPU_INSTRUCTION_FUNCT_OR =>
 						result.operation <= ALU_OPERATION_LOGIC_OR;
 					when MIPS_CPU_INSTRUCTION_FUNCT_XOR =>

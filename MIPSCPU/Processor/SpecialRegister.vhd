@@ -6,6 +6,7 @@ entity SpecialRegister is
 	port (
 		reset : in std_logic;
 		clock : in std_logic;
+		control0 : in RegisterControl_t;
         control1 : in RegisterControl_t;
         control2 : in RegisterControl_t;
         control3 : in RegisterControl_t;
@@ -22,7 +23,10 @@ begin
 		data <= (others => '0');
 		output <= (others => '0');
 	elsif rising_edge(clock) then
-        if control1.operation = REGISTER_OPERATION_WRITE then
+		if control0.operation = REGISTER_OPERATION_WRITE then
+			data <= control0.data;
+			output <= control0.data;
+        elsif control1.operation = REGISTER_OPERATION_WRITE then
             data <= control1.data;
             output <= control1.data;
         elsif control2.operation = REGISTER_OPERATION_WRITE then

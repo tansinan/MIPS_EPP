@@ -52,6 +52,10 @@ package MIPSCP0 is
 	-- Constants related to CP0 instructions
 	constant MIPS_CP0_INSTRUCTION_RS_MF : RegisterAddress_t := "00100";
 	constant MIPS_CP0_INSTRUCTION_RS_MT : RegisterAddress_t := "00000";
+	
+	constant MIPS_CP0_NONBOOT_EXCEPTION_HANDLER :
+		RAMAddress_t := x"80000180";
+		
 
 end package;
 

@@ -8,8 +8,8 @@ use work.HardwareController.all;
 
 entity Processor is
 	port (
-		reset : in std_logic;
-		clock : in std_logic;
+		reset : in Reset_t;
+		clock : in Clock_t;
 		debugData : out CPUDebugData_t;
 		primaryRAMControl : out HardwareRAMControl_t;
 		primaryRAMResult : in RAMData_t;
@@ -47,17 +47,10 @@ architecture Behavioral of Processor is
 	signal pcControl2 : RegisterControl_t;
 	signal pcControl3 : RegisterControl_t;
 	signal pcValue : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
-
-	component SpecialRegister is
-		port (
-			reset : in std_logic;
-			clock : in std_logic;
-			control1 : in RegisterControl_t;
-			control2 : in RegisterControl_t;
-			control3 : in RegisterControl_t;
-			output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0)
-		);
-	end component;
+	
+	signal cp0ExceptionPCOverrideControl : RegisterControl_t;
+	signal cp0ExceptionPipelineClear : EnablingControl_t;
+	signal cp0ExceptionTrigger : CP0ExceptionTrigger_t;
 
 	component RegisterFile is
     Port (
@@ -102,16 +95,17 @@ begin
 		output => register_file_output
 	);
 
-	pcRegister_i : SpecialRegister port map (
+	pcRegister_i : entity work.SpecialRegister port map (
 		reset => reset,
 		clock => clock,
+		control0 => cp0ExceptionPCOverrideControl,
 		control1 => pcControl1,
 		control2 => pcControl2,
 		control3 => pcControl3,
 		output => pcValue
 	);
 
-	pipeline_phase_instruction_decode: PipelinePhaseInstructionDecode port map (
+	pipelinePhaseInstructionDecode_i: PipelinePhaseInstructionDecode port map (
 		reset => reset,
 		clock => clock,
 		register_file => register_file_output,
@@ -121,7 +115,7 @@ begin
 		pcControl => pcControl1
 	);
 
-	pipeline_phase_execute: entity work.PipelinePhaseExecute
+	pipelinePhaseExecute_i: entity work.PipelinePhaseExecute
 	port map (
 		reset => reset,
 		clock => clock,
@@ -138,6 +132,7 @@ begin
 		clock => clock,
 		phaseEXInput => pipelinePhaseEXMAInterface,
 		phaseWBCtrlOutput => pipelinePhaseMAWBInterface,
+		exceptionTriggerOutput => cp0ExceptionTrigger,
 		ramReadResult => memoryAccessResult
 	);
 
@@ -169,6 +164,10 @@ begin
 		instructionExecutionEnabled => instructionExecutionEnabledCP0,
 		primaryRegisterFileData => register_file_output,
 		primaryRegisterFileControl => registerFileControl2,
+		pcValue => pcValue,
+		pcControl => cp0ExceptionPCOverrideControl,
+		exceptionTrigger => cp0ExceptionTrigger,
+		exceptionPipelineClear => cp0ExceptionPipelineClear,
 		debugCP0RegisterFileData => open
 	);
 	
@@ -203,44 +202,49 @@ begin
 		if reset = '0' then
 			instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
 			instructionExecutionEnabledCP0 <= FUNC_DISABLED;
-			ramControl3.address <= (others => '0');
-			ramControl3.writeEnabled <= FUNC_DISABLED;
-			ramControl3.readEnabled <= FUNC_ENABLED;
+			--ramControl3.address <= (others => '0');
+			--ramControl3.writeEnabled <= FUNC_DISABLED;
+			--ramControl3.readEnabled <= FUNC_ENABLED;
 			current_pipeline_phase <= "0100";
 		elsif rising_edge(clock) then
-			if current_pipeline_phase = "0000" then
-				instruction := memoryAccessResult;
-				opcode :=
-					instruction(MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
-				if opcode = MIPS_CPU_INSTRUCTION_OPCODE_CP0 then
-					instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
-					instructionToCP0 <= instruction;
-					instructionExecutionEnabledCP0 <= FUNC_ENABLED;
-				else
-					instructionToPrimary <= instruction;
-					instructionToCP0 <= MIPS_CPU_INSTRUCTION_NOP;
-					instructionExecutionEnabledCP0 <= FUNC_DISABLED;
-				end if;
-				pcControl2.operation <= REGISTER_OPERATION_READ;
-				current_pipeline_phase <= current_pipeline_phase + 1;
-				ramControl3.writeEnabled <= FUNC_DISABLED;
-				ramControl3.readEnabled <= FUNC_DISABLED;
-			elsif current_pipeline_phase = "0100" then
-				pcControl2.operation <= REGISTER_OPERATION_WRITE;
-				pcControl2.data <= pcValue + 4;
-				current_pipeline_phase <= "0000";
-				instructionExecutionEnabledCP0 <= FUNC_DISABLED;
-				ramControl3.address <= pcValue;
-				ramControl3.writeEnabled <= FUNC_DISABLED;
-				ramControl3.readEnabled <= FUNC_ENABLED;
-				ramControl3.data <= (others => '0');
+			if cp0exceptionPipelineClear = FUNC_ENABLED then
+				current_pipeline_phase <= "0100";
 			else
-				pcControl2.operation <= REGISTER_OPERATION_READ;
-				instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
-				instructionExecutionEnabledCP0 <= FUNC_DISABLED;
-				current_pipeline_phase <= current_pipeline_phase + 1;
-				ramControl3.writeEnabled <= FUNC_DISABLED;
-				ramControl3.readEnabled <= FUNC_DISABLED;
+				if current_pipeline_phase = "0000" then
+					instruction := memoryAccessResult;
+					opcode :=
+						instruction(MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
+					if opcode = MIPS_CPU_INSTRUCTION_OPCODE_CP0 then
+						instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
+						instructionToCP0 <= instruction;
+						instructionExecutionEnabledCP0 <= FUNC_ENABLED;
+					else
+						instructionToPrimary <= instruction;
+						instructionToCP0 <= MIPS_CPU_INSTRUCTION_NOP;
+						instructionExecutionEnabledCP0 <= FUNC_DISABLED;
+					end if;
+					pcControl2.operation <= REGISTER_OPERATION_READ;
+					current_pipeline_phase <= current_pipeline_phase + 1;
+					ramControl3.writeEnabled <= FUNC_DISABLED;
+					ramControl3.readEnabled <= FUNC_DISABLED;
+				elsif current_pipeline_phase = "0100" then
+					pcControl2.operation <= REGISTER_OPERATION_WRITE;
+					pcControl2.data <= pcValue + 4;
+					current_pipeline_phase <= "0000";
+					instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
+					instructionExecutionEnabledCP0 <= FUNC_DISABLED;
+					ramControl3.address <= pcValue;
+					ramControl3.writeEnabled <= FUNC_DISABLED;
+					ramControl3.readEnabled <= FUNC_ENABLED;
+					ramControl3.data <= (others => '0');
+				else
+					pcControl2.operation <= REGISTER_OPERATION_READ;
+					instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
+					instructionExecutionEnabledCP0 <= FUNC_DISABLED;
+					current_pipeline_phase <= current_pipeline_phase + 1;
+					ramControl3.writeEnabled <= FUNC_DISABLED;
+					ramControl3.readEnabled <= FUNC_DISABLED;
+				end if;
 			end if;
 		end if;
 	end process;

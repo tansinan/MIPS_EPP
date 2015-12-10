@@ -25,6 +25,7 @@ begin
 				MIPS_CPU_INSTRUCTION_OPCODE_SW =>
 				if phaseEXInput.sourceRAMAddr(1 downto 0) /= "00" then
 					exceptionTrigger.enabled <= FUNC_ENABLED;
+					report "Unaligned LW/SW detected!";
 				else
 					exceptionTrigger.enabled <= FUNC_DISABLED;
 				end if;
@@ -137,7 +138,7 @@ begin
 			--phaseWBCtrlOutput.targetIsReg <= FUNC_DISABLED;
 			--phaseWBCtrlOutput.targetIsRAM <= FUNC_DISABLED;
 		elsif rising_edge(clock) then
-			
+			exceptionTriggerOutput <= exceptionTrigger;
 		end if;
 	end process;
 end Behavioral;

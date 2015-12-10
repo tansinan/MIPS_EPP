@@ -134,6 +134,7 @@ package MIPSCPU is
 
 	-- MIPS CPU funct for the special opcode
 	constant MIPS_CPU_INSTRUCTION_FUNCT_ADDU : InstructionFunct_t := "100001";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_AND : InstructionFunct_t := "100100";
 	constant MIPS_CPU_INSTRUCTION_FUNCT_SUBU : InstructionFunct_t := "100011";
 	constant MIPS_CPU_INSTRUCTION_FUNCT_OR : InstructionFunct_t := "100101";
 	constant MIPS_CPU_INSTRUCTION_FUNCT_XOR : InstructionFunct_t := "100110";

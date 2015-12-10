@@ -11,6 +11,10 @@ entity Coprocessor0_e is
 		instructionExecutionEnabled : in EnablingControl_t;
 		primaryRegisterFileData : in mips_register_file_port;
 		primaryRegisterFileControl : out RegisterFileControl_t;
+		pcValue : in CPUData_t;
+		pcControl : out RegisterControl_t;
+		exceptionTrigger : in CP0ExceptionTrigger_t;
+		exceptionPipelineClear : out EnablingControl_t;
 		debugCP0RegisterFileData : out CP0RegisterFileOutput_t
 	);
 end entity;
@@ -51,6 +55,17 @@ begin
 		clock => clock,
 		control => cp0TLBControl,
 		output => cp0TLBData
+	);
+	
+	cp0ExceptionHandler : entity work.CP0ExceptionHandler
+	port map
+	(
+		clock => clock,
+		reset => reset,
+		exceptionTrigger => exceptionTrigger,
+		pcValue => pcValue,
+		pcOverrideControl => pcControl,
+		exceptionPipelineClear => exceptionPipelineClear
 	);
 
 end architecture;
