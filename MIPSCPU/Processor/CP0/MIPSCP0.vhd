@@ -43,7 +43,12 @@ package MIPSCP0 is
 			index : CP0TLBEntryIndex_t;
 			writeEnabled : std_logic;
 		end record;
-		
+	
+	type CP0ExceptionTrigger_t is
+		record
+			enabled : EnablingControl_t;
+			exceptionPC : CPUData_t;
+		end record;
 	-- Constants related to CP0 instructions
 	constant MIPS_CP0_INSTRUCTION_RS_MF : RegisterAddress_t := "00100";
 	constant MIPS_CP0_INSTRUCTION_RS_MT : RegisterAddress_t := "00000";

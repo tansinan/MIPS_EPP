@@ -1,7 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use work.MIPSCPU.all;
-
+use work.MIPSCP0.all;
 
 entity PipelinePhaseMemoryAccess is
 	port (
@@ -9,13 +9,38 @@ entity PipelinePhaseMemoryAccess is
 		reset : in std_logic;
 		phaseEXInput : in PipelinePhaseEXMAInterface_t;
 		phaseWBCtrlOutput : out PipelinePhaseMAWBInterface_t;
+		exceptionTriggerOutput : out CP0ExceptionTrigger_t;
 		ramReadResult : in std_logic_vector(MIPS_RAM_DATA_WIDTH - 1 downto 0)
 	);
-end PipelinePhaseMemoryAccess;
+end entity;
 
 architecture Behavioral of PipelinePhaseMemoryAccess is
 	signal phaseWBCtrl : PipelinePhaseMAWBInterface_t;
+	signal exceptionTrigger : CP0ExceptionTrigger_t;
 begin
+	process(phaseEXInput)
+	begin
+		case phaseEXInput.instructionOpcode is
+			when MIPS_CPU_INSTRUCTION_OPCODE_LW |
+				MIPS_CPU_INSTRUCTION_OPCODE_SW =>
+				if phaseEXInput.sourceRAMAddr(1 downto 0) /= "00" then
+					exceptionTrigger.enabled <= FUNC_ENABLED;
+				else
+					exceptionTrigger.enabled <= FUNC_DISABLED;
+				end if;
+			when MIPS_CPU_INSTRUCTION_OPCODE_LH |
+				MIPS_CPU_INSTRUCTION_OPCODE_LHU |
+				MIPS_CPU_INSTRUCTION_OPCODE_SH =>
+				if phaseEXInput.sourceRAMAddr(0) /= '0' then
+					exceptionTrigger.enabled <= FUNC_ENABLED;
+				else
+					exceptionTrigger.enabled <= FUNC_DISABLED;
+				end if;
+			when others =>
+				exceptionTrigger.enabled <= FUNC_DISABLED;
+		end case;
+	end process;
+
 	process(phaseEXInput, ramReadResult)
 		variable loadByteResult : std_logic_vector(7 downto 0);
 		variable loadHalfWordResult : std_logic_vector(15 downto 0);
@@ -89,8 +114,23 @@ begin
 		end if;
 		phaseWBCtrl.instructionOpcode <= phaseEXInput.instructionOpcode;
 	end process;
+	
+	process(exceptionTrigger, phaseWBCtrl)
+	begin
+		if exceptionTrigger.enabled = FUNC_ENABLED then
+			phaseWBCtrlOutput <= (
+				sourceImm => (others => '0'),
+				targetIsRAM => FUNC_DISABLED,
+				targetIsReg => FUNC_DISABLED,
+				targetRAMAddr => (others => '0'),
+				targetRegAddr => (others => '0'),
+				instructionOpcode => (others => '0')
+			);
+		else
+			phaseWBCtrlOutput <= phaseWBCtrl;
+		end if;
+	end process;
 
-	phaseWBCtrlOutput <= phaseWBCtrl;
 	process(clock, reset)
 	begin
 		if reset = FUNC_ENABLED then
