@@ -20,7 +20,8 @@ entity Coprocessor0_e is
 end entity;
 
 architecture Behavioral of Coprocessor0_e is
-	signal cp0RegisterFileControl : CP0RegisterFileControl_t;
+	signal cp0RegisterFileControl0 : CP0RegisterFileControl_t;
+	signal cp0RegisterFileControl1 : CP0RegisterFileControl_t;
 	signal cp0RegisterFileData : CP0RegisterFileOutput_t;
 	signal cp0TLBControl : CP0TLBControl_t;
 	signal cp0TLBData : CP0TLBData_t;
@@ -35,7 +36,7 @@ begin
 		primaryRegisterFileData => primaryRegisterFileData,
 		primaryRegisterFileControl => primaryRegisterFileControl,
 		cp0RegisterFileData => cp0RegisterFileData,
-		cp0RegisterFileControl => cp0RegisterFileControl,
+		cp0RegisterFileControl => cp0RegisterFileControl0,
 		cp0TLBData => cp0TLBData,
 		cp0TLBControl => cp0TLBControl
 	);
@@ -45,7 +46,8 @@ begin
 	(
 		reset => reset,
 		clock => clock,
-        control => cp0RegisterFileControl,
+        control0 => cp0RegisterFileControl0,
+		control1 => cp0RegisterFileControl1,
 		output => cp0RegisterFileData
 	);
 	
@@ -65,7 +67,8 @@ begin
 		exceptionTrigger => exceptionTrigger,
 		pcValue => pcValue,
 		pcOverrideControl => pcControl,
-		exceptionPipelineClear => exceptionPipelineClear
+		exceptionPipelineClear => exceptionPipelineClear,
+		cp0RegisterFileControl => cp0RegisterFileControl1
 	);
 
 end architecture;

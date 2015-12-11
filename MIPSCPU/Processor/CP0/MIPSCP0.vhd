@@ -18,6 +18,14 @@ package MIPSCP0 is
 
 	type CP0RegisterFileControl_t is
 		array(0 to MIPS_CP0_REGISTER_COUNT - 1) of RegisterControl_t;
+		
+	constant MIPS_CP0_REGISTER_INDEX_TLB_INDEX : integer := 0;
+	constant MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_LOW0 : integer := 2;
+	constant MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_LOW1 : integer := 3;
+	constant MIPS_CP0_REGISTER_INDEX_TLB_PAGE_MASK : integer := 5;
+	constant MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_HIGH : integer := 10;
+
+	constant MIPS_CP0_REGISTER_INDEX_EPC : integer := 14;
 
 	constant MIPS_CP0_TLB_INDEX_WIDTH : integer := 4;
 	constant MIPS_CP0_TLB_ENTRY_COUNT : integer := 2**MIPS_CP0_TLB_INDEX_WIDTH;
@@ -53,8 +61,7 @@ package MIPSCP0 is
 	constant MIPS_CP0_INSTRUCTION_RS_MF : RegisterAddress_t := "00100";
 	constant MIPS_CP0_INSTRUCTION_RS_MT : RegisterAddress_t := "00000";
 	
-	constant MIPS_CP0_NONBOOT_EXCEPTION_HANDLER :
-		RAMAddress_t := x"80000180";
+	constant MIPS_CP0_NONBOOT_EXCEPTION_HANDLER : RAMAddress_t := x"80000180";
 		
 
 end package;

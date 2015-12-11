@@ -71,12 +71,16 @@ begin
 				cp0RegisterFileControl(i).data <= (others => '0');
 				cp0RegisterFileControl(i).operation <= REGISTER_OPERATION_READ;
 			end loop;
-			cp0TLBControl.writeEnabled <= FUNC_ENABLED;
-			cp0TLBControl.index <= cp0RegisterFileData(0)(3 downto 0);
-			cp0TLBControl.data.pageMask <= cp0RegisterFileData(5);
-			cp0TLBControl.data.entryHigh <= cp0RegisterFileData(10);
-			cp0TLBControl.data.entryLow0 <= cp0RegisterFileData(2);
-			cp0TLBControl.data.entryLow1 <= cp0RegisterFileData(3);
+			cp0TLBControl <= (
+				writeEnabled => FUNC_ENABLED,
+				index => cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_TLB_INDEX)(3 downto 0),
+				data => (
+					pageMask => cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_TLB_PAGE_MASK),
+					entryHigh => cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_HIGH),
+					entryLow0 => cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_LOW0),
+					entryLow1 => cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_LOW1)
+				)
+			);
 		elsif func = "000001" then
 			--Execute TLBR
 			primaryRegisterFileControl.address <= (others => '0');
