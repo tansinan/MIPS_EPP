@@ -1,39 +1,52 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.MIPSCPU.all;
 
 entity FlashRom is
 	port (
 		-- Connect with other CPU Parts
-		clock: in std_logic;
-		writeEnable: in std_logic;
-		readEnable: in std_logic;
-		dataDisplay: out std_logic_vector(15 downto 0);
-		dataControl: in std_logic_vector(15 downto 0);
-		address: in std_logic_vector(22 downto 0);
+		clock : in std_logic;
+		reset : in std_logic;
+		writeEnable : in std_logic;
+		readEnable : in std_logic;
+		dataDisplay : out std_logic_vector(15 downto 0);
+		dataControl : in std_logic_vector(15 downto 0);
+		address : in std_logic_vector(22 downto 0);
+		readyStatus : out ReadyStatus_t;
 		
-		-- Connecct with flash ROM
-		flashByte: out std_logic;
-		flashVPEN: out std_logic;
-		flashCE, flashOE, flashWE: out std_logic;
-		flashRP: out std_logic;
-		flashAddress: out std_logic_vector(22 downto 0);
-		flashData: inout std_logic_vector(15 downto 0)
+		-- Connect with flash ROM
+		flashByte : out std_logic;
+		flashVPEN : out std_logic;
+		flashCE, flashOE, flashWE : out std_logic;
+		flashRP : out std_logic;
+		flashAddress : out std_logic_vector(22 downto 0);
+		flashData : inout std_logic_vector(15 downto 0)
 	);
 end entity;
 
 architecture Behavioral of FlashRom is
-	signal operationState:std_logic_vector(1 downto 0) := "00";-- 00: not busy 01:reading 10: erasing 11: writing
-	signal state:std_logic_vector(3 downto 0);
+	signal operationState : std_logic_vector(1 downto 0) := "00";-- 00: not busy 01:reading 10: erasing 11: writing
+	signal state : std_logic_vector(3 downto 0);
 	
 begin
 	flashByte <= '1';
 	flashVPEN <= '1';
 	flashRP <= '1';
 	
-	process (clock)
+	process (clock, reset)
 	begin
-		if rising_edge(clock) then
+		if operationState = "00" then
+			readyStatus <= STATUS_READY;
+		else
+			readyStatus <= STATUS_BUSY;
+		end if;
+		
+		if reset = '0' then
+			operationState <= "00";
+			state <= "0000";
+			flashData <= (others => 'Z');
+		elsif rising_edge(clock) then
 			-- Read Flash ROM
 			if operationState = "00" and readEnable = '0' and writeEnable = '1' and state = "0000" then
 				flashCE <= '0';
@@ -64,6 +77,7 @@ begin
 						state <= "0000";
 						operationState <= "00";
 				end case;
+
 			-- Erase
 			elsif operationState = "00" and readEnable = '1' and writeEnable = '0' and state = "0000" then
 				flashWE <= '0';

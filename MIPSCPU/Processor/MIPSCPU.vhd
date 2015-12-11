@@ -11,6 +11,10 @@ package MIPSCPU is
 	constant FUNC_ENABLED : std_logic := '0';
 	constant FUNC_DISABLED : std_logic := '1';
 	
+	subtype ReadyStatus_t is std_logic;
+	constant STATUS_BUSY : std_logic := '0';
+	constant STATUS_READY : std_logic := '1';
+	
 	-- General numerical properties of the processor
 	-- The data width of register
 	constant MIPS_CPU_DATA_WIDTH : integer := 32;
