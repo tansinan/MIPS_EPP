@@ -23,7 +23,8 @@ entity FlashRom is
 end entity;
 
 architecture Behavioral of FlashRom is
-	signal operationState:std_logic_vector(1 downto 0) := "00";-- 00: not busy 01:reading 10: erasing 11: writing
+	signal operationState:std_logic_vector(1 downto 0) <= "00";-- 00: not busy 01:reading 10: erasing 11: writing
+	signal state:std_logic_vector(4 downto 0);
 	
 begin
 	flashByte <= '1';
@@ -35,77 +36,76 @@ begin
 	end if;
 	
 	process (clock)
-		variable state:std_logic_vector(4 downto 0)
 	begin
 		if rising_edge(clock) then
 			-- Read Flash ROM
 			if operationState = "00" and readEnable = "0" and writeEnable = "1" and state = "0000"
 				flashCE <= '0';
 				flashWE <= '0';
-				state := "0001";
+				state <= "0001";
 				operationState <= "01";
 			elsif operationState = "01"
 				case state is
 					when "0001" => 
 						flashData <= X"00FF";
 						flashWE <= '1';
-						state := "0010";
+						state <= "0010";
 					when "0010" => 
 						flashOE <= '0';
-						state := "0011";
+						state <= "0011";
 					when "0011" => 
 						flashAddress <= address;
 						flashData <= (others => 'Z');
-						state := "0100";
+						state <= "0100";
 					when "0100" => 
 						dataDisplay <= flashData;
 						flashOE <= '1';
-						state := "0000";
+						state <= "0000";
 					when others =>
 						flashCE <= '1';
 						flashWE <= '1';
-						state := "0000";
+						state <= "0000";
 						operationState <= "00";
 				end case;
 			elsif operationState = "00" and readEnable = "1" and writeEnable = "0" and state = "0000"
 				flashWE <= '0';
 				flashCE <= '0';
-				state := "0001";
+				state <= "0001";
 				operationState <= "10";
 			elsif operationState = "10"
 				case state is
 					when "0001" => 
 						flashData <= X"0020";
 						flashWE <= '1';
-						state := "0010";
+						state <= "0010";
 					when "0010" => 
 						flashWE <= '0';
-						state := "0011";
+						state <= "0011";
 					when "0011" => 
 						flashAddress <= address;
 						flashData <= X"00D0";
-						state := "0100";
+						state <= "0100";
 					when "0100" => 
 						flashWE <= '1';
-						state := "0101";
+						state <= "0101";
 					-- Confirm
 					when "0101" =>
 						flashWE <= '0';
-						state := "0110";
+						state <= "0110";
 					when "0110" =>
 						flashData <= X"0070";
 						flashWE <= '1';
-						state := "0111";
+						state <= "0111";
 					when "0111" =>
 						flashOE <= '0';
 						flashData <= (others => 'Z');
-						state := "1000";
+						state <= "1000";
 					when "1001" =>
 						if flashData(7) = '1'
-							state := "0000";
+							state <= "0000";
 							operationState <= "11";
 						else
-							state := "0101";
+							state <= "0101";
 				end case;		
 						
 			-- Write
@@ -113,43 +113,43 @@ begin
 				case state is
 					when "0000" =>
 						flashWE <= '0';
-						state := "0001";
+						state <= "0001";
 					when "0001" =>
 						flashData <= X"0040";
 						flashWE <= '1';
-						state := "0010";
+						state <= "0010";
 					when "0010" =>
 						flashWE <= '0';
-						state := "0011";
+						state <= "0011";
 					when "0011" =>
 						flashAddress <= address;
 						flashData <= dataControl;
-						state := "0100";
+						state <= "0100";
 					when "0100" =>
 						flashWE <= '1';
-						state := "0101";
+						state <= "0101";
 					-- Confirm
 					when "0101" =>
 						flashWE <= '0';
-						state := "0110";
+						state <= "0110";
 					when "0110" =>
 						flashData <= X"0070";
 						flashWE <= '1';
-						state := "0111";
+						state <= "0111";
 					when "0111" =>
 						flashOE <= '0';
 						flashData <= (others => 'Z');
-						state := "1000";
+						state <= "1000";
 					when "1001" =>
 						if flashData(7) = '1'
-							state := "0000";
+							state <= "0000";
 							operationState <= "11";
 						else
-							state := "0101";
+							state <= "0101";
 					when others =>
 						flashWE <= '1';
 						flashCE <= '1';
-						state := "0000";
+						state <= "0000";
 						operationState <= "00";
 				end case;
 			end if;
