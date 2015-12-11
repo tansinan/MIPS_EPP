@@ -32,6 +32,7 @@ end entity;
 architecture Behavioral of HardwareAddressMapper is
 	signal addressType : AddressType_t;
 	signal savedAddressType : AddressType_t;
+	signal savedAddressType2 : AddressType_t;
 	signal usedRAMControl : RAMControl_t;
 begin
 	-- Determine the actual used RAM Control signal
@@ -48,14 +49,6 @@ begin
 			usedRAMControl <= ramControl1;
 		end if;
 	end process;
-	
-	process(clock,reset)
-	begin
-		if rising_edge(clock) then
-			savedAddressType <= addressType;
-		end if;
-	end process;
-	
 	
 	-- Determine the address type;
 	process(usedRAMControl)
@@ -109,6 +102,14 @@ begin
 				secondaryRAMHardwareControl.writeEnabled <= FUNC_DISABLED;
 				uart1Control.address <= (others => '0');
 		end case;
+	end process;
+		
+	process(clock,reset)
+	begin
+		if rising_edge(clock) then
+			savedAddressType <= addressType;
+			savedAddressType2 <= savedAddressType;
+		end if;
 	end process;
 	
 	-- Determine the result

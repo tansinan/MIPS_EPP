@@ -196,56 +196,75 @@ begin
 	);
 
 	Processor_Process : process (clock, reset)
-		variable opcode : InstructionOpcode_t;
-		variable instruction : Instruction_t;
 	begin
 		if reset = '0' then
-			instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
-			instructionExecutionEnabledCP0 <= FUNC_DISABLED;
+			--instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
+			--instructionExecutionEnabledCP0 <= FUNC_DISABLED;
 			--ramControl3.address <= (others => '0');
 			--ramControl3.writeEnabled <= FUNC_DISABLED;
 			--ramControl3.readEnabled <= FUNC_ENABLED;
-			current_pipeline_phase <= "0100";
+			pcControl2.operation <= REGISTER_OPERATION_WRITE;
+			pcControl2.data <= x"80000000";
+			current_pipeline_phase <= "1111";
 		elsif rising_edge(clock) then
 			if cp0exceptionPipelineClear = FUNC_ENABLED then
 				current_pipeline_phase <= "0100";
 			else
-				if current_pipeline_phase = "0000" then
-					instruction := memoryAccessResult;
-					opcode :=
-						instruction(MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
-					if opcode = MIPS_CPU_INSTRUCTION_OPCODE_CP0 then
-						instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
-						instructionToCP0 <= instruction;
-						instructionExecutionEnabledCP0 <= FUNC_ENABLED;
-					else
-						instructionToPrimary <= instruction;
-						instructionToCP0 <= MIPS_CPU_INSTRUCTION_NOP;
-						instructionExecutionEnabledCP0 <= FUNC_DISABLED;
-					end if;
+				if current_pipeline_phase = "1111" then
+					pcControl2.operation <= REGISTER_OPERATION_WRITE;
+					pcControl2.data <= x"00000000";
+					current_pipeline_phase <= "0100";
+				elsif current_pipeline_phase = "0000" then
 					pcControl2.operation <= REGISTER_OPERATION_READ;
 					current_pipeline_phase <= current_pipeline_phase + 1;
-					ramControl3.writeEnabled <= FUNC_DISABLED;
-					ramControl3.readEnabled <= FUNC_DISABLED;
 				elsif current_pipeline_phase = "0100" then
 					pcControl2.operation <= REGISTER_OPERATION_WRITE;
 					pcControl2.data <= pcValue + 4;
 					current_pipeline_phase <= "0000";
-					instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
-					instructionExecutionEnabledCP0 <= FUNC_DISABLED;
-					ramControl3.address <= pcValue;
-					ramControl3.writeEnabled <= FUNC_DISABLED;
-					ramControl3.readEnabled <= FUNC_ENABLED;
-					ramControl3.data <= (others => '0');
 				else
 					pcControl2.operation <= REGISTER_OPERATION_READ;
-					instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
-					instructionExecutionEnabledCP0 <= FUNC_DISABLED;
 					current_pipeline_phase <= current_pipeline_phase + 1;
-					ramControl3.writeEnabled <= FUNC_DISABLED;
-					ramControl3.readEnabled <= FUNC_DISABLED;
 				end if;
 			end if;
 		end if;
 	end process;
+	
+	instructionFetchProcess : process (current_pipeline_phase, pcValue)
+	begin
+		if  current_pipeline_phase = "0100" then
+			ramControl3.address <= pcValue;
+			ramControl3.writeEnabled <= FUNC_DISABLED;
+			ramControl3.readEnabled <= FUNC_ENABLED;
+			ramControl3.data <= (others => '0');
+		else
+			ramControl3.address <= (others => '0');
+			ramControl3.writeEnabled <= FUNC_DISABLED;
+			ramControl3.readEnabled <= FUNC_DISABLED;
+			ramControl3.data <= (others => '0');
+		end if;
+	end process;
+	
+	process (current_pipeline_phase, memoryAccessResult)
+		variable opcode : InstructionOpcode_t;
+		variable instruction : Instruction_t;
+	begin
+		if  current_pipeline_phase = "0000" then
+			instruction := memoryAccessResult;
+			opcode :=
+				instruction(MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
+			if opcode = MIPS_CPU_INSTRUCTION_OPCODE_CP0 then
+				instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
+				instructionToCP0 <= instruction;
+				instructionExecutionEnabledCP0 <= FUNC_ENABLED;
+			else
+				instructionToPrimary <= instruction;
+				instructionToCP0 <= MIPS_CPU_INSTRUCTION_NOP;
+				instructionExecutionEnabledCP0 <= FUNC_DISABLED;
+			end if;
+		else
+			instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
+			instructionExecutionEnabledCP0 <= FUNC_DISABLED;
+		end if;
+	end process;
+	
 end architecture;
