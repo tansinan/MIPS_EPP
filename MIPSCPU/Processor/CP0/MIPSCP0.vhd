@@ -59,8 +59,8 @@ package MIPSCP0 is
 		end record;
 
 	-- Constants related to CP0 instructions
-	constant MIPS_CP0_INSTRUCTION_RS_MF : RegisterAddress_t := "00100";
-	constant MIPS_CP0_INSTRUCTION_RS_MT : RegisterAddress_t := "00000";
+	constant MIPS_CP0_INSTRUCTION_RS_MF : RegisterAddress_t := "00000";
+	constant MIPS_CP0_INSTRUCTION_RS_MT : RegisterAddress_t := "00100";
 	
 	constant MIPS_CP0_INSTRUCTION_FUNCT_ERET : InstructionFunct_t := "011000";
 	constant MIPS_CP0_INSTRUCTION_FUNCT_TLBWI : InstructionFunct_t := "000010";

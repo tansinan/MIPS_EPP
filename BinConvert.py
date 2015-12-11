@@ -40,11 +40,11 @@ else:
 f = open("MIPSBarebone/barebone.bin", "rb")
 
 fout = open("/mnt/MIPS_EPP_RAMDISK/RAM1.txt", "w")
-createRAMImage(f,100,1024 * 16,fout)
+createRAMImage(f,200,1024 * 16,fout)
 fout.close()
 
 fout = open("/mnt/MIPS_EPP_RAMDISK/RAM2.txt", "w")
-createRAMImage(f,100,1024 * 16,fout)
+createRAMImage(f,200,1024 * 16,fout)
 fout.close()
 
 f.close()

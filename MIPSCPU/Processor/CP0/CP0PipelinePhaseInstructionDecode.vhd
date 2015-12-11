@@ -117,6 +117,13 @@ begin
 				operation => REGISTER_OPERATION_WRITE,
 				data => cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_EPC)
 			);
+		else
+			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
+				cp0RegisterFileControl(i).operation <= REGISTER_OPERATION_READ;
+			end loop;
+			cp0TLBControl.writeEnabled <= FUNC_DISABLED;
+			primaryRegisterFileControl.address <= (others => '0');
+			cp0TLBControl.writeEnabled <= FUNC_DISABLED;
 		end if;
 	end process;
 end architecture;
