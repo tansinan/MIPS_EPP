@@ -12,7 +12,8 @@ entity Coprocessor0_e is
 		primaryRegisterFileData : in mips_register_file_port;
 		primaryRegisterFileControl : out RegisterFileControl_t;
 		pcValue : in CPUData_t;
-		pcControl : out RegisterControl_t;
+		pcControlException : out RegisterControl_t;
+		pcControlPipeline : out RegisterControl_t;
 		exceptionTrigger : in CP0ExceptionTrigger_t;
 		exceptionPipelineClear : out EnablingControl_t;
 		debugCP0RegisterFileData : out CP0RegisterFileOutput_t
@@ -38,7 +39,8 @@ begin
 		cp0RegisterFileData => cp0RegisterFileData,
 		cp0RegisterFileControl => cp0RegisterFileControl0,
 		cp0TLBData => cp0TLBData,
-		cp0TLBControl => cp0TLBControl
+		cp0TLBControl => cp0TLBControl,
+		pcControl => pcControlPipeline
 	);
 	
 	cp0RegisterFile_i: entity work.CP0RegisterFile_c
@@ -66,7 +68,7 @@ begin
 		reset => reset,
 		exceptionTrigger => exceptionTrigger,
 		pcValue => pcValue,
-		pcOverrideControl => pcControl,
+		pcOverrideControl => pcControlException,
 		exceptionPipelineClear => exceptionPipelineClear,
 		cp0RegisterFileControl => cp0RegisterFileControl1
 	);

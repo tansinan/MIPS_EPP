@@ -57,9 +57,14 @@ package MIPSCP0 is
 			enabled : EnablingControl_t;
 			exceptionPC : CPUData_t;
 		end record;
+
 	-- Constants related to CP0 instructions
 	constant MIPS_CP0_INSTRUCTION_RS_MF : RegisterAddress_t := "00100";
 	constant MIPS_CP0_INSTRUCTION_RS_MT : RegisterAddress_t := "00000";
+	
+	constant MIPS_CP0_INSTRUCTION_FUNCT_ERET : InstructionFunct_t := "011000";
+	constant MIPS_CP0_INSTRUCTION_FUNCT_TLBWI : InstructionFunct_t := "000010";
+	constant MIPS_CP0_INSTRUCTION_FUNCT_TLBR : InstructionFunct_t := "000001";
 	
 	constant MIPS_CP0_NONBOOT_EXCEPTION_HANDLER : RAMAddress_t := x"80000180";
 		

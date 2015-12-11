@@ -25,7 +25,7 @@ architecture Behavioral of Processor is
 	signal register_file_operation: std_logic_vector (MIPS_CPU_REGISTER_COUNT - 1 downto 0);
 	signal register_file_output : mips_register_file_port;
 	signal registerFileControl1 : RegisterFileControl_t;
-	signal registerFileControl2 : RegisterFileControl_t;
+	signal cp0PipelineRegisterFileControl : RegisterFileControl_t;
 
 	signal pipelinePhaseIDEXInterface : PipelinePhaseIDEXInterface_t;
 	signal pipelinePhaseEXMAInterface : PipelinePhaseEXMAInterface_t;
@@ -48,7 +48,8 @@ architecture Behavioral of Processor is
 	signal pcControl3 : RegisterControl_t;
 	signal pcValue : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	
-	signal cp0ExceptionPCOverrideControl : RegisterControl_t;
+	signal cp0ExceptionPCControl : RegisterControl_t;
+	signal cp0PipelinePCControl : RegisterControl_t;
 	signal cp0ExceptionPipelineClear : EnablingControl_t;
 	signal cp0ExceptionTrigger : CP0ExceptionTrigger_t;
 
@@ -98,10 +99,11 @@ begin
 	pcRegister_i : entity work.SpecialRegister port map (
 		reset => reset,
 		clock => clock,
-		control0 => cp0ExceptionPCOverrideControl,
-		control1 => pcControl1,
-		control2 => pcControl2,
-		control3 => pcControl3,
+		control0 => cp0ExceptionPCControl,
+		control1 => cp0PipelinePCControl,
+		control2 => pcControl1,
+		control3 => pcControl2,
+		control4 => pcControl3,
 		output => pcValue
 	);
 
@@ -147,10 +149,7 @@ begin
 	port map
 	(
 		control1 => registerFileControl1,
-		control2 => (
-			address => (others => '0'),
-			data => (others => '0')
-		),
+		control2 => cp0PipelineRegisterFileControl,
 		operation_output => register_file_operation,
 		data_output => register_file_input
 	);
@@ -163,9 +162,10 @@ begin
 		instruction => instructionToCP0,
 		instructionExecutionEnabled => instructionExecutionEnabledCP0,
 		primaryRegisterFileData => register_file_output,
-		primaryRegisterFileControl => registerFileControl2,
+		primaryRegisterFileControl => cp0PipelineRegisterFileControl,
 		pcValue => pcValue,
-		pcControl => cp0ExceptionPCOverrideControl,
+		pcControlException => cp0ExceptionPCControl,
+		pcControlPipeline => cp0PipelinePCControl,
 		exceptionTrigger => cp0ExceptionTrigger,
 		exceptionPipelineClear => cp0ExceptionPipelineClear,
 		debugCP0RegisterFileData => open

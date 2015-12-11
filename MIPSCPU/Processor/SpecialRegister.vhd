@@ -10,6 +10,7 @@ entity SpecialRegister is
         control1 : in RegisterControl_t;
         control2 : in RegisterControl_t;
         control3 : in RegisterControl_t;
+		control4 : in RegisterControl_t;
         output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0)
 	);
 end entity;
@@ -35,6 +36,9 @@ begin
         elsif control3.operation = REGISTER_OPERATION_WRITE then
             data <= control3.data;
             output <= control3.data;
+		elsif control4.operation = REGISTER_OPERATION_WRITE then
+			data <= control4.data;
+			output <= control4.data;
 		else
 			data <= data;
 			output <= data;
