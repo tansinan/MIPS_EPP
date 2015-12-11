@@ -24,27 +24,23 @@ end entity;
 
 architecture Behavioral of FlashRom is
 	signal operationState:std_logic_vector(1 downto 0) <= "00";-- 00: not busy 01:reading 10: erasing 11: writing
-	signal state:std_logic_vector(4 downto 0);
+	signal state:std_logic_vector(3 downto 0);
 	
 begin
 	flashByte <= '1';
 	flashVPEN <= '1';
 	flashRP <= '1';
-	if operationState = "00"
-		flashData <= (others => 'Z');
-		flashOE <= '1';
-	end if;
 	
 	process (clock)
 	begin
 		if rising_edge(clock) then
 			-- Read Flash ROM
-			if operationState = "00" and readEnable = "0" and writeEnable = "1" and state = "0000"
+			if operationState = "00" and readEnable = "0" and writeEnable = "1" and state = "0000" then
 				flashCE <= '0';
 				flashWE <= '0';
 				state <= "0001";
 				operationState <= "01";
-			elsif operationState = "01"
+			elsif operationState = "01" then
 				case state is
 					when "0001" => 
 						flashData <= X"00FF";
@@ -64,15 +60,17 @@ begin
 					when others =>
 						flashCE <= '1';
 						flashWE <= '1';
+						flashOE <= '1';
 						state <= "0000";
 						operationState <= "00";
 				end case;
-			elsif operationState = "00" and readEnable = "1" and writeEnable = "0" and state = "0000"
+			-- Erase
+			elsif operationState = "00" and readEnable = "1" and writeEnable = "0" and state = "0000" then
 				flashWE <= '0';
 				flashCE <= '0';
 				state <= "0001";
 				operationState <= "10";
-			elsif operationState = "10"
+			elsif operationState = "10" then
 				case state is
 					when "0001" => 
 						flashData <= X"0020";
@@ -106,10 +104,16 @@ begin
 							operationState <= "11";
 						else
 							state <= "0101";
-				end case;		
+					when others =>
+						flashWE <= '1';
+						flashCE <= '1';
+						flashOE <= '1';
+						state <= "0000";
+						operationState <= "00";
+				end case;	
 						
 			-- Write
-			elsif operationState = "11";
+			elsif operationState = "11" then
 				case state is
 					when "0000" =>
 						flashWE <= '0';
@@ -149,6 +153,7 @@ begin
 					when others =>
 						flashWE <= '1';
 						flashCE <= '1';
+						flashOE <= '1';
 						state <= "0000";
 						operationState <= "00";
 				end case;
