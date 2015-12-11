@@ -23,7 +23,7 @@ entity FlashRom is
 end entity;
 
 architecture Behavioral of FlashRom is
-	signal operationState:std_logic_vector(1 downto 0) <= "00";-- 00: not busy 01:reading 10: erasing 11: writing
+	signal operationState:std_logic_vector(1 downto 0) := "00";-- 00: not busy 01:reading 10: erasing 11: writing
 	signal state:std_logic_vector(3 downto 0);
 	
 begin
@@ -35,7 +35,7 @@ begin
 	begin
 		if rising_edge(clock) then
 			-- Read Flash ROM
-			if operationState = "00" and readEnable = "0" and writeEnable = "1" and state = "0000" then
+			if operationState = "00" and readEnable = '0' and writeEnable = '1' and state = "0000" then
 				flashCE <= '0';
 				flashWE <= '0';
 				state <= "0001";
@@ -65,7 +65,7 @@ begin
 						operationState <= "00";
 				end case;
 			-- Erase
-			elsif operationState = "00" and readEnable = "1" and writeEnable = "0" and state = "0000" then
+			elsif operationState = "00" and readEnable = '1' and writeEnable = '0' and state = "0000" then
 				flashWE <= '0';
 				flashCE <= '0';
 				state <= "0001";
@@ -99,11 +99,12 @@ begin
 						flashData <= (others => 'Z');
 						state <= "1000";
 					when "1001" =>
-						if flashData(7) = '1'
+						if flashData(7) = '1' then
 							state <= "0000";
 							operationState <= "11";
 						else
 							state <= "0101";
+						end if;
 					when others =>
 						flashWE <= '1';
 						flashCE <= '1';
@@ -145,11 +146,12 @@ begin
 						flashData <= (others => 'Z');
 						state <= "1000";
 					when "1001" =>
-						if flashData(7) = '1'
+						if flashData(7) = '1' then
 							state <= "0000";
 							operationState <= "11";
 						else
 							state <= "0101";
+						end if;
 					when others =>
 						flashWE <= '1';
 						flashCE <= '1';
