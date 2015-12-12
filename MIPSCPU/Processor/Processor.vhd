@@ -203,26 +203,20 @@ begin
 			--ramControl3.address <= (others => '0');
 			--ramControl3.writeEnabled <= FUNC_DISABLED;
 			--ramControl3.readEnabled <= FUNC_ENABLED;
-			pcControl2.operation <= REGISTER_OPERATION_WRITE;
-			pcControl2.data <= x"80000000";
+			--pcControl2.operation <= REGISTER_OPERATION_WRITE;
+			--pcControl2.data <= x"80000000";
 			current_pipeline_phase <= "1111";
 		elsif rising_edge(clock) then
 			if cp0exceptionPipelineClear = FUNC_ENABLED then
 				current_pipeline_phase <= "0100";
 			else
 				if current_pipeline_phase = "1111" then
-					pcControl2.operation <= REGISTER_OPERATION_WRITE;
-					pcControl2.data <= x"00000000";
 					current_pipeline_phase <= "0100";
 				elsif current_pipeline_phase = "0000" then
-					pcControl2.operation <= REGISTER_OPERATION_READ;
 					current_pipeline_phase <= current_pipeline_phase + 1;
 				elsif current_pipeline_phase = "0100" then
-					pcControl2.operation <= REGISTER_OPERATION_WRITE;
-					pcControl2.data <= pcValue + 4;
 					current_pipeline_phase <= "0000";
 				else
-					pcControl2.operation <= REGISTER_OPERATION_READ;
 					current_pipeline_phase <= current_pipeline_phase + 1;
 				end if;
 			end if;
@@ -232,11 +226,19 @@ begin
 	instructionFetchProcess : process (current_pipeline_phase, pcValue)
 	begin
 		if  current_pipeline_phase = "0100" then
+			pcControl2.operation <= REGISTER_OPERATION_WRITE;
+			pcControl2.data <= pcValue + 4;
 			ramControl3.address <= pcValue;
 			ramControl3.writeEnabled <= FUNC_DISABLED;
 			ramControl3.readEnabled <= FUNC_ENABLED;
 			ramControl3.data <= (others => '0');
 		else
+			if  current_pipeline_phase /= "1111" then
+				pcControl2.operation <= REGISTER_OPERATION_READ;
+			else
+				pcControl2.operation <= REGISTER_OPERATION_WRITE;
+				pcControl2.data <= x"80000000";
+			end if;
 			ramControl3.address <= (others => '0');
 			ramControl3.writeEnabled <= FUNC_DISABLED;
 			ramControl3.readEnabled <= FUNC_DISABLED;

@@ -72,7 +72,7 @@ begin
 					when others =>
 						result.operation <= (others => 'X');
 				end case;
-			when MIPS_CPU_INSTRUCTION_FUNCT_JR =>
+			when MIPS_CPU_INSTRUCTION_FUNCT_JALR =>
 				result.regAddr1 <= (others => '0');
 				result.regAddr2 <= (others => '0');
 				result.regDest <= rd;
@@ -86,7 +86,7 @@ begin
 					operation => REGISTER_OPERATION_WRITE,
 					data => rsData
 				);
-			when MIPS_CPU_INSTRUCTION_FUNCT_JALR =>
+			when MIPS_CPU_INSTRUCTION_FUNCT_JR =>
 				result.regAddr1 <= (others => '0');
 				result.regAddr2 <= (others => '0');
 				result.regDest <= (others => '0');

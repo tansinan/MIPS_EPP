@@ -10,6 +10,10 @@ package VirtualHardware is
 		:= "/mnt/MIPS_EPP_RAMDISK/RAM2.txt";
 	constant VIRTUAL_HARDWARE_SECONDARY_RAM_TEMP_FILE : string
 		:= "/mnt/MIPS_EPP_RAMDISK/RAM2_Temp.txt";
+	constant VIRTUAL_HARDWARE_UART_INPUT_PIPE : string
+		:= "/tmp/MIPS_EPP/UART_Input.pipe";
+	constant VIRTUAL_HARDWARE_UART_OUTPUT_PIPE : string
+		:= "/tmp/MIPS_EPP/UART_Output.pipe";
 end package;
 
 package body VirtualHardware is
