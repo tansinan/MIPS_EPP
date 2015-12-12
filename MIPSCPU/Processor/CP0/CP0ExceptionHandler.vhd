@@ -13,6 +13,7 @@ entity CP0ExceptionHandler is
 		pcValue : in CPUData_t;
 		pcOverrideControl : out RegisterControl_t;
 		exceptionPipelineClear : out EnablingControl_t;
+		cp0RegisterFileData : in CP0RegisterFileOutput_t;
 		cp0RegisterFileControl : out CP0RegisterFileControl_t
 	);
 end entity;
@@ -20,6 +21,7 @@ end entity;
 architecture Behavioral of CP0ExceptionHandler is
 begin
 	process(clock, reset)
+		variable newCP0CauseRegister : CPUData_t;
 	begin
 		if reset = FUNC_ENABLED then
 			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
@@ -43,6 +45,13 @@ begin
 				cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_EPC) <= (
 					operation => REGISTER_OPERATION_WRITE,
 					data => pcValue - 4
+				);
+				newCP0CauseRegister := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_CAUSE);
+				newCP0CauseRegister(MIPS_CP0_CAUSE_EXCEPTION_CODE_HI downto MIPS_CP0_CAUSE_EXCEPTION_CODE_LO)
+					:= exceptionTrigger.exceptionCode;
+				cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_EPC) <= (
+					operation => REGISTER_OPERATION_WRITE,
+					data => newCP0CauseRegister
 				);
 				report "Debug : Exception triggered, pipeline will be cleared.";
 			else

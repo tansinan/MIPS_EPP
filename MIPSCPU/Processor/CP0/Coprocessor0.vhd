@@ -70,6 +70,7 @@ begin
 		pcValue => pcValue,
 		pcOverrideControl => pcControlException,
 		exceptionPipelineClear => exceptionPipelineClear,
+		cp0RegisterFileData => cp0RegisterFileData,
 		cp0RegisterFileControl => cp0RegisterFileControl1
 	);
 

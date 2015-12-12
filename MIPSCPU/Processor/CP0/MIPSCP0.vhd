@@ -24,8 +24,43 @@ package MIPSCP0 is
 	constant MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_LOW1 : integer := 3;
 	constant MIPS_CP0_REGISTER_INDEX_TLB_PAGE_MASK : integer := 5;
 	constant MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_HIGH : integer := 10;
-
+	constant MIPS_CP0_REGISTER_INDEX_STATUS : integer := 12;
+	constant MIPS_CP0_REGISTER_INDEX_CAUSE : integer := 13;
 	constant MIPS_CP0_REGISTER_INDEX_EPC : integer := 14;
+	
+	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_HI : integer := 6;
+	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_LO : integer := 2;
+	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_WIDTH : integer := 
+		MIPS_CP0_CAUSE_EXCEPTION_CODE_HI - MIPS_CP0_CAUSE_EXCEPTION_CODE_LO + 1;
+	subtype CP0CauseExceptionCode_t is
+		std_logic_vector(MIPS_CP0_CAUSE_EXCEPTION_CODE_WIDTH - 1 downto 0);
+
+	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_INTERRUPT :
+		CP0CauseExceptionCode_t := "00000";
+
+	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_MODIFICATION :
+		CP0CauseExceptionCode_t := "00001";
+		
+	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_LOAD :
+		CP0CauseExceptionCode_t := "00010";
+
+	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_STORE :
+		CP0CauseExceptionCode_t := "00011";
+	
+	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_LOAD :
+		CP0CauseExceptionCode_t := "00100";
+
+	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_STORE :
+		CP0CauseExceptionCode_t := "00101";
+	
+	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_BUS_LOAD :
+		CP0CauseExceptionCode_t := "00110";
+
+	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_BUS_STORE :
+		CP0CauseExceptionCode_t := "00111";
+	
+	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_SYSCALL :
+		CP0CauseExceptionCode_t := "01000";
 
 	constant MIPS_CP0_TLB_INDEX_WIDTH : integer := 4;
 	constant MIPS_CP0_TLB_ENTRY_COUNT : integer := 2**MIPS_CP0_TLB_INDEX_WIDTH;
@@ -56,6 +91,7 @@ package MIPSCP0 is
 		record
 			enabled : EnablingControl_t;
 			exceptionPC : CPUData_t;
+			exceptionCode : CP0CauseExceptionCode_t;
 		end record;
 
 	-- Constants related to CP0 instructions
@@ -67,7 +103,6 @@ package MIPSCP0 is
 	constant MIPS_CP0_INSTRUCTION_FUNCT_TLBR : InstructionFunct_t := "000001";
 	
 	constant MIPS_CP0_NONBOOT_EXCEPTION_HANDLER : RAMAddress_t := x"80000180";
-		
 
 end package;
 

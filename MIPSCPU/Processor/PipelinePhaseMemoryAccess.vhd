@@ -25,6 +25,11 @@ begin
 				MIPS_CPU_INSTRUCTION_OPCODE_SW =>
 				if phaseEXInput.sourceRAMAddr(1 downto 0) /= "00" then
 					exceptionTrigger.enabled <= FUNC_ENABLED;
+					if phaseEXInput.instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SW then
+						exceptionTrigger.exceptionCode <= MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_STORE;
+					else
+						exceptionTrigger.exceptionCode <= MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_LOAD;
+					end if;
 					report "Unaligned LW/SW detected!";
 				else
 					exceptionTrigger.enabled <= FUNC_DISABLED;
@@ -34,6 +39,11 @@ begin
 				MIPS_CPU_INSTRUCTION_OPCODE_SH =>
 				if phaseEXInput.sourceRAMAddr(0) /= '0' then
 					exceptionTrigger.enabled <= FUNC_ENABLED;
+					if phaseEXInput.instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SH then
+						exceptionTrigger.exceptionCode <= MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_STORE;
+					else
+						exceptionTrigger.exceptionCode <= MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_LOAD;
+					end if;
 				else
 					exceptionTrigger.enabled <= FUNC_DISABLED;
 				end if;
