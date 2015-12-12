@@ -15,9 +15,14 @@ def writeRAMWord(val):
     return ret;
     
 def createRAMImage(binaryFile, maxInstructionCount, ramSize, ramImageFile):
+    actualInstructionCount = 0
     binaryFile.seek(0)
     for i in range(0, maxInstructionCount):
         instructionStr = binaryFile.read(4)
+        if not instructionStr:
+            print(actualInstructionCount)
+            break
+        actualInstructionCount += 1
         instruction = 0
         for j in range(0, 4):
             instruction += (instructionStr[j] << (j * 8))
@@ -40,11 +45,11 @@ else:
 f = open("MIPSBarebone/barebone.bin", "rb")
 
 fout = open("/mnt/MIPS_EPP_RAMDISK/RAM1.txt", "w")
-createRAMImage(f,200,1024 * 16,fout)
+createRAMImage(f,5000,1024 * 16,fout)
 fout.close()
 
 fout = open("/mnt/MIPS_EPP_RAMDISK/RAM2.txt", "w")
-createRAMImage(f,200,1024 * 16,fout)
+createRAMImage(f,5000,1024 * 16,fout)
 fout.close()
 
 f.close()

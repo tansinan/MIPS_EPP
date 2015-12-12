@@ -88,7 +88,7 @@ begin
 		begin
 			file_open(tmpRAMFile, virtualRAMFileName, READ_MODE);
 			file_open(file_pointer, virtualRAMTempFileName, WRITE_MODE);
-			for i in 0 to 1024 - 1 loop
+			for i in 0 to 10240 - 1 loop
 				readline (tmpRAMFile, contentLine);
 				if i /= lineNumber then
 					writeline(file_pointer, contentLine);
@@ -100,7 +100,7 @@ begin
 			file_close(file_pointer);
 			file_open(file_pointer, virtualRAMFileName, WRITE_MODE);
 			file_open(tmpRAMFile, virtualRAMTempFileName, READ_MODE);
-			for i in 0 to 1024 - 1 loop
+			for i in 0 to 10240 - 1 loop
 				readline (tmpRAMFile, contentLine);
 				writeline(file_pointer, contentLine);
 			end loop;
@@ -119,7 +119,7 @@ begin
 				file_open(file_pointer, virtualRAMFileName, READ_MODE);
 				lineToRead := to_integer(unsigned(addressBus));
 				report "Reading:" & integer'image(lineToRead);
-				if lineToRead < 1024 then
+				if lineToRead < 10240 then
 					fileSeek(lineToRead);
 					fileReadData(readResult);
 				else
@@ -130,7 +130,7 @@ begin
 			elsif writeEnabled = FUNC_ENABLED then
 				lineToRead := to_integer(unsigned(addressBus));
 				report "Wrtiting:" & integer'image(lineToRead);
-				if lineToRead < 1024 then
+				if lineToRead < 10240 then
 					writeData := dataBus;
 					fileEditLine(to_integer(unsigned(addressBus)), writeData);
 				else

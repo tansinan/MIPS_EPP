@@ -95,6 +95,7 @@ begin
 					uart1Control.operation <= REGISTER_OPERATION_WRITE;
 				end if;
 				uart1Control.address <= usedRAMControl.address;
+				uart1Control.data <= usedRAMControl.data;
 			when others =>
 				primaryRAMHardwareControl.readEnabled <= FUNC_DISABLED;
 				primaryRAMHardwareControl.writeEnabled <= FUNC_DISABLED;

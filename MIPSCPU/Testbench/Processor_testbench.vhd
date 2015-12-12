@@ -117,6 +117,14 @@ begin
 		ramClock <= '1';
 		wait for RAM_CLOCK_PERIOD/2;
 	end process;
+	
+	-- Debugging helper process
+	process(debugData.pcValue)
+	begin
+		if debugData.pcValue = x"800005e8" then
+			report "2333";
+		end if;
+	end process;
 
 
 	-- stimulus process
