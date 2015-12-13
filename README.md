@@ -9,5 +9,5 @@ We use the UART module from https://github.com/pabennett/uart.
 We generate them by using Xilinx's IP Core generator.
 
 ## Team members
-* Liang Ze Yu
 * Tan Si Nan
+* Liao Yi Yang

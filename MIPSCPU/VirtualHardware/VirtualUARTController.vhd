@@ -21,7 +21,7 @@ entity UARTController is
 	);
 end entity;
 
-architecture Simulation of UARTController is
+architecture behaviour of UARTController is
 	signal inputBufferNotEmpty : boolean;
 	signal inputBufferCharacter : integer;
 begin

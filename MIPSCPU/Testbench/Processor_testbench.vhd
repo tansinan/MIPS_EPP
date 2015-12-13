@@ -88,17 +88,6 @@ begin
 		addressBus => secondaryPhysicsRAMAddressBus,
 		dataBus => secondaryPhysicsRAMDataBus
 	);
-	
-	virtualUART1 : entity work.VirtualUART
-	generic map
-	(
-		baudRate => 115200
-	)
-    port map
-	(
-		uartReceive => uart1Transmit,
-		uartTransmit => uart1Receive
-	);
 
 	-- CPU clock
 	cpuClockProcess : process

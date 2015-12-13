@@ -21,6 +21,10 @@ package MIPSCPU is
 	subtype CPUData_t is
 		std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		
+	constant MIPS_CPU_DOUBLE_WORD_DATA_WIDTH : integer := 2 * MIPS_CPU_DATA_WIDTH;
+	subtype CPUDoubleWordData_t is
+		std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		
 	-- Memory access and mapping related (sub)types and constants
 	constant MIPS_RAM_ADDRESS_WIDTH : integer := 32;
 	constant MIPS_RAM_DATA_WIDTH : integer := 32;

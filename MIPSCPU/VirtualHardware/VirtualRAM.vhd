@@ -22,7 +22,7 @@ entity VirtualRAM_c is
 	);
 end entity;
 
-architecture behavior of VirtualRAM_c is
+architecture behaviour of VirtualRAM_c is
 begin
 	process(clock, reset)
 		file file_pointer : text;

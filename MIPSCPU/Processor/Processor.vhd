@@ -52,43 +52,9 @@ architecture Behavioral of Processor is
 	signal cp0PipelinePCControl : RegisterControl_t;
 	signal cp0ExceptionPipelineClear : EnablingControl_t;
 	signal cp0ExceptionTrigger : CP0ExceptionTrigger_t;
-
-	component RegisterFile is
-    Port (
-		reset : in std_logic;
-		clock : in std_logic;
-		input : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		operation : in std_logic_vector (MIPS_CPU_REGISTER_COUNT - 1 downto 0);
-		output : out mips_register_file_port
-	);
-	end component;
-
-	component PipelinePhaseInstructionDecode is
-	port (
-		reset : in std_logic;
-		clock : in std_logic;
-		register_file : in mips_register_file_port;
-		instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
-		phaseExCtrlOutput : out PipelinePhaseIDEXInterface_t;
-		pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		pcControl : out RegisterControl_t
-	);
-	end component;
-
-	component PipelinePhaseExecute is
-	port (
-		reset : in std_logic;
-		clock : in std_logic;
-		phaseIDInput : in PipelinePhaseIDEXInterface_t;
-		pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
-		pcControl : out RegisterControl_t;
-		phaseMACtrlOutput : out PipelinePhaseEXMAInterface_t
-	);
-	end component;
-
 begin
 
-	registerFile_i : RegisterFile port map (
+	registerFile_i : entity work.RegisterFile port map (
 		reset => reset,
 		clock => clock,
 		input => register_file_input,
@@ -107,7 +73,7 @@ begin
 		output => pcValue
 	);
 
-	pipelinePhaseInstructionDecode_i: PipelinePhaseInstructionDecode port map (
+	pipelinePhaseInstructionDecode_i: entity work.PipelinePhaseInstructionDecode port map (
 		reset => reset,
 		clock => clock,
 		register_file => register_file_output,
