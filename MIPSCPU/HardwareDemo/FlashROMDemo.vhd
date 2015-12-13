@@ -6,19 +6,19 @@ use work.MIPSCPU.all;
 use work.HardwareController.all;
 
 entity FlashROMDemo is
-    port
-    (
-        reset : in Reset_t;
-        clock : in Clock_t;
-				successLight : out std_logic;
-        -- Connect with flash ROM
-        flashByte : out std_logic;
-        flashVPEN : out std_logic;
-        flashCE, flashOE, flashWE : out std_logic;
-        flashRP : out std_logic;
-        flashAddress : out std_logic_vector(22 downto 0);
-        flashData : inout std_logic_vector(15 downto 0)
-    );
+	port
+	(
+		reset : in Reset_t;
+		clock : in Clock_t;
+		successLight : out std_logic;
+		-- Connect with flash ROM
+		flashByte : out std_logic;
+		flashVPEN : out std_logic;
+		flashCE, flashOE, flashWE : out std_logic;
+		flashRP : out std_logic;
+		flashAddress : out std_logic_vector(22 downto 0);
+		flashData : inout std_logic_vector(15 downto 0)
+	);
 end entity;
 
 architecture Behavioral of FlashROMDemo is

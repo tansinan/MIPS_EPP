@@ -21,26 +21,10 @@ entity UARTController is
 	);
 end entity;
 
-architecture Behavioral of UARTController is
+architecture Simulation of UARTController is
 	signal inputBufferNotEmpty : boolean;
 	signal inputBufferCharacter : integer;
 begin
-	-- This virtual UART module from 
---	process
---		subtype UnsignedChar_t is std_logic_vector(7 downto 0);
---		type BinaryFile_t is file of Character;
---		variable hardwareRegisterAddress : std_logic_vector(11 downto 0);
---		variable ch : Character;
---		file outputFile : BinaryFile_t;
---	begin
---		file_open(outputFile, VIRTUAL_HARDWARE_UART_OUTPUT_PIPE, WRITE_MODE);
---		for i in 65 to 77 loop
---		ch := character'val(i);
---		write(outputFile, ch);
---		end loop;
---		file_close(outputFile);
---		wait;
---	end process;
 	process(reset, clock)
 		type BinaryFile_t is file of Character;
 		variable hardwareRegisterAddress : std_logic_vector(11 downto 0);

@@ -5,7 +5,9 @@ MIPS_EPP is our project for the course < Computer Organization >, aiming at crea
 ## About the UART module
 We use the UART module from https://github.com/pabennett/uart.
 
+## About the Multiplier and the Divider module
+We generate them by using Xilinx's IP Core generator.
+
 ## Team members
-* Liao Yi Yang
 * Liang Ze Yu
 * Tan Si Nan

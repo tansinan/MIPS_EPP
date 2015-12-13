@@ -61,7 +61,7 @@ begin
 		output => cp0TLBData
 	);
 	
-	cp0ExceptionHandler : entity work.CP0ExceptionHandler
+	cp0ExceptionHandler_i : entity work.CP0ExceptionHandler
 	port map
 	(
 		clock => clock,
