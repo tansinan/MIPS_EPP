@@ -6,6 +6,7 @@ entity HighLatencyMathModule is
 	port (
 		reset : in Reset_t;
 		clock : in Clock_t;
+		clock50M : in Clock_t;
 		instruction : in Instruction_t;
 		instructionExecutionEnabled : in EnablingControl_t;
 		registerFileData : in mips_register_file_port;
@@ -31,6 +32,7 @@ begin
 	port map
 	(
 		clock => clock,
+		clock50M => clock50M,
 		reset => reset,
 		number1 => ipCoreWrapperNumber1,
 		number1Signed => ipCoreWrapperNumber1Signed,
@@ -73,6 +75,12 @@ begin
 		hiRegisterControl => hiRegisterControl,
 		loRegisterData => loRegisterData,
 		loRegisterControl => loRegisterControl,
+		ipCoreWrapperNumber1 => ipCoreWrapperNumber1,
+		ipCoreWrapperNumber1Signed => ipCoreWrapperNumber1Signed,
+		ipCoreWrapperNumber2 => ipCoreWrapperNumber2,
+		ipCoreWrapperNumber2Signed => ipCoreWrapperNumber2Signed,
+		ipCoreWrapperResultReady => ipCoreWrapperResultReady,
+		ipCoreWrapperOutput => ipCoreWrapperOutput,
 		ready => ready
 	);
 end architecture;

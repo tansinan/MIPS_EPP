@@ -10,6 +10,7 @@ entity Processor is
 	port (
 		reset : in Reset_t;
 		clock : in Clock_t;
+		clock50M : in Clock_t;
 		debugData : out CPUDebugData_t;
 		primaryRAMControl : out HardwareRAMControl_t;
 		primaryRAMResult : in RAMData_t;
@@ -261,6 +262,7 @@ begin
 	(
 		reset => reset,
 		clock => clock,
+		clock50M => clock50M,
 		instruction => instructionToHighLatencyMath,
 		instructionExecutionEnabled =>
 			instructionExecutionEnabledToHighLatencyMath,

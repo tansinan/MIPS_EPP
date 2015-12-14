@@ -55,8 +55,8 @@ begin
 		secondaryPhysicsRAMAddressBus => secondaryPhysicsRAMAddressBus,
 		secondaryPhysicsRAMDataBus => secondaryPhysicsRAMDataBus,
 		uart1Transmit => uart1Transmit,
-		uart1Receive => uart1Receive,
-		debugData => debugData
+		uart1Receive => uart1Receive
+		--debugData => debugData
 	);
 	
 	virtualPrimaryRam_i :entity work.VirtualRam_c

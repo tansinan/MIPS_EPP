@@ -7,6 +7,7 @@ entity HighLatencyMathIPCoreWrapper is
 	(
 		reset : in Reset_t;
 		clock : in Clock_t;
+		clock50M : in Clock_t;
 		number1 : in CPUData_t;
 		number1Signed : in EnablingControl_t;
 		number2 : in CPUData_t;
@@ -23,7 +24,7 @@ architecture Behavioral of HighLatencyMathIPCoreWrapper is
 begin
 	ipCoreMultiplier_i :entity work.IPCoreMultiplier
 	port map (
-		clk => clock,
+		clk => clock50M,
 		a => mulIpCoreNumber1,
 		b => mulIpCoreNumber2,
 		p => mulIpCoreResult
@@ -33,9 +34,19 @@ begin
 		if reset = FUNC_ENABLED then
 			output <= (others => '0');
 		elsif rising_edge(clock) then
-			mulIpCoreNumber1 <= "0" & number1;
-			mulIpCoreNumber2 <= "0" & number2;
-			output(31 downto 0) <= mulIpCoreResult(31 downto 0);
+			if number1Signed = FUNC_ENABLED then
+				mulIpCoreNumber1 <= number1(MIPS_CPU_DATA_WIDTH - 1) & number1;
+			else
+				mulIpCoreNumber1 <= "0" & number1;
+			end if;
+			
+			if number2Signed = FUNC_ENABLED then
+				mulIpCoreNumber2 <= number2(MIPS_CPU_DATA_WIDTH - 1) & number2;
+			else
+				mulIpCoreNumber2 <= "0" & number2;
+			end if;
+			output(MIPS_CPU_DATA_WIDTH * 2 - 1 downto 0) <=
+				mulIpCoreResult(MIPS_CPU_DATA_WIDTH * 2 - 1 downto 0);
 		end if;
 	end process;
 end architecture;
