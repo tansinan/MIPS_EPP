@@ -10,8 +10,9 @@ CPLDShortcut/*.html
 MIPSCPU/*.html
 
 #Core generator
-MIPSCPU/ipcore_dir
 !MIPSCPU/ipcore_dir/*.xco
+!MIPSCPU/ipcore_dir/*.xise
+#MIPSCPU/ipcore_dir
 
 # project-wide generated files
 *.gise
