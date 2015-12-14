@@ -133,6 +133,7 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_OPCODE_LHU : InstructionOpcode_t := "100101";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_LUI : InstructionOpcode_t := "001111";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_CP0 : InstructionOpcode_t := "010000";
+	constant MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL2 : InstructionOpcode_t := "011100";
 
 	-- MIPS CPU rt for the regimm opcode
 	constant MIPS_CPU_INSTRUCTION_RT_BGEZ :
@@ -158,6 +159,15 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_FUNCT_JR : InstructionFunct_t := "001000";
 	constant MIPS_CPU_INSTRUCTION_FUNCT_JALR : InstructionFunct_t := "001001";
 	constant MIPS_CPU_INSTRUCTION_FUNCT_SYSCALL : InstructionFunct_t := "001100";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_MFHI : InstructionFunct_t := "010000";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_MFLO : InstructionFunct_t := "010010";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_MTHI : InstructionFunct_t := "010001";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_MTLO : InstructionFunct_t := "010011";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_MULT : InstructionFunct_t := "011000";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_MULTU : InstructionFunct_t := "011001";
+	
+	-- MIPS CPU funct for the special2 opcode
+	constant MIPS_CPU_INSTRUCTION_FUNCT_MUL : InstructionFunct_t := "000010";
 
 	-- General
 	constant ALU_OPERATION_CTRL_WIDTH : integer := 5;

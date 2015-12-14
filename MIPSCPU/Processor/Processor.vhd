@@ -26,6 +26,7 @@ architecture Behavioral of Processor is
 	signal register_file_output : mips_register_file_port;
 	signal registerFileControl1 : RegisterFileControl_t;
 	signal cp0PipelineRegisterFileControl : RegisterFileControl_t;
+	signal highLatencyMatheRegisterFileControl : RegisterFileControl_t;
 
 	signal pipelinePhaseIDEXInterface : PipelinePhaseIDEXInterface_t;
 	signal pipelinePhaseEXMAInterface : PipelinePhaseEXMAInterface_t;
@@ -34,6 +35,9 @@ architecture Behavioral of Processor is
 	signal instructionToCP0 : Instruction_t;
 	signal instructionToPrimary : Instruction_t;
 	signal instructionExecutionEnabledCP0 : EnablingControl_t;
+	signal instructionToHighLatencyMath : Instruction_t;
+	signal instructionExecutionEnabledToHighLatencyMath : EnablingControl_t;
+	
 	signal instruction_done : std_logic;
 
 	signal current_pipeline_phase : std_logic_vector(3 downto 0) := "0000";
@@ -116,6 +120,7 @@ begin
 	(
 		control1 => registerFileControl1,
 		control2 => cp0PipelineRegisterFileControl,
+		control3 => highLatencyMatheRegisterFileControl,
 		operation_output => register_file_operation,
 		data_output => register_file_input
 	);
@@ -214,20 +219,36 @@ begin
 	
 	process (current_pipeline_phase, memoryAccessResult)
 		variable opcode : InstructionOpcode_t;
+		variable funct : InstructionFunct_t;
 		variable instruction : Instruction_t;
 	begin
 		if  current_pipeline_phase = "0000" then
 			instruction := memoryAccessResult;
 			opcode :=
 				instruction(MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
+			funct := instruction(MIPS_CPU_INSTRUCTION_FUNCT_HI downto MIPS_CPU_INSTRUCTION_FUNCT_LO);
 			if opcode = MIPS_CPU_INSTRUCTION_OPCODE_CP0 then
 				instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
 				instructionToCP0 <= instruction;
 				instructionExecutionEnabledCP0 <= FUNC_ENABLED;
+				instructionExecutionEnabledToHighLatencyMath <=
+					FUNC_DISABLED;
+			elsif opcode = MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL
+				and (funct = MIPS_CPU_INSTRUCTION_FUNCT_MFHI or
+				funct = MIPS_CPU_INSTRUCTION_FUNCT_MFLO or
+				funct = MIPS_CPU_INSTRUCTION_FUNCT_MTHI or
+				funct = MIPS_CPU_INSTRUCTION_FUNCT_MTLO) then
+				instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
+				instructionExecutionEnabledCP0 <= FUNC_DISABLED;
+				instructionToHighLatencyMath <= instruction;
+				instructionExecutionEnabledToHighLatencyMath <=
+					FUNC_ENABLED;
 			else
 				instructionToPrimary <= instruction;
 				instructionToCP0 <= MIPS_CPU_INSTRUCTION_NOP;
 				instructionExecutionEnabledCP0 <= FUNC_DISABLED;
+				instructionExecutionEnabledToHighLatencyMath <=
+					FUNC_DISABLED;
 			end if;
 		else
 			instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
@@ -235,4 +256,16 @@ begin
 		end if;
 	end process;
 	
+	highLatencyMathModule_i : entity work.HighLatencyMathModule
+	port map
+	(
+		reset => reset,
+		clock => clock,
+		instruction => instructionToHighLatencyMath,
+		instructionExecutionEnabled =>
+			instructionExecutionEnabledToHighLatencyMath,
+		registerFileData => register_file_output,
+		registerFileControl => highLatencyMatheRegisterFileControl
+	);
+
 end architecture;

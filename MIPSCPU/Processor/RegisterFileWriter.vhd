@@ -7,6 +7,7 @@ entity RegisterFileWriter is
   port (
 		control1 : in RegisterFileControl_t;
 		control2 : in RegisterFileControl_t;
+		control3 : in RegisterFileControl_t;
 		operation_output : out std_logic_vector(MIPS_CPU_REGISTER_COUNT - 1 downto 0);
 		data_output : out std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0)
 	);
@@ -19,8 +20,10 @@ begin
 	begin
 		if control1.address /= "00000" then
 			validControl := control1;
-		else
+		elsif control2.address /= "00000" then
 			validControl := control2;
+		else
+			validControl := control3;
 		end if;
 
 		for i in 0 to MIPS_CPU_REGISTER_COUNT - 1 loop
