@@ -38,19 +38,19 @@ end entity;
 
 architecture Behavioral of BootLoader is
     -- Connect with FlashRomModule
-    signal flashWriteEnable : std_logic;
-    signal flashReadEnable : std_logic;
-    signal flashDataDisplay : std_logic_vector(15 downto 0);
-    signal flashDataControl : std_logic_vector(15 downto 0);
-    signal flashAddressControl : std_logic_vector(22 downto 0);
-		signal flashReadyStatus : ReadyStatus_t;
-		-- Connect with RAMModule
-		signal RAMControl : HardwareRAMControl_t;
-		signal RAMResult : PhysicsRAMData_t;
-		-- Not for connection
-		signal state : bootLoaderState := READY_TO_GO;
-		signal addressPtr : std_logic_vector(13 downto 0) := "00000000000000";
-		signal RAMBuffer : std_logic_vector(15 downto 0);
+	signal flashWriteEnable : std_logic;
+	signal flashReadEnable : std_logic;
+	signal flashDataDisplay : std_logic_vector(15 downto 0);
+	signal flashDataControl : std_logic_vector(15 downto 0);
+	signal flashAddressControl : std_logic_vector(22 downto 0);
+	signal flashReadyStatus : ReadyStatus_t;
+	-- Connect with RAMModule
+	signal RAMControl : HardwareRAMControl_t;
+	signal RAMResult : PhysicsRAMData_t;
+	-- Not for connection
+	signal state : bootLoaderState := READY_TO_GO;
+	signal addressPtr : std_logic_vector(13 downto 0) := "00000000000000";
+	signal RAMBuffer : std_logic_vector(15 downto 0);
 begin
 	flashROMModule_i : entity work.FlashRom
 	port map (
@@ -72,7 +72,7 @@ begin
 		flashData => flashData,
 		reset => reset
 	);
-	RAMModule_i : entity work.RAM
+	ramController_i : entity work.RAMController_e
 	port map (
 		clock => clock,
 		reset => reset,
@@ -99,7 +99,7 @@ begin
 					elsif flashReadyStatus = STATUS_READY then
 						flashWriteEnable <= '1';
 						flashReadEnable <= '0';
-						flashAddressControl(13 downto 0) <= addressPtr(others => '0');
+						flashAddressControl(13 downto 0) <= addressPtr;
 						state <= READ_FLASH_1_WAIT;
 					end if;
 				
@@ -109,7 +109,7 @@ begin
 					if flashReadyStatus = STATUS_READY then
 						RAMBuffer <= flashDataDisplay;
 						state <= READ_FLASH_2_COMMAND;
-						addressPtr = addressPtr + '1';
+						addressPtr <= addressPtr + '1';
 					end if;
 				
 				when READ_FLASH_2_COMMAND =>
@@ -129,7 +129,7 @@ begin
 						RAMControl.address <= "000000000000000000" & (addressPtr - "1");
 						RAMControl.data <= flashDataDisplay & RAMBuffer;
 						state <= RAM_WAIT;
-						addressPtr = addressPtr + '1';
+						addressPtr <= addressPtr + '1';
 					end if;
 				
 				when RAM_WAIT =>
