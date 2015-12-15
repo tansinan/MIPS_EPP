@@ -32,7 +32,11 @@ entity BootLoader is
     );
 	type bootLoaderState is
 	(
-		READ_FLASH_1_COMMAND
+		READ_FLASH_1_COMMAND,
+		READ_FLASH_2_COMMAND,
+		READ_FLASH_1_WAIT,
+		READ_FLASH_2_WAIT,
+		WORK_FINISHED
 	);
 end entity;
 
@@ -126,20 +130,18 @@ begin
 					if flashReadyStatus = STATUS_READY then
 						RAMControl.writeEnabled <= FUNC_ENABLED;
 						RAMControl.readEnabled <= FUNC_DISABLED;
-						RAMControl.address <= "000000000000000000" & (addressPtr - "1");
+						RAMControl.address <= "000000000000000000" & (addressPtr - '1');
+						-- Warning: watch out for byte order!
 						RAMControl.data <= flashDataDisplay & RAMBuffer;
-						state <= RAM_WAIT;
+						state <= READ_FLASH_1_COMMAND;
 						addressPtr <= addressPtr + '1';
 					end if;
-				
-				when RAM_WAIT =>
-					state <= READ_FLASH_1_COMMAND;
 					
 				when WORK_FINISHED =>
 					workFinished <= '1';
 					
 				when others =>
-					state <= READY_TO_GO;
+					state <= READ_FLASH_1_COMMAND;
 					addressPtr <= (others => '0');
 					workFinished <= '0';
 			end case;
