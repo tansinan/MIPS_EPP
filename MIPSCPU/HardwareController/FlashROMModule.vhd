@@ -85,7 +85,7 @@ begin
 			elsif operationState = "00" and readEnable = '1' and writeEnable = '1' and eraseEnable = '0' and state = "0000" then
 				flashWE <= '0';
 				flashCE <= '0';
-				state <= "0000";
+				state <= "0001";
 				operationState <= "10";
 			elsif operationState = "10" then
 				case state is

@@ -21,8 +21,17 @@ architecture Behavioral of HighLatencyMathIPCoreWrapper is
 	signal mulIpCoreNumber1 : std_logic_vector(MIPS_CPU_DATA_WIDTH downto 0);
 	signal mulIpCoreNumber2 : std_logic_vector(MIPS_CPU_DATA_WIDTH downto 0);
 	signal mulIpCoreResult : std_logic_vector(MIPS_CPU_DATA_WIDTH * 2 + 2 downto 0);
+	component ipcoremultiplier
+	port (
+		clk : in std_logic;
+		a : in std_logic_vector(32 downto 0);
+		b : in std_logic_vector(32 downto 0);
+		p : out std_logic_vector(66 downto 0)
+	);
+end component;
 begin
-	ipCoreMultiplier_i :entity work.IPCoreMultiplier
+
+	ipCoreMultiplier_i : IPCoreMultiplier
 	port map (
 		clk => clock50M,
 		a => mulIpCoreNumber1,

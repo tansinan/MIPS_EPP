@@ -27,6 +27,7 @@ entity HardwareAddressMapper is
 		USER_SPACE_ADDRESS,
 		KERNEL_SPACE_ADDRESS,
 		ISA_ADDRESS,
+		BOOTLOADER_ADDRESS,
 		UNKNOWN
 	);
 end entity;
@@ -36,7 +37,22 @@ architecture Behavioral of HardwareAddressMapper is
 	signal savedAddressType : AddressType_t;
 	signal savedAddressType2 : AddressType_t;
 	signal usedRAMControl : RAMControl_t;
+	signal savedROMData : CPUData_t;
+	signal romData : CPUData_t;
+	component ipcorebootloader
+	port (
+		a : in std_logic_vector(6 downto 0);
+		spo : out std_logic_vector(31 downto 0)
+	);
+end component;
 begin
+
+	ipCoreBootloader_i : IPCoreBootloader
+	port map (
+		a => usedRAMControl.address(8 downto 2),
+		spo => romData
+	);
+
 	-- Determine the actual used RAM Control signal
 	-- TODO: add simulation debugging statement to check RAM access violation.
 	process(ramControl1, ramControl2, ramControl3)
@@ -68,6 +84,8 @@ begin
 			addressType <= KERNEL_SPACE_ADDRESS;
 		elsif (physicsAddress and USER_ADDRESS_SPACE_MASK) = USER_ADDRESS_SPACE then
 			addressType <= USER_SPACE_ADDRESS;
+		elsif (physicsAddress and BOOTLOADER_ADDRESS_SPACE_MASK) = BOOTLOADER_ADDRESS_SPACE then
+			addressType <= BOOTLOADER_ADDRESS;
 		else
 			addressType <= UNKNOWN;
 		end if;
@@ -117,6 +135,7 @@ begin
 		if rising_edge(clock) then
 			savedAddressType <= addressType;
 			savedAddressType2 <= savedAddressType;
+			savedROMData <= romData;
 		end if;
 	end process;
 	
@@ -130,6 +149,8 @@ begin
 				result <= primaryRAMResult;
 			when ISA_ADDRESS =>
 				result <= uart1Result;
+			when BOOTLOADER_ADDRESS =>
+				result <= savedROMData;
 			when others =>
 				result <= (others => '0');
 		end case;

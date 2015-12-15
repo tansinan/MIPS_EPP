@@ -44,6 +44,8 @@ package MIPSCPU is
 	constant KERNEL_ADDRESS_SPACE_MASK : CPUData_t := x"FFC00000";
 	constant USER_ADDRESS_SPACE : CPUData_t := x"00000000";
 	constant USER_ADDRESS_SPACE_MASK : CPUData_t := x"FFC00000";
+	constant BOOTLOADER_ADDRESS_SPACE : CPUData_t := x"BFC00000";
+	constant BOOTLOADER_ADDRESS_SPACE_MASK : CPUData_t := x"FFFF0000";
 
 	-- The address width of the registers in primary processor
 	constant MIPS_CPU_REGISTER_ADDRESS_WIDTH: integer := 5;

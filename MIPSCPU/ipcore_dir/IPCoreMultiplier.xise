@@ -15,8 +15,17 @@
   <version xil_pn:ise_version="14.7" xil_pn:schema_version="2"/>
 
   <files>
-    <file xil_pn:name="IPCoreMultiplier.ngc" xil_pn:type="FILE_NGC"/>
-    <file xil_pn:name="IPCoreMultiplier.vhd" xil_pn:type="FILE_VHDL"/>
+    <file xil_pn:name="IPCoreMultiplier.ngc" xil_pn:type="FILE_NGC">
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="2"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
+    </file>
+    <file xil_pn:name="IPCoreMultiplier.vhd" xil_pn:type="FILE_VHDL">
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="4"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="1"/>
+      <association xil_pn:name="PostMapSimulation" xil_pn:seqID="4"/>
+      <association xil_pn:name="PostRouteSimulation" xil_pn:seqID="4"/>
+      <association xil_pn:name="PostTranslateSimulation" xil_pn:seqID="4"/>
+    </file>
   </files>
 
   <properties>
@@ -42,8 +51,8 @@
     <!--                                                                                  -->
     <property xil_pn:name="PROP_DesignName" xil_pn:value="IPCoreMultiplier" xil_pn:valueState="non-default"/>
     <property xil_pn:name="PROP_DevFamilyPMName" xil_pn:value="spartan6" xil_pn:valueState="default"/>
-    <property xil_pn:name="PROP_intProjectCreationTimestamp" xil_pn:value="2015-12-13T10:01:54" xil_pn:valueState="non-default"/>
-    <property xil_pn:name="PROP_intWbtProjectID" xil_pn:value="E94927C8FF6ADF04E1248FDBF8BA9CA2" xil_pn:valueState="non-default"/>
+    <property xil_pn:name="PROP_intProjectCreationTimestamp" xil_pn:value="2015-12-16T02:46:53" xil_pn:valueState="non-default"/>
+    <property xil_pn:name="PROP_intWbtProjectID" xil_pn:value="11E98EF2E48E4DF58B3C2B154104D28D" xil_pn:valueState="non-default"/>
     <property xil_pn:name="PROP_intWorkingDirLocWRTProjDir" xil_pn:value="Same" xil_pn:valueState="non-default"/>
     <property xil_pn:name="PROP_intWorkingDirUsed" xil_pn:value="No" xil_pn:valueState="non-default"/>
   </properties>

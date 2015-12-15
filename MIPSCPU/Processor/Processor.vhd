@@ -17,6 +17,7 @@ entity Processor is
 		secondaryRAMControl : out HardwareRAMControl_t;
 		secondaryRAMResult : in RAMData_t;
 		uart1Control : out HardwareRegisterControl_t;
+		light : out std_logic_vector(15 downto 0);
 		uart1Result : in CPUData_t
 	);
 end entity;
@@ -61,7 +62,7 @@ architecture Behavioral of Processor is
 	signal cp0VirtualAddress : RAMAddress_t;
 	signal cp0PhysicsAddress : RAMAddress_t;
 begin
-
+	light <= register_file_output(1)(15 downto 0);
 	registerFile_i : entity work.RegisterFile port map (
 		reset => reset,
 		clock => clock,
@@ -216,7 +217,7 @@ begin
 				pcControl2.operation <= REGISTER_OPERATION_READ;
 			else
 				pcControl2.operation <= REGISTER_OPERATION_WRITE;
-				pcControl2.data <= x"80000000";
+				pcControl2.data <= x"bfc00000";
 			end if;
 			ramControl3.address <= (others => '0');
 			ramControl3.writeEnabled <= FUNC_DISABLED;

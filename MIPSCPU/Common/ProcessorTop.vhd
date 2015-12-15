@@ -15,6 +15,7 @@ entity ProcessorTop is
 		secondaryPhysicsRAMControl : out PhysicsRAMControl_t;
 		secondaryPhysicsRAMAddressBus : out PhysicsRAMAddress_t;
 		secondaryPhysicsRAMDataBus : inout PhysicsRAMData_t;
+		light : out std_logic_vector(15 downto 0);
 		uart1Transmit : out std_logic;
 		uart1Receive : in std_logic
 	);
@@ -70,7 +71,8 @@ begin
 		secondaryRAMControl => secondaryRAMControl,
 		secondaryRAMResult => secondaryRAMResult,
 		uart1control => uart1Control,
-		uart1result => uart1Output
+		uart1result => uart1Output,
+		light => light
 	);
 	
 	uartController : entity work.UARTController
