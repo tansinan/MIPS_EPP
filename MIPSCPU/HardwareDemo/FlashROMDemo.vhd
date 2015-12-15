@@ -18,7 +18,8 @@ entity FlashROMDemo is
 		flashCE1, flashCE2 : out std_logic;
 		flashRP : out std_logic;
 		flashAddress : out std_logic_vector(22 downto 0);
-		flashData : inout std_logic_vector(15 downto 0)
+		flashData : inout std_logic_vector(15 downto 0);
+		outputLight : out std_logic_vector(15 downto 0)
 	);
 end entity;
 
@@ -31,11 +32,20 @@ architecture Behavioral of FlashROMDemo is
     signal address : std_logic_vector(22 downto 0);
 		signal readyStatus : ReadyStatus_t;
 		-- Not for connection
-		signal state : std_logic_vector(1 downto 0);
+		signal state : std_logic_vector(2 downto 0);
+		signal stateDbg : std_logic_vector(3 downto 0);
+		signal olb : std_logic_vector(15 downto 0);
 begin
 	flashCE1 <= '0';
 	flashCE2 <= '0';
-	successLight <= '1';
+	outputLight <= olb;
+	--outputLight(15 downto 3) <= (others => '1');
+	--outputLight(2 downto 0) <= state;
+	--with state select outputLight <=
+	--	(others => '1') when "10",
+	--	(others => '0') when others;
+		
+	--successLight <= '1';
 	flashROMModule_i : entity work.FlashRom
 	port map (
 		clock => clock,
@@ -53,28 +63,39 @@ begin
 		flashAddress => flashAddress,
 		flashData => flashData,
 		readyStatus => readyStatus,
-		reset => reset
+		reset => reset,
+		stateDbg => stateDbg
 	);
 	
 	process(clock, reset)
 	begin
 		if reset = '0' then
-			state <= "00";
+			--outputLight <= (others => '0');
+			state <= "000";
+			olb <= (others => '0');
 		elsif rising_edge(clock) then
 			case state is
 				-- write 0xABCD to flash[0]
-				when "00" =>
+				when "000" =>
 					if readyStatus = STATUS_READY then
 						writeEnable <= '0';
 						readEnable <= '1';
 						address <= (others => '0');
-						dataControl <= X"ABCD";
+						dataControl <= "0101101000111100";
 					else
 						writeEnable <= '1';
 						readEnable <= '1';
-						state <= "01";
+						state <= "110";
 					end if;
-				when "11" =>
+				when "110" =>
+					state <= "111";
+				when "111" =>
+					state <= "100";
+				when "100" =>
+					if readyStatus = STATUS_READY then
+						state <= "001";
+					end if;
+				when "011" =>
 					if readyStatus = STATUS_READY then
 						writeEnable <= '0';
 						readEnable <= '1';
@@ -83,24 +104,31 @@ begin
 					else
 						writeEnable <= '1';
 						readEnable <= '1';
-						state <= "01";
+						state <= "010";
 					end if;
 				-- read flash[0] and examine
-				when "01" =>
+				when "001" =>
 					if readyStatus = STATUS_READY then
 						writeEnable <= '1';
 						readEnable <= '0';
-						address <= (others => '0');
-						state <= "10";
+						address <= "00000000000000000000000";
+						state <= "101";
 					end if;
-				when "10" =>
+				when "101" =>
 					if readyStatus = STATUS_READY then
-						if dataDisplay = X"ABCD" then
-							--successLight <= '1';
-						else
-							--successLight <= '0';
+						state <= "010";
+					end if;
+				when "010" =>
+					if readyStatus = STATUS_READY then
+						if olb = "0000000000000000" then
+							olb <= dataDisplay;
 						end if;
-						state <= "11";
+						if dataDisplay = X"ABCD" then
+							successLight <= '1';
+						else
+							successLight <= '0';
+						end if;
+						--state <= "11";
 					else
 						writeEnable <= '1';
 						readEnable <= '1';

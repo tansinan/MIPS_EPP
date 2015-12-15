@@ -14,7 +14,7 @@ entity FlashRom is
 		dataControl : in std_logic_vector(15 downto 0);
 		address : in std_logic_vector(22 downto 0);
 		readyStatus : out ReadyStatus_t;
-		
+		stateDbg : out std_logic_vector(3 downto 0);
 		-- Connect with flash ROM
 		flashByte : out std_logic;
 		flashVPEN : out std_logic;
@@ -31,6 +31,7 @@ architecture Behavioral of FlashRom is
 	signal state : std_logic_vector(3 downto 0);
 	
 begin
+	stateDbg <= state;
 	flashByte <= '1';
 	flashVPEN <= '1';
 	flashRP <= '1';
@@ -83,12 +84,15 @@ begin
 			elsif operationState = "00" and readEnable = '1' and writeEnable = '0' and state = "0000" then
 				flashWE <= '0';
 				flashCE <= '0';
-				state <= "0001";
-				operationState <= "10";
+				state <= "0000";
+				operationState <= "11";
+				--operationState <= "10";
 			elsif operationState = "10" then
 				case state is
 					when "0001" => 
 						flashData <= X"0020";
+						state <= "1111";
+					when "1111" =>
 						flashWE <= '1';
 						state <= "0010";
 					when "0010" => 
@@ -104,9 +108,10 @@ begin
 					-- Confirm
 					when "0101" =>
 						flashWE <= '0';
+						flashData <= X"0070";
 						state <= "0110";
 					when "0110" =>
-						flashData <= X"0070";
+						--flashData <= X"0070";
 						flashWE <= '1';
 						state <= "0111";
 					when "0111" =>
@@ -132,10 +137,10 @@ begin
 			elsif operationState = "11" then
 				case state is
 					when "0000" =>
-						flashWE <= '0';
+						flashData <= X"0040";
+						--flashWE <= '0';
 						state <= "0001";
 					when "0001" =>
-						flashData <= X"0040";
 						flashWE <= '1';
 						state <= "0010";
 					when "0010" =>
@@ -151,28 +156,41 @@ begin
 					-- Confirm
 					when "0101" =>
 						flashWE <= '0';
+						flashData <= X"0070";
 						state <= "0110";
 					when "0110" =>
-						flashData <= X"0070";
 						flashWE <= '1';
 						state <= "0111";
 					when "0111" =>
-						flashOE <= '0';
 						flashData <= (others => 'Z');
 						state <= "1000";
+					when "1000" =>
+						flashOE <= '0';
+						state <= "1001";
 					when "1001" =>
+						flashOE <= '1';
 						if flashData(7) = '1' then
-							state <= "0000";
-							operationState <= "11";
+							state <= "1010";
+							--operationState <= "00";
 						else
 							state <= "0101";
 						end if;
-					when others =>
-						flashWE <= '1';
-						flashCE <= '1';
-						flashOE <= '1';
-						state <= "0000";
-						operationState <= "00";
+				when "1010" =>
+					flashWE <= '0';
+					state <= "1011";
+				when "1011" =>
+					flashData <= x"00FF";
+					state <= "1100";
+				when "1100" =>
+					flashWE <= '1';
+					state <= "0000";
+					operationState <= "00";
+				when others =>
+					flashWE <= '1';
+					flashCE <= '1';
+					flashOE <= '1';
+					state <= "0000";
+					operationState <= "00";
 				end case;
 			end if;
 		end if;
