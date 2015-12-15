@@ -15,6 +15,7 @@ entity FlashROMDemo is
 		flashByte : out std_logic;
 		flashVPEN : out std_logic;
 		flashCE, flashOE, flashWE : out std_logic;
+		flashCE1, flashCE2 : out std_logic;
 		flashRP : out std_logic;
 		flashAddress : out std_logic_vector(22 downto 0);
 		flashData : inout std_logic_vector(15 downto 0)
@@ -32,6 +33,9 @@ architecture Behavioral of FlashROMDemo is
 		-- Not for connection
 		signal state : std_logic_vector(1 downto 0);
 begin
+	flashCE1 <= '0';
+	flashCE2 <= '0';
+	successLight <= '1';
 	flashROMModule_i : entity work.FlashRom
 	port map (
 		clock => clock,
@@ -70,6 +74,17 @@ begin
 						readEnable <= '1';
 						state <= "01";
 					end if;
+				when "11" =>
+					if readyStatus = STATUS_READY then
+						writeEnable <= '0';
+						readEnable <= '1';
+						address <= (1 => '1', others => '0');
+						dataControl <= X"ED34";
+					else
+						writeEnable <= '1';
+						readEnable <= '1';
+						state <= "01";
+					end if;
 				-- read flash[0] and examine
 				when "01" =>
 					if readyStatus = STATUS_READY then
@@ -81,9 +96,9 @@ begin
 				when "10" =>
 					if readyStatus = STATUS_READY then
 						if dataDisplay = X"ABCD" then
-							successLight <= '1';
+							--successLight <= '1';
 						else
-							successLight <= '0';
+							--successLight <= '0';
 						end if;
 						state <= "11";
 					else

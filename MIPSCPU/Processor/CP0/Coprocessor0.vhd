@@ -16,7 +16,9 @@ entity Coprocessor0_e is
 		pcControlPipeline : out RegisterControl_t;
 		exceptionTrigger : in CP0ExceptionTrigger_t;
 		exceptionPipelineClear : out EnablingControl_t;
-		debugCP0RegisterFileData : out CP0RegisterFileOutput_t
+		debugCP0RegisterFileData : out CP0RegisterFileOutput_t;
+		virtualAddress : in RAMAddress_t;
+		physicsAddress : out RAMAddress_t
 	);
 end entity;
 
@@ -72,6 +74,14 @@ begin
 		exceptionPipelineClear => exceptionPipelineClear,
 		cp0RegisterFileData => cp0RegisterFileData,
 		cp0RegisterFileControl => cp0RegisterFileControl1
+	);
+	
+	cp0AddressTranslator_i : entity work.CP0AddressTranslator
+	port map
+	(
+		tlbData => cp0TLBData,
+		virtualAddress => virtualAddress,
+		physicsAddress => physicsAddress
 	);
 
 end architecture;

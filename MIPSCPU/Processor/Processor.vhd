@@ -57,6 +57,9 @@ architecture Behavioral of Processor is
 	signal cp0PipelinePCControl : RegisterControl_t;
 	signal cp0ExceptionPipelineClear : EnablingControl_t;
 	signal cp0ExceptionTrigger : CP0ExceptionTrigger_t;
+	
+	signal cp0VirtualAddress : RAMAddress_t;
+	signal cp0PhysicsAddress : RAMAddress_t;
 begin
 
 	registerFile_i : entity work.RegisterFile port map (
@@ -140,7 +143,9 @@ begin
 		pcControlPipeline => cp0PipelinePCControl,
 		exceptionTrigger => cp0ExceptionTrigger,
 		exceptionPipelineClear => cp0ExceptionPipelineClear,
-		debugCP0RegisterFileData => open
+		debugCP0RegisterFileData => open,
+		virtualAddress => cp0VirtualAddress,
+		physicsAddress => cp0PhysicsAddress
 	);
 	
 	hardwareAddressMapper : entity work.HardwareAddressMapper

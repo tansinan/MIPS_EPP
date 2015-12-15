@@ -26,7 +26,8 @@ entity FlashRom is
 end entity;
 
 architecture Behavioral of FlashRom is
-	signal operationState : std_logic_vector(1 downto 0) := "00";-- 00: not busy 01:reading 10: erasing 11: writing
+	signal operationState : std_logic_vector(1 downto 0) := "00";
+	-- 00: not busy 01:reading 10: erasing 11: writing
 	signal state : std_logic_vector(3 downto 0);
 	
 begin

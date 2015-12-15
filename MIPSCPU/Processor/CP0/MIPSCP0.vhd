@@ -28,6 +28,31 @@ package MIPSCP0 is
 	constant MIPS_CP0_REGISTER_INDEX_CAUSE : integer := 13;
 	constant MIPS_CP0_REGISTER_INDEX_EPC : integer := 14;
 	
+	constant MIPS_CP0_REGISTER_PAGE_MASK_HI : integer := 28;
+	constant MIPS_CP0_REGISTER_PAGE_MASK_LO : integer := 13;
+	constant MIPS_CP0_REGISTER_PAGE_MASK_WIDTH : integer := 
+		MIPS_CP0_REGISTER_PAGE_MASK_HI - MIPS_CP0_REGISTER_PAGE_MASK_LO + 1;
+	subtype CP0TLBPageMask_t is
+		std_logic_vector(MIPS_CP0_REGISTER_PAGE_MASK_WIDTH - 1 downto 0);
+		
+	constant MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_HI : integer := 31;
+	constant MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_LO : integer := 13;
+	constant MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_WIDTH : integer := 
+		MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_HI - MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_LO + 1;
+	subtype CP0TLBVPN2_t is
+		std_logic_vector(MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_WIDTH - 1 downto 0);
+		
+	constant MIPS_CP0_REGISTER_ENTRY_LOW_PFN_HI : integer := 29;
+	constant MIPS_CP0_REGISTER_ENTRY_LOW_PFN_LO : integer := 6;
+	constant MIPS_CP0_REGISTER_ENTRY_LOW_PFN_WIDTH : integer := 
+		MIPS_CP0_REGISTER_ENTRY_LOW_PFN_HI - MIPS_CP0_REGISTER_ENTRY_LOW_PFN_LO + 1;
+	subtype CP0TLBPFN_t is
+		std_logic_vector(MIPS_CP0_REGISTER_ENTRY_LOW_PFN_WIDTH - 1 downto 0);
+	
+	constant MIPS_CP0_REGISTER_ENTRY_LOW_DIRTY : integer := 2;
+	constant MIPS_CP0_REGISTER_ENTRY_LOW_VALID : integer := 1;
+	constant MIPS_CP0_REGISTER_ENTRY_LOW_GLOBAL : integer := 0;
+	
 	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_HI : integer := 6;
 	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_LO : integer := 2;
 	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_WIDTH : integer := 
