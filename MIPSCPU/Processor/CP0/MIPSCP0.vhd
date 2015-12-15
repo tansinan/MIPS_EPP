@@ -115,7 +115,6 @@ package MIPSCP0 is
 	type CP0ExceptionTrigger_t is
 		record
 			enabled : EnablingControl_t;
-			exceptionPC : CPUData_t;
 			exceptionCode : CP0CauseExceptionCode_t;
 		end record;
 

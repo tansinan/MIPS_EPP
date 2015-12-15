@@ -38,12 +38,13 @@ architecture Behavioral of HighLatencyMathInstructionDecode is
 	signal rt : std_logic_vector (MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 	signal rd : std_logic_vector (MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 	signal opcode : std_logic_vector (MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0);
-	signal funct : std_logic_vector (MIPS_CPU_INSTRUCTION_FUNCT_WIDTH - 1 downto 0);
+	signal funct : InstructionFunct_t;
 	signal shamt : std_logic_vector (MIPS_CPU_INSTRUCTION_SHAMT_WIDTH - 1 downto 0);
 	signal state : InstructionExecutationState_t;
 	signal ipCoreMulWaitCycleRemain : std_logic_vector(2 downto 0);
 begin
 	process(clock, reset)
+		variable functVariable : InstructionFunct_t;
 	begin
 		if reset = FUNC_ENABLED then
 			state <= STATE_IDLE;
@@ -54,9 +55,10 @@ begin
 					rt <= instruction(MIPS_CPU_INSTRUCTION_RT_HI downto MIPS_CPU_INSTRUCTION_RT_LO);
 					rd <= instruction(MIPS_CPU_INSTRUCTION_RD_HI downto MIPS_CPU_INSTRUCTION_RD_LO);
 					opcode <= instruction(MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
-					funct <= instruction(MIPS_CPU_INSTRUCTION_FUNCT_HI downto MIPS_CPU_INSTRUCTION_FUNCT_LO);
+					functVariable := instruction(MIPS_CPU_INSTRUCTION_FUNCT_HI downto MIPS_CPU_INSTRUCTION_FUNCT_LO);
+					funct <= functVariable;
 					shamt <= instruction(MIPS_CPU_INSTRUCTION_SHAMT_HI downto MIPS_CPU_INSTRUCTION_SHAMT_LO);
-					case funct is
+					case functVariable is
 						when MIPS_CPU_INSTRUCTION_FUNCT_MFHI |
 						MIPS_CPU_INSTRUCTION_FUNCT_MFLO |
 						MIPS_CPU_INSTRUCTION_FUNCT_MTHI |
@@ -65,7 +67,7 @@ begin
 						when MIPS_CPU_INSTRUCTION_FUNCT_MULT |
 						MIPS_CPU_INSTRUCTION_FUNCT_MULTU =>
 							state <= STATE_BUSY_MUL;
-							ipCoreMulWaitCycleRemain <= "011";
+							ipCoreMulWaitCycleRemain <= "100";
 						when others =>
 							state <= STATE_IDLE;
 					end case;

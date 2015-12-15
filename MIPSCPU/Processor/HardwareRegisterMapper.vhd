@@ -18,7 +18,9 @@ entity HardwareAddressMapper is
 		secondaryRAMHardwareControl : out HardwareRAMControl_t;
 		secondaryRAMResult : in PhysicsRAMData_t;
 		uart1Control : out HardwareRegisterControl_t;
-		uart1Result : in CPUData_t
+		uart1Result : in CPUData_t;
+		cp0VirtualAddress : out RAMAddress_t;
+		cp0PhysicsAddress : in RAMAddress_t
 	);
 	type AddressType_t is
 	(
@@ -50,11 +52,16 @@ begin
 		end if;
 	end process;
 	
+	process(usedRAMControl.address)
+	begin
+		cp0VirtualAddress <= usedRAMControl.address;
+	end process;
+	
 	-- Determine the address type;
-	process(usedRAMControl)
+	process(cp0PhysicsAddress)
 		variable physicsAddress : RAMAddress_t;
 	begin
-		physicsAddress := usedRAMControl.address;
+		physicsAddress := cp0PhysicsAddress;
 		if (physicsAddress and ISA_ADDRESS_SPACE_MASK) = ISA_ADDRESS_SPACE then
 			addressType <= ISA_ADDRESS;
 		elsif (physicsAddress and KERNEL_ADDRESS_SPACE_MASK) = KERNEL_ADDRESS_SPACE then
@@ -67,14 +74,14 @@ begin
 	end process;
 	
 	-- According to the address type, determine control signals
-	process(addressType, usedRAMControl)
+	process(addressType, usedRAMControl, cp0PhysicsAddress)
 	begin
 		case addressType is
 			when USER_SPACE_ADDRESS =>
 				secondaryRAMHardwareControl <= (
 					readEnabled => usedRAMControl.readEnabled,
 					writeEnabled => usedRAMControl.writeEnabled,
-					address => usedRAMControl.address(2 + PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 2),
+					address => cp0PhysicsAddress(2 + PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 2),
 					data => usedRAMControl.data
 				);
 				primaryRAMHardwareControl.readEnabled <= FUNC_DISABLED;
@@ -83,7 +90,7 @@ begin
 				primaryRAMHardwareControl <= (
 					readEnabled => usedRAMControl.readEnabled,
 					writeEnabled => usedRAMControl.writeEnabled,
-					address => usedRAMControl.address(2 + PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 2),
+					address => cp0PhysicsAddress(2 + PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 2),
 					data => usedRAMControl.data
 				);
 				secondaryRAMHardwareControl.readEnabled <= FUNC_DISABLED;
@@ -94,7 +101,7 @@ begin
 				elsif usedRAMControl.writeEnabled = FUNC_ENABLED then
 					uart1Control.operation <= REGISTER_OPERATION_WRITE;
 				end if;
-				uart1Control.address <= usedRAMControl.address;
+				uart1Control.address <= cp0PhysicsAddress;
 				uart1Control.data <= usedRAMControl.data;
 			when others =>
 				primaryRAMHardwareControl.readEnabled <= FUNC_DISABLED;

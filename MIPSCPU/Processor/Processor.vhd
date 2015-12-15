@@ -162,7 +162,9 @@ begin
 		secondaryRAMHardwareControl => secondaryRAMControl,
 		secondaryRAMResult => secondaryRAMResult,
 		uart1Control => uart1Control,
-		uart1Result => uart1Result
+		uart1Result => uart1Result,
+		cp0VirtualAddress => cp0VirtualAddress,
+		cp0PhysicsAddress => cp0PhysicsAddress
 	);
 	
 	-- Output internal debug data.
@@ -240,10 +242,12 @@ begin
 				instructionExecutionEnabledToHighLatencyMath <=
 					FUNC_DISABLED;
 			elsif opcode = MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL
-				and (funct = MIPS_CPU_INSTRUCTION_FUNCT_MFHI or
-				funct = MIPS_CPU_INSTRUCTION_FUNCT_MFLO or
-				funct = MIPS_CPU_INSTRUCTION_FUNCT_MTHI or
-				funct = MIPS_CPU_INSTRUCTION_FUNCT_MTLO) then
+			and (funct = MIPS_CPU_INSTRUCTION_FUNCT_MFHI or
+			funct = MIPS_CPU_INSTRUCTION_FUNCT_MFLO or
+			funct = MIPS_CPU_INSTRUCTION_FUNCT_MTHI or
+			funct = MIPS_CPU_INSTRUCTION_FUNCT_MTLO or
+			funct = MIPS_CPU_INSTRUCTION_FUNCT_MULT or
+			funct = MIPS_CPU_INSTRUCTION_FUNCT_MULTU) then
 				instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
 				instructionExecutionEnabledCP0 <= FUNC_DISABLED;
 				instructionToHighLatencyMath <= instruction;
