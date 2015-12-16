@@ -50,6 +50,7 @@ begin
 			when others =>
 				exceptionTrigger.enabled <= FUNC_DISABLED;
 		end case;
+		exceptionTrigger.badVirtualAddress <= (others => '0');
 	end process;
 
 	process(phaseEXInput, ramReadResult)

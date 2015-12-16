@@ -10,11 +10,12 @@ entity CP0AddressTranslator is
 		tlbData : in CP0TLBData_t;
 		virtualAddress : in RAMAddress_t;
 		physicsAddress : out RAMAddress_t;
-		exceptionTrigger : out CP0ExceptionTrigger_t
+		exceptionTriggerOut : out CP0ExceptionTrigger_t
 	);
 end entity;
 
 architecture Behavioral of CP0AddressTranslator is
+	signal exceptionTrigger : CP0ExceptionTrigger_t;
 begin
 	process(tlbData, virtualAddress)
 		variable tlbEntryFound : boolean;
@@ -27,13 +28,23 @@ begin
 	begin
 		-- TODO : We haven't implement kernel mapped memory segment.
 		
+		exceptionTrigger <= (
+			enabled => FUNC_DISABLED,
+			exceptionCode => (others => '0'),
+			badVirtualAddress => (others => '0')
+		);
+		tlbEntryFound := false;
+
 		-- Logic address in kernel unmapped memory segment is physics address.
 		if virtualAddress(MIPS_RAM_ADDRESS_WIDTH - 1) = '1' then
 			physicsAddress <= virtualAddress;
 			exceptionTrigger <= (
 				enabled => FUNC_DISABLED,
-				exceptionCode => (others => 'U')
+				exceptionCode => (others => 'U'),
+				badVirtualAddress => (others => '0')
 			);
+			tlbEntryFound := true;
+			physicsAddress <= virtualAddress;
 		else
 			for i in 0 to MIPS_CP0_TLB_ENTRY_COUNT - 1 loop
 				vpn2 := tlbData(i).entryHigh(
@@ -59,17 +70,26 @@ begin
 						when "1111111111111111" => evenOddBit := 28;
 						when others => evenOddBit := 12;--TODO : undefined behaviour.
 					end case;
-				end if;
-				if virtualAddress(evenOddBit) = '0' then
-					pfn := pfn0;
-				else
-					pfn := pfn1;
-				end if;
-				physicsAddress <= pfn(MIPS_CPU_DATA_WIDTH - 1 - 12 downto evenOddBit - 12) &
+					if virtualAddress(evenOddBit) = '0' then
+						pfn := pfn0;
+					else
+						pfn := pfn1;
+					end if;
+					physicsAddress <= pfn(MIPS_CPU_DATA_WIDTH - 1 - 12 downto evenOddBit - 12) &
 					virtualAddress(evenOddBit - 1 downto 0);
+					tlbEntryFound := true;
+				end if;
 			end loop;
+			if tlbEntryFound = false then
+				exceptionTrigger <= (
+					enabled => FUNC_ENABLED,
+					exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_LOAD,
+					badVirtualAddress => virtualAddress
+				);
+			end if;
 		end if;
 	end process;
+	exceptionTriggerOut <= exceptionTrigger;
 
 end architecture;
 

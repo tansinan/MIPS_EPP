@@ -30,10 +30,10 @@ begin
 	UART_i : entity work.UART
 	generic map (
 			BAUD_RATE => 115200,
-			CLOCK_FREQUENCY => 50000000
+			CLOCK_FREQUENCY => 25000000
 		)
 	port map (
-		clock => clock50M,
+		clock => clock,
 		reset => not reset,
 		DATA_STREAM_IN => dataWrite,
 		DATA_STREAM_IN_STB => writeSTB,
@@ -50,6 +50,7 @@ begin
 		hardwareRegisterAddress := control.address(11 downto 0);
 		if reset = FUNC_ENABLED then
 			output <= (others => '0');
+			writeSTB <= '0';
 		elsif rising_edge(clock) then
 			-- Handles the signals of the UART module
 			if writeACK = '1' then
@@ -59,15 +60,18 @@ begin
 				readACK <= '0';
 			end if;
 			if hardwareRegisterAddress = UART1_REGISTER_DATA then
-				if control.operation = REGISTER_OPERATION_READ then
+				if control.operation = REGISTER_OPERATION_WRITE then
 					if writeSTB = '0' and writeACK = '0' then
 						dataWrite <= control.data(7 downto 0);
 						writeSTB <= '1';
 					end if;
-				elsif control.operation = REGISTER_OPERATION_WRITE then
-					output(MIPS_CPU_DATA_WIDTH - 1 downto 8) <= (others => '0');
-					output(7 downto 0) <= dataRead;
-					readACK <= '1';
+				elsif control.operation = REGISTER_OPERATION_READ then
+					if readSTB = '1' then
+						output(MIPS_CPU_DATA_WIDTH - 1 downto 8) <= (others => '0');
+						output(7 downto 0) <= dataRead;
+					else
+						output <= (others => '0');
+					end if;
 				end if;
 			elsif hardwareRegisterAddress = UART1_REGISTER_STATUS then
 				if control.operation = REGISTER_OPERATION_READ then

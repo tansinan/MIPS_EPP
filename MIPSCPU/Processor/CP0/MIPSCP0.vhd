@@ -116,6 +116,7 @@ package MIPSCP0 is
 		record
 			enabled : EnablingControl_t;
 			exceptionCode : CP0CauseExceptionCode_t;
+			badVirtualAddress : RAMAddress_t;
 		end record;
 
 	-- Constants related to CP0 instructions
