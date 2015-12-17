@@ -20,7 +20,9 @@ entity HardwareAddressMapper is
 		uart1Control : out HardwareRegisterControl_t;
 		uart1Result : in CPUData_t;
 		cp0VirtualAddress : out RAMAddress_t;
-		cp0PhysicsAddress : in RAMAddress_t
+		cp0PhysicsAddress : in RAMAddress_t;
+		cp0ExceptionTrigger : in CP0ExceptionTrigger_t;
+		exceptionTrigger : out CP0ExceptionTrigger_t
 	);
 	type AddressType_t is
 	(
@@ -39,6 +41,7 @@ architecture Behavioral of HardwareAddressMapper is
 	signal usedRAMControl : RAMControl_t;
 	signal savedROMData : CPUData_t;
 	signal romData : CPUData_t;
+	signal cp0ExceptionTriggerRegister : CP0ExceptionTrigger_t;
 	component ipcorebootloader
 	port (
 		a : in std_logic_vector(6 downto 0);
@@ -136,12 +139,21 @@ begin
 			savedAddressType <= addressType;
 			savedAddressType2 <= savedAddressType;
 			savedROMData <= romData;
+			cp0ExceptionTriggerRegister <= cp0ExceptionTrigger;
 		end if;
 	end process;
 	
 	-- Determine the result
 	process(savedAddressType, primaryRAMResult, secondaryRAMResult, uart1Result)
 	begin
+		exceptionTrigger <= (
+			enabled => FUNC_DISABLED,
+			exceptionCode => (others => '0'),
+			badVirtualAddress => (others => '0')
+		);
+		if cp0ExceptionTriggerRegister.enabled = FUNC_ENABLED then
+			exceptionTrigger <= cp0ExceptionTriggerRegister;
+		end if;
 		case savedAddressType is
 			when USER_SPACE_ADDRESS =>
 				result <= secondaryRAMResult;
@@ -152,6 +164,11 @@ begin
 			when BOOTLOADER_ADDRESS =>
 				result <= savedROMData;
 			when others =>
+				exceptionTrigger <= (
+					enabled => FUNC_ENABLED,
+					exceptionCode => (others => 'U'), -- TODO needs to add correct excCode.
+					badVirtualAddress => (others => '0')
+				);
 				result <= (others => '0');
 		end case;
 	end process;

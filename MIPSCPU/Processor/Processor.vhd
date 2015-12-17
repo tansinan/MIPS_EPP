@@ -48,6 +48,7 @@ architecture Behavioral of Processor is
 	signal ramControl2 : RAMControl_t;
 	signal ramControl3 : RAMControl_t;
 	signal memoryAccessResult : RAMData_t;
+	signal memoryAccessExceptionTrigger : CP0ExceptionTrigger_t;
 
 	signal pcControl1 : RegisterControl_t;
 	signal pcControl2 : RegisterControl_t;
@@ -58,6 +59,7 @@ architecture Behavioral of Processor is
 	signal cp0PipelinePCControl : RegisterControl_t;
 	signal cp0ExceptionPipelineClear : EnablingControl_t;
 	signal cp0ExceptionTrigger : CP0ExceptionTrigger_t;
+	signal cp0MemoryAccessExceptionTrigger : CP0ExceptionTrigger_t;
 	
 	signal cp0VirtualAddress : RAMAddress_t;
 	signal cp0PhysicsAddress : RAMAddress_t;
@@ -110,7 +112,8 @@ begin
 		phaseEXInput => pipelinePhaseEXMAInterface,
 		phaseWBCtrlOutput => pipelinePhaseMAWBInterface,
 		exceptionTriggerOutput => cp0ExceptionTrigger,
-		ramReadResult => memoryAccessResult
+		ramReadResult => memoryAccessResult,
+		ramReadException => memoryAccessExceptionTrigger
 	);
 
 	pipelinePhaseWirteBack_i: entity work.PipelinePhaseWriteBack
@@ -146,7 +149,8 @@ begin
 		exceptionPipelineClear => cp0ExceptionPipelineClear,
 		debugCP0RegisterFileData => open,
 		virtualAddress => cp0VirtualAddress,
-		physicsAddress => cp0PhysicsAddress
+		physicsAddress => cp0PhysicsAddress,
+		memoryTranslationExceptionTrigger => cp0MemoryAccessExceptionTrigger
 	);
 	
 	hardwareAddressMapper : entity work.HardwareAddressMapper
@@ -165,7 +169,9 @@ begin
 		uart1Control => uart1Control,
 		uart1Result => uart1Result,
 		cp0VirtualAddress => cp0VirtualAddress,
-		cp0PhysicsAddress => cp0PhysicsAddress
+		cp0PhysicsAddress => cp0PhysicsAddress,
+		cp0ExceptionTrigger => cp0MemoryAccessExceptionTrigger,
+		exceptionTrigger => memoryAccessExceptionTrigger
 	);
 	
 	-- Output internal debug data.

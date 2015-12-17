@@ -10,7 +10,8 @@ entity PipelinePhaseMemoryAccess is
 		phaseEXInput : in PipelinePhaseEXMAInterface_t;
 		phaseWBCtrlOutput : out PipelinePhaseMAWBInterface_t;
 		exceptionTriggerOutput : out CP0ExceptionTrigger_t;
-		ramReadResult : in std_logic_vector(MIPS_RAM_DATA_WIDTH - 1 downto 0)
+		ramReadResult : in std_logic_vector(MIPS_RAM_DATA_WIDTH - 1 downto 0);
+		ramReadException : CP0ExceptionTrigger_t
 	);
 end entity;
 
@@ -20,37 +21,41 @@ architecture Behavioral of PipelinePhaseMemoryAccess is
 begin
 	process(phaseEXInput)
 	begin
-		case phaseEXInput.instructionOpcode is
-			when MIPS_CPU_INSTRUCTION_OPCODE_LW |
-				MIPS_CPU_INSTRUCTION_OPCODE_SW =>
-				if phaseEXInput.sourceRAMAddr(1 downto 0) /= "00" then
-					exceptionTrigger.enabled <= FUNC_ENABLED;
-					if phaseEXInput.instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SW then
-						exceptionTrigger.exceptionCode <= MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_STORE;
+		if ramReadException.enabled = FUNC_ENABLED then
+			exceptionTrigger <= ramReadException;
+		else
+			case phaseEXInput.instructionOpcode is
+				when MIPS_CPU_INSTRUCTION_OPCODE_LW |
+					MIPS_CPU_INSTRUCTION_OPCODE_SW =>
+					if phaseEXInput.sourceRAMAddr(1 downto 0) /= "00" then
+						exceptionTrigger.enabled <= FUNC_ENABLED;
+						if phaseEXInput.instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SW then
+							exceptionTrigger.exceptionCode <= MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_STORE;
+						else
+							exceptionTrigger.exceptionCode <= MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_LOAD;
+						end if;
+						report "Unaligned LW/SW detected!";
 					else
-						exceptionTrigger.exceptionCode <= MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_LOAD;
+						exceptionTrigger.enabled <= FUNC_DISABLED;
 					end if;
-					report "Unaligned LW/SW detected!";
-				else
-					exceptionTrigger.enabled <= FUNC_DISABLED;
-				end if;
-			when MIPS_CPU_INSTRUCTION_OPCODE_LH |
-				MIPS_CPU_INSTRUCTION_OPCODE_LHU |
-				MIPS_CPU_INSTRUCTION_OPCODE_SH =>
-				if phaseEXInput.sourceRAMAddr(0) /= '0' then
-					exceptionTrigger.enabled <= FUNC_ENABLED;
-					if phaseEXInput.instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SH then
-						exceptionTrigger.exceptionCode <= MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_STORE;
+				when MIPS_CPU_INSTRUCTION_OPCODE_LH |
+					MIPS_CPU_INSTRUCTION_OPCODE_LHU |
+					MIPS_CPU_INSTRUCTION_OPCODE_SH =>
+					if phaseEXInput.sourceRAMAddr(0) /= '0' then
+						exceptionTrigger.enabled <= FUNC_ENABLED;
+						if phaseEXInput.instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SH then
+							exceptionTrigger.exceptionCode <= MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_STORE;
+						else
+							exceptionTrigger.exceptionCode <= MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_LOAD;
+						end if;
 					else
-						exceptionTrigger.exceptionCode <= MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_LOAD;
+						exceptionTrigger.enabled <= FUNC_DISABLED;
 					end if;
-				else
+				when others =>
 					exceptionTrigger.enabled <= FUNC_DISABLED;
-				end if;
-			when others =>
-				exceptionTrigger.enabled <= FUNC_DISABLED;
-		end case;
-		exceptionTrigger.badVirtualAddress <= (others => '0');
+			end case;
+			exceptionTrigger.badVirtualAddress <= (others => '0');
+		end if;
 	end process;
 
 	process(phaseEXInput, ramReadResult)
