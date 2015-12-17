@@ -65,6 +65,7 @@ architecture Behavioral of Processor is
 	signal cp0PhysicsAddress : RAMAddress_t;
 begin
 	light <= register_file_output(1)(15 downto 0);
+	--light <= pcValue(15 downto 0);
 	registerFile_i : entity work.RegisterFile port map (
 		reset => reset,
 		clock => clock,

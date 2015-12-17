@@ -29,7 +29,7 @@ package HardwareController is
 	constant UART1_REGISTER_DATA : ISAHardwareRegisterAddress_t := x"3F8";
 	constant UART1_REGISTER_STATUS : ISAHardwareRegisterAddress_t := x"40C";
 	constant UART1_REGISTER_STATUS_BIT_CAN_READ : integer := 0;
-	constant UART1_REGISTER_STATUS_BIT_CAN_WRITE : integer := 0;
+	constant UART1_REGISTER_STATUS_BIT_CAN_WRITE : integer := 5;
 	
 end package;
 

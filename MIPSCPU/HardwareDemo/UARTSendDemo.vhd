@@ -63,22 +63,20 @@ begin
 			if state = "000" then
 				DATA_STREAM_IN_STB <= '0';
 				data <= current_char;
-				wait2 <= wait2 + 1;
-				if wait2 = "111111" then
-					wait2 <= (others => '0');
-					state <= "010";
-					zero_wait <= (others => '0');
-					state <= "001";
-				else
-				end if;
+				state <= "001";
+				--wait2 <= wait2 + 1;
+				--if wait2 = "111111" then
+				--	wait2 <= (others => '0');
+				--	state <= "010";
+				--	zero_wait <= (others => '0');
+				--	state <= "001";
+				--else
+				--send if;
 			elsif state = "001" then
 				DATA_STREAM_IN_STB <= '1';
 				data <= current_char;
 				zero_wait <= zero_wait + 1;
-				if zero_wait = "111111" then
-					--output(7 downto 3) <= data_bus_1(7 downto 3);
-					state <= "010";
-				end if;
+				state <= "010";
 			elsif state = "010" then
 				data <= current_char;
 				DATA_STREAM_IN_STB <= '1';
@@ -87,11 +85,11 @@ begin
 				else
 				end if;
 			elsif state = "011" then
-				data <= current_char;
+				data <= (others => '0');
 				DATA_STREAM_IN_STB <= '0';
 				if current_char(7) = '0' and current_char(6) = '0' then
 					current_char <= current_char + 1;
-					state <= "000";
+					state <= "001";
 				else
 					state <= "111";
 				end if;

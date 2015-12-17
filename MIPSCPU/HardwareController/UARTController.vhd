@@ -26,6 +26,8 @@ architecture Behavioral of UARTController is
 	signal writeACK : std_logic;
 	signal readSTB : std_logic;
 	signal readACK : std_logic;
+	signal isWriting : std_logic;
+	signal isReading : std_logic;
 begin
 	UART_i : entity work.UART
 	generic map (
@@ -50,20 +52,29 @@ begin
 		hardwareRegisterAddress := control.address(11 downto 0);
 		if reset = FUNC_ENABLED then
 			output <= (others => '0');
+			isWriting <= '0';
+			isReading <= '0';
 			writeSTB <= '0';
 		elsif rising_edge(clock) then
 			-- Handles the signals of the UART module
-			if writeACK = '1' then
-				writeSTB <= '0';
+			if isWriting = '1' then
+				if writeSTB = '0' then
+					writeSTB <= '1';
+				elsif writeACK = '1' then
+					writeSTB <= '0';
+					isWriting <= '0';
+				end if;
 			end if;
 			if readSTB = '0' then
 				readACK <= '0';
 			end if;
 			if hardwareRegisterAddress = UART1_REGISTER_DATA then
 				if control.operation = REGISTER_OPERATION_WRITE then
-					if writeSTB = '0' and writeACK = '0' then
+					if isWriting = '0' then
+						--dataWrite <= "01000001";
 						dataWrite <= control.data(7 downto 0);
-						writeSTB <= '1';
+						isWriting <= '1';
+						--writeSTB <= '1';
 					end if;
 				elsif control.operation = REGISTER_OPERATION_READ then
 					if readSTB = '1' then

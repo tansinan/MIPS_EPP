@@ -37,7 +37,6 @@ end entity;
 architecture Behavioral of HardwareAddressMapper is
 	signal addressType : AddressType_t;
 	signal savedAddressType : AddressType_t;
-	signal savedAddressType2 : AddressType_t;
 	signal usedRAMControl : RAMControl_t;
 	signal savedROMData : CPUData_t;
 	signal romData : CPUData_t;
@@ -97,6 +96,24 @@ begin
 	-- According to the address type, determine control signals
 	process(addressType, usedRAMControl, cp0PhysicsAddress)
 	begin
+		-- Default signals : disable everything.
+		secondaryRAMHardwareControl <= (
+			readEnabled => FUNC_DISABLED,
+			writeEnabled => FUNC_DISABLED,
+			address => (others => '0'),
+			data => (others => '0')
+		);
+		primaryRAMHardwareControl <= (
+			readEnabled => FUNC_DISABLED,
+			writeEnabled => FUNC_DISABLED,
+			address => (others => '0'),
+			data => (others => '0')
+		);
+		uart1Control <= (
+			operation => REGISTER_OPERATION_READ,
+			address => (others => '0'),
+			data => (others => '0')
+		);
 		case addressType is
 			when USER_SPACE_ADDRESS =>
 				secondaryRAMHardwareControl <= (
@@ -105,8 +122,6 @@ begin
 					address => cp0PhysicsAddress(2 + PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 2),
 					data => usedRAMControl.data
 				);
-				primaryRAMHardwareControl.readEnabled <= FUNC_DISABLED;
-				primaryRAMHardwareControl.writeEnabled <= FUNC_DISABLED;
 			when KERNEL_SPACE_ADDRESS =>
 				primaryRAMHardwareControl <= (
 					readEnabled => usedRAMControl.readEnabled,
@@ -114,8 +129,6 @@ begin
 					address => cp0PhysicsAddress(2 + PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 2),
 					data => usedRAMControl.data
 				);
-				secondaryRAMHardwareControl.readEnabled <= FUNC_DISABLED;
-				secondaryRAMHardwareControl.writeEnabled <= FUNC_DISABLED;
 			when ISA_ADDRESS =>
 				if usedRAMControl.readEnabled = FUNC_ENABLED then
 					uart1Control.operation <= REGISTER_OPERATION_READ;
@@ -125,11 +138,6 @@ begin
 				uart1Control.address <= cp0PhysicsAddress;
 				uart1Control.data <= usedRAMControl.data;
 			when others =>
-				primaryRAMHardwareControl.readEnabled <= FUNC_DISABLED;
-				primaryRAMHardwareControl.writeEnabled <= FUNC_DISABLED;
-				secondaryRAMHardwareControl.readEnabled <= FUNC_DISABLED;
-				secondaryRAMHardwareControl.writeEnabled <= FUNC_DISABLED;
-				uart1Control.address <= (others => '0');
 		end case;
 	end process;
 		
@@ -137,7 +145,6 @@ begin
 	begin
 		if rising_edge(clock) then
 			savedAddressType <= addressType;
-			savedAddressType2 <= savedAddressType;
 			savedROMData <= romData;
 			cp0ExceptionTriggerRegister <= cp0ExceptionTrigger;
 		end if;
