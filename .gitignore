@@ -68,3 +68,9 @@ Translator/*.asm
 
 # Linux temporary files
 .directory
+
+# Bootloader project related file
+Bootloader/*.bin
+Bootloader/*.coe
+Bootloader/*.o
+Bootloader/*.elf
