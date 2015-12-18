@@ -1,6 +1,7 @@
 
 
 NET "clock50M" LOC = U26;
+NET "clock11M" LOC = U25;
 NET "reset" LOC = T1;
 NET "uart1Receive" LOC = R26;
 NET "uart1Transmit" LOC = P24;

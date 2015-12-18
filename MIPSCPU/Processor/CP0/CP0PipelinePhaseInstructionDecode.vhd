@@ -41,12 +41,11 @@ begin
 		funct := instruction(MIPS_CPU_INSTRUCTION_FUNCT_HI downto MIPS_CPU_INSTRUCTION_FUNCT_LO);
 		moveAddressPrimaryInt := to_integer(unsigned(rt));
 		moveAddressCP0Int := to_integer(unsigned(rd));
-<<<<<<< HEAD
 		exceptionTrigger <= (
 			enabled => FUNC_DISABLED,
 			exceptionCode => (others => '0'),
 			badVirtualAddress => (others => '0')
-=======
+		);
 		causeTemp := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_CAUSE);
 		statusTemp := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_STATUS);
 		
@@ -78,7 +77,6 @@ begin
 		pcControl <= (
 			operation => REGISTER_OPERATION_READ,
 			data => (others => '0')
->>>>>>> 50580fcc2f9a15eca1c72cd440022361697a95ec
 		);
 		
 		if instructionExecutionEnabled = FUNC_DISABLED then
@@ -179,6 +177,7 @@ begin
 			exceptionTrigger <= (
 				enabled => FUNC_ENABLED,
 				exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_SYSCALL,
+				badVirtualAddress => (others => '0')
 			);
 		else
 			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop

@@ -62,7 +62,6 @@ begin
 			elsif state = RAM_CONTROLLER_STATE_ACTIVE then
 				result <= physicsDataBus;
 				physicsRAMControl.writeEnabled <= FUNC_DISABLED;
-				--TODO: This need to be verified on board!
 				physicsRAMControl.readEnabled <= FUNC_DISABLED;
 				physicsAddressBus <= (others => '0');
 				physicsDataBus <= (others => 'Z');

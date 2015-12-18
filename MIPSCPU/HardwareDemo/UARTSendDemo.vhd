@@ -25,16 +25,15 @@ architecture Behavioral of UARTSendDemo is
 	signal DATA_STREAM_IN_STB : std_logic;
 	signal DATA_STREAM_IN_ACK : std_logic;
 	signal DATA_STREAM_OUT_ACK : std_logic;
+	signal DATA_STREAM_OUT : std_logic_vector(7 downto 0);
+	signal DATA_STREAM_OUT_STB : std_logic;
 	signal rdn : std_logic;
 	signal wrn : std_logic;
 	signal data : std_logic_vector(7 downto 0);
-	--signal dataReady : std_logic;
-	--signal parityError : std_logic;
-	--signal framingError : std_logic;
 begin
 	UARTController_i : entity work.UART
     generic map (
-            BAUD_RATE => 115200,
+            BAUD => 115200,
             CLOCK_FREQUENCY => 50000000
         )
     port map (
@@ -43,12 +42,26 @@ begin
 		DATA_STREAM_IN => data,
 		DATA_STREAM_IN_STB => DATA_STREAM_IN_STB,
 		DATA_STREAM_IN_ACK => DATA_STREAM_IN_ACK,
-		DATA_STREAM_OUT => open,
-		DATA_STREAM_OUT_STB => open,
-		DATA_STREAM_OUT_ACK => DATA_STREAM_OUT_ACK,
+		DATA_STREAM_OUT => DATA_STREAM_OUT,
+		DATA_STREAM_OUT_STB =>DATA_STREAM_OUT_STB,
 		TX => txd,
-		RX => '1'
+		RX => rxd
     );
+	
+	
+	process(clock, reset)
+	begin
+		if reset = '0' then
+			output <= (others => '0');
+		elsif rising_edge(clock) then
+			if DATA_STREAM_OUT_STB = '1' then
+				output <= DATA_STREAM_OUT;
+				DATA_STREAM_OUT_ACK <= '1';
+			else
+				DATA_STREAM_OUT_ACK <= '0';
+			end if;
+		end if;
+	end process;
 
 	process(clock, reset)
 	begin
@@ -63,15 +76,9 @@ begin
 			if state = "000" then
 				DATA_STREAM_IN_STB <= '0';
 				data <= current_char;
-				state <= "001";
-				--wait2 <= wait2 + 1;
-				--if wait2 = "111111" then
-				--	wait2 <= (others => '0');
-				--	state <= "010";
-				--	zero_wait <= (others => '0');
-				--	state <= "001";
-				--else
-				--send if;
+				if counter(19 downto 0) = "10000000000000000000" then
+					state <= "001";
+				end if;
 			elsif state = "001" then
 				DATA_STREAM_IN_STB <= '1';
 				data <= current_char;
@@ -89,7 +96,7 @@ begin
 				DATA_STREAM_IN_STB <= '0';
 				if current_char(7) = '0' and current_char(6) = '0' then
 					current_char <= current_char + 1;
-					state <= "001";
+					state <= "000";
 				else
 					state <= "111";
 				end if;
@@ -98,10 +105,6 @@ begin
 			counter <= counter + 1;
 			clock_divided <= counter(21);
 			disp <= '0';
-			output <= data;
-			--output(7 downto 3) <= data(7 downto 3);
-			--output(2 downto 0) <= state;
-			--output <= UARTController_i/txmit/tsr;
 		end if;
 	end process;
 end architecture;

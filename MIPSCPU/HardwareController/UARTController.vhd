@@ -9,7 +9,7 @@ entity UARTController is
 	(
 		reset : in Reset_t;
 		clock : in Clock_t;
-		clock50M : in Clock_t;
+		clock11M : in Clock_t;
 		control : in HardwareRegisterControl_t;
 		output : out CPUData_t;
 		uartTransmit : out std_logic;
@@ -27,34 +27,37 @@ architecture Behavioral of UARTController is
 	signal readSTB : std_logic;
 	signal readACK : std_logic;
 	signal isWriting : std_logic;
-	signal isReading : std_logic;
+	signal readBuffer : std_logic_vector(7 downto 0);
+	signal readBufferAvailable : std_logic;
+	signal finishReading : std_logic;
 begin
 	UART_i : entity work.UART
 	generic map (
-			BAUD_RATE => 115200,
-			CLOCK_FREQUENCY => 25000000
+			baud => 115200,
+			clock_frequency => 11059200
 		)
 	port map (
-		clock => clock,
+		clock => clock11M,
 		reset => not reset,
-		DATA_STREAM_IN => dataWrite,
-		DATA_STREAM_IN_STB => writeSTB,
-		DATA_STREAM_IN_ACK => writeACK,
-		DATA_STREAM_OUT => dataRead,
-		DATA_STREAM_OUT_STB => readSTB,
-		DATA_STREAM_OUT_ACK => readACK,
-		TX => uartTransmit,
-		RX => uartReceive
+		data_stream_in => dataWrite,
+		data_stream_in_stb => writeSTB,
+		data_stream_in_ack => writeACK,
+		data_stream_out => dataRead,
+		data_stream_out_stb => readSTB,
+		tx => uartTransmit,
+		rx => uartReceive
 	);
-	process(reset, clock)
+	process(reset, clock, control)
 		variable hardwareRegisterAddress : std_logic_vector(11 downto 0);
 	begin
 		hardwareRegisterAddress := control.address(11 downto 0);
 		if reset = FUNC_ENABLED then
 			output <= (others => '0');
 			isWriting <= '0';
-			isReading <= '0';
+			finishReading <= '0';
 			writeSTB <= '0';
+			readBuffer <= (others => '0');
+			readBufferAvailable <= '0';
 		elsif rising_edge(clock) then
 			-- Handles the signals of the UART module
 			if isWriting = '1' then
@@ -65,8 +68,9 @@ begin
 					isWriting <= '0';
 				end if;
 			end if;
-			if readSTB = '0' then
-				readACK <= '0';
+			if readSTB = '1' then
+				readBuffer <= dataRead;
+				readBufferAvailable <= '1';
 			end if;
 			if hardwareRegisterAddress = UART1_REGISTER_DATA then
 				if control.operation = REGISTER_OPERATION_WRITE then
@@ -77,9 +81,10 @@ begin
 						--writeSTB <= '1';
 					end if;
 				elsif control.operation = REGISTER_OPERATION_READ then
-					if readSTB = '1' then
+					if readBufferAvailable = '1' then
 						output(MIPS_CPU_DATA_WIDTH - 1 downto 8) <= (others => '0');
-						output(7 downto 0) <= dataRead;
+						output(7 downto 0) <= readBuffer;
+						readBufferAvailable <= '0';
 					else
 						output <= (others => '0');
 					end if;
@@ -87,7 +92,7 @@ begin
 			elsif hardwareRegisterAddress = UART1_REGISTER_STATUS then
 				if control.operation = REGISTER_OPERATION_READ then
 					output(MIPS_CPU_DATA_WIDTH - 1 downto 0) <= (others => '0');
-					if readSTB = '1' then
+					if readBufferAvailable = '1' then
 						output(UART1_REGISTER_STATUS_BIT_CAN_READ) <= '1';
 					end if;
 					if writeSTB = '0' and writeACK = '0' then

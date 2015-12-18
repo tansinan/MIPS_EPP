@@ -8,6 +8,7 @@ entity ProcessorTop is
 	port
 	(
 		clock50M : in Clock_t;
+		clock11M : in Clock_t;
 		reset : in Reset_t;
 		primaryPhysicsRAMControl : out PhysicsRAMControl_t;
 		primaryPhysicsRAMAddressBus : out PhysicsRAMAddress_t;
@@ -80,7 +81,7 @@ begin
 	(
 		reset => reset,
 		clock => clockDivided,
-		clock50M => clock50M,
+		clock11M => clock11M,
 		control => uart1Control,
 		output => uart1Output,
 		uartTransmit => uart1Transmit,

@@ -224,8 +224,8 @@ begin
 				pcControl2.operation <= REGISTER_OPERATION_READ;
 			else
 				pcControl2.operation <= REGISTER_OPERATION_WRITE;
-				--pcControl2.data <= x"bfc00000"; -- for FPGA Boot loader
-				pcControl2.data <= x"80000000"; -- for testbench
+				pcControl2.data <= x"bfc00000"; -- for FPGA Boot loader
+				--pcControl2.data <= x"80000000"; -- for testbench
 			end if;
 			ramControl3.address <= (others => '0');
 			ramControl3.writeEnabled <= FUNC_DISABLED;
