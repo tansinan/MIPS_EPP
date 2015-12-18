@@ -16,11 +16,13 @@ entity CP0PipelinePhaseInstructionDecode is
 		cp0RegisterFileControl : out CP0RegisterFileControl_t;
 		cp0TLBData : in CP0TLBData_t;
 		cp0TLBControl: out CP0TLBControl_t;
-		pcControl : out RegisterControl_t
+		pcControl : out RegisterControl_t;
+		exceptionTriggerOut : out CP0ExceptionTrigger_t
 	);
 end entity;
 
 architecture Behavioral of CP0PipelinePhaseInstructionDecode is
+	signal exceptionTrigger : CP0ExceptionTrigger_t;
 begin
 	process(instruction, primaryRegisterFileData, cp0RegisterFileData, instructionExecutionEnabled)
 		variable rs, rt: RegisterAddress_t;
@@ -35,6 +37,12 @@ begin
 		funct := instruction(MIPS_CPU_INSTRUCTION_FUNCT_HI downto MIPS_CPU_INSTRUCTION_FUNCT_LO);
 		moveAddressPrimaryInt := to_integer(unsigned(rt));
 		moveAddressCP0Int := to_integer(unsigned(rd));
+		exceptionTrigger <= (
+			enabled => FUNC_DISABLED,
+			exceptionCode => (others => '0'),
+			badVirtualAddress => (others => '0')
+		);
+		
 		if instructionExecutionEnabled = FUNC_DISABLED then
 			primaryRegisterFileControl.address <= (others => '0');
 			primaryRegisterFileControl.data <= (others => '0');
@@ -44,6 +52,8 @@ begin
 			end loop;
 			cp0TLBControl.writeEnabled <= FUNC_DISABLED;
 			pcControl.operation <= REGISTER_OPERATION_READ;
+			
+		-- MTC0 instruction
 		elsif rs = MIPS_CP0_INSTRUCTION_RS_MT then
 			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
 				if i = moveAddressCP0Int then
@@ -58,6 +68,8 @@ begin
 			primaryRegisterFileControl.data <= (others => '0');
 			cp0TLBControl.writeEnabled <= FUNC_DISABLED;
 			pcControl.operation <= REGISTER_OPERATION_READ;
+			
+		-- MFC0 instruction
 		elsif rs = MIPS_CP0_INSTRUCTION_RS_MF then
 			primaryRegisterFileControl.address <= rt;
 			primaryRegisterFileControl.data <= cp0RegisterFileData(moveAddressCP0Int);
@@ -67,6 +79,7 @@ begin
 			end loop;
 			pcControl.operation <= REGISTER_OPERATION_READ;
 			cp0TLBControl.writeEnabled <= FUNC_DISABLED;
+			
 		-- TLBWI instruction, update the TLB entry specified by the Index register
 		elsif funct = MIPS_CP0_INSTRUCTION_FUNCT_TLBWI then
 			primaryRegisterFileControl.address <= (others => '0');
@@ -117,6 +130,18 @@ begin
 				operation => REGISTER_OPERATION_WRITE,
 				data => cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_EPC)
 			);
+		
+		-- SYSCALL instruction
+		elsif funct = MIPS_CP0_INSTRUCTION_FUNCT_SYSCALL then
+			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
+				cp0RegisterFileControl(i).operation <= REGISTER_OPERATION_READ;
+			end loop;
+			cp0TLBControl.writeEnabled <= FUNC_DISABLED;
+			exceptionTrigger <= (
+				enabled => FUNC_ENABLED,
+				exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_SYSCALL,
+			);
+			
 		else
 			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
 				cp0RegisterFileControl(i).operation <= REGISTER_OPERATION_READ;
@@ -126,4 +151,5 @@ begin
 			cp0TLBControl.writeEnabled <= FUNC_DISABLED;
 		end if;
 	end process;
+	exceptionTriggerOut <= exceptionTrigger;
 end architecture;

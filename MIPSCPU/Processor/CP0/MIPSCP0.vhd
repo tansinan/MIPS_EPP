@@ -126,6 +126,7 @@ package MIPSCP0 is
 	constant MIPS_CP0_INSTRUCTION_FUNCT_ERET : InstructionFunct_t := "011000";
 	constant MIPS_CP0_INSTRUCTION_FUNCT_TLBWI : InstructionFunct_t := "000010";
 	constant MIPS_CP0_INSTRUCTION_FUNCT_TLBR : InstructionFunct_t := "000001";
+	constant MIPS_CP0_INSTRUCTION_FUNCT_SYSCALL : InstructionFunct_t := "001100";
 	
 	constant MIPS_CP0_NONBOOT_EXCEPTION_HANDLER : RAMAddress_t := x"80000180";
 
