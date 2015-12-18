@@ -57,6 +57,10 @@ package MIPSCP0 is
 	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_LO : integer := 2;
 	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_WIDTH : integer := 
 		MIPS_CP0_CAUSE_EXCEPTION_CODE_HI - MIPS_CP0_CAUSE_EXCEPTION_CODE_LO + 1;
+		
+	constant MIPS_CP0_STATUS_ERL : integer := 2;
+	constant MIPS_CP0_STATUS_EXL : integer := 1;
+	
 	subtype CP0CauseExceptionCode_t is
 		std_logic_vector(MIPS_CP0_CAUSE_EXCEPTION_CODE_WIDTH - 1 downto 0);
 
