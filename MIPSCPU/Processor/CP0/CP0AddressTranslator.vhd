@@ -27,7 +27,10 @@ begin
 		variable evenOddBit : integer := 0;
 	begin
 		-- TODO : We haven't implement kernel mapped memory segment.
+		-- But seems it is not commonly used in experimental OS.
 		
+		-- Add default value : returns physics address all zero, no exception.
+		physicsAddress <= (others => '0');
 		exceptionTrigger <= (
 			enabled => FUNC_DISABLED,
 			exceptionCode => (others => '0'),
@@ -36,13 +39,8 @@ begin
 		tlbEntryFound := false;
 
 		-- Logic address in kernel unmapped memory segment is physics address.
+		-- No translation. tlbFound is set so no further exceptions will be triggered.
 		if virtualAddress(MIPS_RAM_ADDRESS_WIDTH - 1) = '1' then
-			physicsAddress <= virtualAddress;
-			exceptionTrigger <= (
-				enabled => FUNC_DISABLED,
-				exceptionCode => (others => 'U'),
-				badVirtualAddress => (others => '0')
-			);
 			tlbEntryFound := true;
 			physicsAddress <= virtualAddress;
 		else

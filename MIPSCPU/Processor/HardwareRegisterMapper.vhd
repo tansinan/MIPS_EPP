@@ -59,13 +59,20 @@ begin
 	-- TODO: add simulation debugging statement to check RAM access violation.
 	process(ramControl1, ramControl2, ramControl3)
 	begin
+		usedRAMControl <= (
+			readEnabled => FUNC_DISABLED,
+			writeEnabled => FUNC_DISABLED,
+			address => x"80000000",
+			data => (others => '0')
+		);
 		if ramControl3.readEnabled = FUNC_ENABLED or 
 		ramControl3.writeEnabled = FUNC_ENABLED then
 			usedRAMControl <= ramControl3;
 		elsif ramControl2.readEnabled = FUNC_ENABLED or 
 		ramControl2.writeEnabled = FUNC_ENABLED then
 			usedRAMControl <= ramControl2;
-		else
+		elsif ramControl1.readEnabled = FUNC_ENABLED or 
+		ramControl1.writeEnabled = FUNC_ENABLED then
 			usedRAMControl <= ramControl1;
 		end if;
 	end process;

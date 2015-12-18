@@ -29,5 +29,6 @@ lw $2, 4($10)
 
 halt:
 j halt
-addiu $0, $0, 0
-addiu $0, $0, 0
+nop
+nop
+nop
