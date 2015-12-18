@@ -24,32 +24,65 @@ end entity;
 architecture Behavioral of CP0PipelinePhaseInstructionDecode is
 	signal exceptionTrigger : CP0ExceptionTrigger_t;
 begin
-	process(instruction, primaryRegisterFileData, cp0RegisterFileData, instructionExecutionEnabled)
+	process(instruction, primaryRegisterFileData, 
+	cp0RegisterFileData, instructionExecutionEnabled, cp0TLBData)
 		variable rs, rt: RegisterAddress_t;
 		variable rd: CP0RegisterAddress_t;
 		variable funct: InstructionFunct_t;
 		variable moveAddressPrimaryInt : integer;
 		variable moveAddressCP0Int : integer;
+		variable causeTemp : CPUData_t;
+		variable statusTemp : CPUData_t;
 	begin
+		-- Store related data to variables
 		rs := instruction(MIPS_CPU_INSTRUCTION_RS_HI downto MIPS_CPU_INSTRUCTION_RS_LO);
 		rt := instruction(MIPS_CPU_INSTRUCTION_RT_HI downto MIPS_CPU_INSTRUCTION_RT_LO);
 		rd := instruction(MIPS_CPU_INSTRUCTION_RD_HI downto MIPS_CPU_INSTRUCTION_RD_LO);
 		funct := instruction(MIPS_CPU_INSTRUCTION_FUNCT_HI downto MIPS_CPU_INSTRUCTION_FUNCT_LO);
 		moveAddressPrimaryInt := to_integer(unsigned(rt));
 		moveAddressCP0Int := to_integer(unsigned(rd));
+<<<<<<< HEAD
 		exceptionTrigger <= (
 			enabled => FUNC_DISABLED,
 			exceptionCode => (others => '0'),
 			badVirtualAddress => (others => '0')
+=======
+		causeTemp := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_CAUSE);
+		statusTemp := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_STATUS);
+		
+		-- Let nothing to be done on default state
+		-- Disable primary register file control
+		primaryRegisterFileControl <= (
+			address => (others => '0'),
+			data => (others => '0')
+		);
+		-- Disable CP0 Register file control
+		for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
+			cp0RegisterFileControl(i) <= (
+				operation => REGISTER_OPERATION_READ,
+				data => (others => '0')
+			);
+		end loop;
+		-- Disable TLB Controls
+		cp0TLBControl <= (
+			writeEnabled => FUNC_DISABLED,
+			index => (others => '0'),
+			data => (
+				pageMask => (others => '0'),
+				entryHigh => (others => '0'),
+				entryLow0 => (others => '0'),
+				entryLow1 => (others => '0')
+			)
+		);
+		-- Disable PC Controls
+		pcControl <= (
+			operation => REGISTER_OPERATION_READ,
+			data => (others => '0')
+>>>>>>> 50580fcc2f9a15eca1c72cd440022361697a95ec
 		);
 		
 		if instructionExecutionEnabled = FUNC_DISABLED then
-			primaryRegisterFileControl.address <= (others => '0');
-			primaryRegisterFileControl.data <= (others => '0');
-			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
-				cp0RegisterFileControl(i).data <= (others => '0');
-				cp0RegisterFileControl(i).operation <= REGISTER_OPERATION_READ;
-			end loop;
+
 			cp0TLBControl.writeEnabled <= FUNC_DISABLED;
 			pcControl.operation <= REGISTER_OPERATION_READ;
 			
@@ -130,7 +163,13 @@ begin
 				operation => REGISTER_OPERATION_WRITE,
 				data => cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_EPC)
 			);
-		
+			statusTemp(MIPS_CP0_STATUS_ERL) := '0';
+			statusTemp(MIPS_CP0_STATUS_EXL) := '0';
+			cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_STATUS) <= (
+				operation => REGISTER_OPERATION_WRITE,
+				data => statusTemp
+			);
+
 		-- SYSCALL instruction
 		elsif funct = MIPS_CP0_INSTRUCTION_FUNCT_SYSCALL then
 			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
@@ -141,7 +180,6 @@ begin
 				enabled => FUNC_ENABLED,
 				exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_SYSCALL,
 			);
-			
 		else
 			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
 				cp0RegisterFileControl(i).operation <= REGISTER_OPERATION_READ;

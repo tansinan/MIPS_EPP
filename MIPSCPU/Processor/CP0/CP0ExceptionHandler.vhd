@@ -22,6 +22,7 @@ architecture Behavioral of CP0ExceptionHandler is
 begin
 	process(clock, reset)
 		variable newCP0CauseRegister : CPUData_t;
+		variable newCP0StatusRegister : CPUData_t;
 	begin
 		if reset = FUNC_ENABLED then
 			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
@@ -32,6 +33,8 @@ begin
 			end loop;
 			pcOverrideControl.operation <= REGISTER_OPERATION_READ;
 		elsif rising_edge(clock) then
+			newCP0CauseRegister := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_CAUSE);
+			newCP0StatusRegister := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_STATUS);
 			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
 				cp0RegisterFileControl(i) <= (
 					operation => REGISTER_OPERATION_READ,
@@ -46,14 +49,16 @@ begin
 					operation => REGISTER_OPERATION_WRITE,
 					data => pcValue - 4
 				);
-				newCP0CauseRegister := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_CAUSE);
 				newCP0CauseRegister(MIPS_CP0_CAUSE_EXCEPTION_CODE_HI downto MIPS_CP0_CAUSE_EXCEPTION_CODE_LO)
 					:= exceptionTrigger.exceptionCode;
+				-- TODO : currently we don't implement any reset/cache/NMI, so it is always EXL to
+				-- be set. if those features are added in the future, this need to be changed!
+				newCP0StatusRegister(MIPS_CP0_STATUS_EXL) := '1';
 				cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_EPC) <= (
 					operation => REGISTER_OPERATION_WRITE,
 					data => newCP0CauseRegister
 				);
-				report "Debug : Exception triggered, pipeline will be cleared.";
+				
 			else
 				pcOverrideControl.operation <= REGISTER_OPERATION_READ;
 				pcOverrideControl.data <= (others => '0');
