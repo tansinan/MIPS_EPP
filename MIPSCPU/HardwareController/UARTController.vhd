@@ -37,10 +37,10 @@ begin
 	UART_i : entity work.UART
 	generic map (
 			baud => 115200,
-			clock_frequency => 11059200
+			clock_frequency => 25000000
 		)
 	port map (
-		clock => clock11M,
+		clock => clock,
 		reset => uartModuleReset,
 		data_stream_in => dataWrite,
 		data_stream_in_stb => writeSTB,
@@ -87,6 +87,7 @@ begin
 					if readBufferAvailable = '1' then
 						output(MIPS_CPU_DATA_WIDTH - 1 downto 8) <= (others => '0');
 						output(7 downto 0) <= readBuffer;
+						--output(7 downto 0) <= x"31";
 						readBufferAvailable <= '0';
 					else
 						output <= (others => '0');

@@ -53,27 +53,28 @@ LEAF(_start)
     addiu $3, $2, 4096
       write_one_byte:
       jal wait_for_read
-      lb $1, 0($10)
+      lbu $1, 0($10)
       sb $1, 0($2)
       addiu $2, $2, 1
       addu $4, $4, $1
       bne $2, $3, write_one_byte
 
+    move $3, $4
     /* Write checksum back to serial port */
     jal wait_for_write
-    sb $4, 0($10)
+    sw $4, 0($10)
     srl $4, 8
 
     jal wait_for_write
-    sb $4, 0($10)
+    sw $4, 0($10)
     srl $4, 8
 
     jal wait_for_write
-    sb $4, 0($10)
+    sw $4, 0($10)
     srl $4, 8
 
     jal wait_for_write
-    sb $4, 0($10)
+    sw $4, 0($10)
 
   /* Back to the beginning */
   j load_address

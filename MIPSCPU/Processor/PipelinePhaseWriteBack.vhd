@@ -24,6 +24,7 @@ begin
 	ramControl <= (
 		writeEnabled => phaseMAInput.targetIsRAM,
 		readEnabled => FUNC_DISABLED,
+		readOnStore => FUNC_DISABLED,
 		address => phaseMAInput.targetRAMAddr,
 		data => phaseMAInput.sourceImm
 	);

@@ -37,6 +37,7 @@ end entity;
 architecture Behavioral of HardwareAddressMapper is
 	signal addressType : AddressType_t;
 	signal savedAddressType : AddressType_t;
+	signal savedReadOnStore : EnablingControl_t;
 	signal usedRAMControl : RAMControl_t;
 	signal savedROMData : CPUData_t;
 	signal romData : CPUData_t;
@@ -62,6 +63,7 @@ begin
 		usedRAMControl <= (
 			readEnabled => FUNC_DISABLED,
 			writeEnabled => FUNC_DISABLED,
+			readOnStore => FUNC_DISABLED,
 			address => x"80000000",
 			data => (others => '0')
 		);
@@ -142,7 +144,13 @@ begin
 				elsif usedRAMControl.writeEnabled = FUNC_ENABLED then
 					uart1Control.operation <= REGISTER_OPERATION_WRITE;
 				end if;
-				uart1Control.address <= cp0PhysicsAddress;
+				
+				if usedRAMControl.readOnStore = FUNC_ENABLED and
+				usedRAMControl.readEnabled = FUNC_ENABLED then
+					uart1Control.address <= (others => '0');
+				else
+					uart1Control.address <= cp0PhysicsAddress;
+				end if;
 				uart1Control.data <= usedRAMControl.data;
 			when others =>
 		end case;
@@ -154,6 +162,7 @@ begin
 			savedAddressType <= addressType;
 			savedROMData <= romData;
 			cp0ExceptionTriggerRegister <= cp0ExceptionTrigger;
+			savedReadOnStore <= usedRAMControl.readOnStore;
 		end if;
 	end process;
 	

@@ -34,6 +34,7 @@ package MIPSCPU is
 		record
 			writeEnabled : EnablingControl_t;
 			readEnabled : EnablingControl_t;
+			readOnStore : EnablingControl_t;
 			address : RAMAddress_t;
 			data : RAMData_t;
 		end record;

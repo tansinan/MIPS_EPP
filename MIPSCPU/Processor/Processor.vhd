@@ -68,7 +68,7 @@ architecture Behavioral of Processor is
 	signal cp0VirtualAddress : RAMAddress_t;
 	signal cp0PhysicsAddress : RAMAddress_t;
 begin
-	light <= register_file_output(1)(15 downto 0);
+	light <= register_file_output(3)(15 downto 0);
 	--light <= pcValue(15 downto 0);
 	registerFile_i : entity work.RegisterFile port map (
 		reset => reset,
@@ -226,6 +226,7 @@ begin
 			exceptionCode => (others => '0'),
 			badVirtualAddress => (others => '0')
 		);
+		ramControl3.readOnStore <= FUNC_DISABLED;
 		if  current_pipeline_phase = "0100" then
 			pcControl2.operation <= REGISTER_OPERATION_WRITE;
 			pcControl2.data <= pcValue + 4;

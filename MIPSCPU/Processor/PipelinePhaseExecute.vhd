@@ -73,16 +73,28 @@ begin
 			ramControl <= (
 				readEnabled => FUNC_ENABLED,
 				writeEnabled => FUNC_DISABLED,
+				readOnStore => FUNC_ENABLED,
 				address => phaseMACtrl.sourceRAMAddr,
 				data => (others => '0')
 			);
 		else
-			ramControl <= (
-				readEnabled => phaseMACtrl.sourceIsRAM,
-				writeEnabled => FUNC_DISABLED,
-				address => phaseMACtrl.sourceRAMAddr,
-				data => (others => '0')
-			);
+			if phaseMACtrl.instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SW then
+				ramControl <= (
+					readEnabled => phaseMACtrl.sourceIsRAM,
+					writeEnabled => FUNC_DISABLED,
+					readOnStore => FUNC_ENABLED,
+					address => phaseMACtrl.sourceRAMAddr,
+					data => (others => '0')
+				);
+			else
+				ramControl <= (
+					readEnabled => phaseMACtrl.sourceIsRAM,
+					writeEnabled => FUNC_DISABLED,
+					readOnStore => FUNC_DISABLED,
+					address => phaseMACtrl.sourceRAMAddr,
+					data => (others => '0')
+				);
+			end if;
 		end if;
 	end process;
 	phaseMAExceptionTrigger <= phaseIDExceptionTrigger;

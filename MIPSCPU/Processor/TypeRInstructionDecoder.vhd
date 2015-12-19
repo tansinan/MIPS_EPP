@@ -49,7 +49,7 @@ begin
 			when MIPS_CPU_INSTRUCTION_FUNCT_SLL |
 			MIPS_CPU_INSTRUCTION_FUNCT_SRL |
 			MIPS_CPU_INSTRUCTION_FUNCT_SRA =>
-				result.regAddr1 <= rs;
+				result.regAddr1 <= rt;
 				result.regAddr2 <= (others => '0');
 				result.regDest <= rd;
 				result.imm(MIPS_CPU_INSTRUCTION_SHAMT_WIDTH - 1 downto 0) <= shamt;

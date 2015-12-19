@@ -1,26 +1,39 @@
 import argparse
 import os
 import serial
+import time
 from subprocess import call
 argumentParser = argparse.ArgumentParser(description = 'MIPS_EPP on-chip bootloader utility')
 
 argumentParser.parse_args();
-    
+
 def sendFileBySerial(serialObject, binaryFile):
-    CHUNK_SIZE = 128
+    def integerToLittleEndianArray(value):
+        ret = []
+        for i in range(0, 4):
+            ret.append(value % 256)
+            value //= 256
+        return ret
+
+    def littleEndianArrayToInteger(arr):
+        ret = 0
+        for i in range(0, 4):
+            ret += (arr[i] << (i * 8))
+        return ret
+
+    CHUNK_SIZE = 4096
     binaryFile.seek(0)
     address = 0x80000000
     while True:
-        addressArr = []
-        tempAddress = address
-        for i in range(0, 4):
-            addressArr.append(tempAddress % 256)
-        serialObject.write(addressArr)
-        print(addressArr)
         fileData = binaryFile.read(CHUNK_SIZE)
         actualLength = len(fileData)
         if actualLength == 0:
             break
+        
+        addressArr = integerToLittleEndianArray(address)
+        serialObject.write(addressArr)
+        print(addressArr)
+        
         dataArr = []
         checksum = 0
         for byte in fileData:
@@ -28,18 +41,25 @@ def sendFileBySerial(serialObject, binaryFile):
             checksum += byte
         if actualLength < CHUNK_SIZE:
             for i in range(actualLength, CHUNK_SIZE):
-                dataArr.append(i)
+                dataArr.append(0)
+        print(len(dataArr))
         serialObject.write(dataArr)
-        checksum %= 256
-        receivedChecksum = serialObject.read(1)
-        # TODO :Add checksum comparing.
+        receivedChecksumArr = serialObject.read(4)
+        print(len(receivedChecksumArr))
+        receivedChecksum = littleEndianArrayToInteger(receivedChecksumArr)
+        print('Expected checksum : %x' % checksum)
+        print('Received checksum : %x' % receivedChecksum)
         print('0x%x: %d bytes padding to %d bytes, checksum: %d' %
               (address, actualLength, len(dataArr), checksum))
+        #break
         if actualLength < CHUNK_SIZE:
             break
         address += CHUNK_SIZE
+        print('............')
     print('Done.')
 
-inputFile = open("bootloader.bin", "rb")
-serialObject = serial.Serial('/dev/tty1', 115200, timeout=1)
+#inputFile = open("bootloader.bin", "rb")
+inputFile = open("../MIPSBarebone/barebone.bin", "rb")
+serialObject = serial.Serial('/dev/ttyUSB0', 115200, timeout=10)
+serialObject.write([0,0,0,0]);
 sendFileBySerial(serialObject, inputFile)
