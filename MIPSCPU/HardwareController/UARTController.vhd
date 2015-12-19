@@ -30,7 +30,10 @@ architecture Behavioral of UARTController is
 	signal readBuffer : std_logic_vector(7 downto 0);
 	signal readBufferAvailable : std_logic;
 	signal finishReading : std_logic;
+	signal uartModuleReset : std_logic;
 begin
+	-- The UART module use '1' as reset enable instead of '0'
+	uartModuleReset <= not reset;
 	UART_i : entity work.UART
 	generic map (
 			baud => 115200,
@@ -38,7 +41,7 @@ begin
 		)
 	port map (
 		clock => clock11M,
-		reset => not reset,
+		reset => uartModuleReset,
 		data_stream_in => dataWrite,
 		data_stream_in_stb => writeSTB,
 		data_stream_in_ack => writeACK,

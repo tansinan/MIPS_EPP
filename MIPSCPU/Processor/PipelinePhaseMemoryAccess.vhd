@@ -11,7 +11,8 @@ entity PipelinePhaseMemoryAccess is
 		phaseWBCtrlOutput : out PipelinePhaseMAWBInterface_t;
 		exceptionTriggerOutput : out CP0ExceptionTrigger_t;
 		ramReadResult : in std_logic_vector(MIPS_RAM_DATA_WIDTH - 1 downto 0);
-		ramReadException : CP0ExceptionTrigger_t
+		ramReadException : in CP0ExceptionTrigger_t;
+		phaseEXExceptionTrigger : out CP0ExceptionTrigger_t
 	);
 end entity;
 

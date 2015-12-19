@@ -3,6 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.std_logic_unsigned.all;
 use work.MIPSCPU.all;
+use work.MIPSCP0.all;
 
 entity PipelinePhaseExecute is
 	port (
@@ -12,7 +13,9 @@ entity PipelinePhaseExecute is
 		pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		pcControl : out RegisterControl_t;
 		ramControl : out RAMControl_t;
-		phaseMACtrlOutput : out PipelinePhaseEXMAInterface_t
+		phaseMACtrlOutput : out PipelinePhaseEXMAInterface_t;
+		phaseIDExceptionTrigger : in CP0ExceptionTrigger_t;
+		phaseMAExceptionTrigger : out CP0ExceptionTrigger_t
 	);
 end entity;
 architecture Behavioral of PipelinePhaseExecute is
@@ -82,6 +85,7 @@ begin
 			);
 		end if;
 	end process;
+	phaseMAExceptionTrigger <= phaseIDExceptionTrigger;
 	PipelinePhaseExecute_Process : process (clock, reset)
 	begin
 		if reset = '0' then

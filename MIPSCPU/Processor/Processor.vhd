@@ -34,6 +34,10 @@ architecture Behavioral of Processor is
 	signal pipelinePhaseEXMAInterface : PipelinePhaseEXMAInterface_t;
 	signal pipelinePhaseMAWBInterface : PipelinePhaseMAWBInterface_t;
 
+	signal pipelinePhaseIFIDException : CP0ExceptionTrigger_t;
+	signal pipelinePhaseIDEXException : CP0ExceptionTrigger_t;
+	signal pipelinePhaseEXMAException : CP0ExceptionTrigger_t;
+
 	signal instructionToCP0 : Instruction_t;
 	signal instructionToPrimary : Instruction_t;
 	signal instructionExecutionEnabledCP0 : EnablingControl_t;
@@ -92,7 +96,9 @@ begin
 		instruction => instructionToPrimary,
 		phaseExCtrlOutput => pipelinePhaseIDEXInterface,
 		pcValue => pcValue,
-		pcControl => pcControl1
+		pcControl => pcControl1,
+		phaseIFExceptionTrigger => pipelinePhaseIFIDException,
+		phaseEXExceptionTrigger => pipelinePhaseIDEXException
 	);
 
 	pipelinePhaseExecute_i: entity work.PipelinePhaseExecute
@@ -103,7 +109,9 @@ begin
 		pcValue => pcValue,
 		pcControl => pcControl3,
 		ramControl => ramControl1,
-		phaseMACtrlOutput => pipelinePhaseEXMAInterface
+		phaseMACtrlOutput => pipelinePhaseEXMAInterface,
+		phaseIDExceptionTrigger => pipelinePhaseIDEXException,
+		phaseMAExceptionTrigger => pipelinePhaseEXMAException
 	);
 
 	pipelinePhaseMemoryAccess_i: entity work.PipelinePhaseMemoryAccess
@@ -114,7 +122,8 @@ begin
 		phaseWBCtrlOutput => pipelinePhaseMAWBInterface,
 		exceptionTriggerOutput => cp0ExceptionTrigger,
 		ramReadResult => memoryAccessResult,
-		ramReadException => memoryAccessExceptionTrigger
+		ramReadException => memoryAccessExceptionTrigger,
+		phaseEXExceptionTrigger => pipelinePhaseEXMAException
 	);
 
 	pipelinePhaseWirteBack_i: entity work.PipelinePhaseWriteBack
@@ -212,6 +221,11 @@ begin
 	
 	instructionFetchProcess : process (current_pipeline_phase, pcValue)
 	begin
+		pipelinePhaseIFIDException <= (
+			enabled => FUNC_DISABLED,
+			exceptionCode => (others => '0'),
+			badVirtualAddress => (others => '0')
+		);
 		if  current_pipeline_phase = "0100" then
 			pcControl2.operation <= REGISTER_OPERATION_WRITE;
 			pcControl2.data <= pcValue + 4;

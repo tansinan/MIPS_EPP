@@ -1,6 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use work.MIPSCPU.all;
+use work.MIPSCP0.all;
 
 entity PipelinePhaseInstructionDecode is
 	port (
@@ -10,7 +11,9 @@ entity PipelinePhaseInstructionDecode is
 		instruction : in Instruction_t;
 		pcValue : in CPUData_t;
 		pcControl : out RegisterControl_t;
-		phaseExCtrlOutput : out PipelinePhaseIDEXInterface_t
+		phaseExCtrlOutput : out PipelinePhaseIDEXInterface_t;
+		phaseIFExceptionTrigger : in CP0ExceptionTrigger_t;
+		phaseEXExceptionTrigger : out CP0ExceptionTrigger_t
 	);
 end PipelinePhaseInstructionDecode;
 
@@ -136,6 +139,7 @@ begin
 		regData2 when FUNC_DISABLED,
 		decodingResult.imm when FUNC_ENABLED;
 
+	phaseExExceptionTrigger <= phaseIFExceptionTrigger;
 	PipelinePhaseInstructionDecode_Process : process (clock, reset)
 	begin
 		if reset = '0' then
