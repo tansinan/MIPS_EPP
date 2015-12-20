@@ -97,7 +97,9 @@ LEAF(_start)
     jr ra
 
   jump_to_os_entry:
-		li $1, 0x80000000
-		jr $1
+    jal wait_for_read
+    lbu $1, 0($10)
+    li $1, 0x80000000
+    jr $1
 
 END(_start)

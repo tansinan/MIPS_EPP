@@ -51,7 +51,6 @@ def sendFileBySerial(serialObject, binaryFile):
         print('Received checksum : %x' % receivedChecksum)
         print('0x%x: %d bytes padding to %d bytes, checksum: %d' %
               (address, actualLength, len(dataArr), checksum))
-        #break
         if actualLength < CHUNK_SIZE:
             break
         address += CHUNK_SIZE
@@ -61,5 +60,5 @@ def sendFileBySerial(serialObject, binaryFile):
 #inputFile = open("bootloader.bin", "rb")
 inputFile = open("../MIPSBarebone/barebone.bin", "rb")
 serialObject = serial.Serial('/dev/ttyUSB0', 115200, timeout=10)
-serialObject.write([0,0,0,0]);
 sendFileBySerial(serialObject, inputFile)
+serialObject.write([0, 0, 0, 0])
