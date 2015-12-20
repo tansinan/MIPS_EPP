@@ -15,6 +15,7 @@ entity Coprocessor0_e is
 		pcControlException : out RegisterControl_t;
 		pcControlPipeline : out RegisterControl_t;
 		exceptionTrigger : in CP0ExceptionTrigger_t;
+		interruptTriggerArray : in CP0HardwareInterruptTriggerArray_t;
 		exceptionPipelineClear : out EnablingControl_t;
 		debugCP0RegisterFileData : out CP0RegisterFileOutput_t;
 		virtualAddress : in RAMAddress_t;
@@ -70,6 +71,7 @@ begin
 		clock => clock,
 		reset => reset,
 		exceptionTrigger => exceptionTrigger,
+		interruptTriggerArray => interruptTriggerArray,
 		pcValue => pcValue,
 		pcOverrideControl => pcControlException,
 		exceptionPipelineClear => exceptionPipelineClear,

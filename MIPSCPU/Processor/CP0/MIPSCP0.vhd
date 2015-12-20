@@ -57,7 +57,12 @@ package MIPSCP0 is
 	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_LO : integer := 2;
 	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_WIDTH : integer := 
 		MIPS_CP0_CAUSE_EXCEPTION_CODE_HI - MIPS_CP0_CAUSE_EXCEPTION_CODE_LO + 1;
-		
+	
+	constant MIPS_CP0_CAUSE_INTERRUPT_PENDING_HI : integer := 15;
+	constant MIPS_CP0_CAUSE_INTERRUPT_PENDING_LO : integer := 10;
+	constant MIPS_CP0_CAUSE_INTERRUPT_PENDING_WIDTH : integer := 
+		MIPS_CP0_CAUSE_INTERRUPT_PENDING_HI - MIPS_CP0_CAUSE_INTERRUPT_PENDING_LO + 1;
+	
 	constant MIPS_CP0_STATUS_ERL : integer := 2;
 	constant MIPS_CP0_STATUS_EXL : integer := 1;
 	
@@ -116,12 +121,27 @@ package MIPSCP0 is
 			writeEnabled : std_logic;
 		end record;
 	
+	-- Constant and (sub)types related to interrupt handling
 	type CP0ExceptionTrigger_t is
 		record
 			enabled : EnablingControl_t;
 			exceptionCode : CP0CauseExceptionCode_t;
 			badVirtualAddress : RAMAddress_t;
 		end record;
+		
+	constant MIPS_CP0_HARDWARE_INTERRUPT_COUNT : integer := 6;
+	subtype CP0InterruptCodeMask_t is
+		std_logic_vector(MIPS_CP0_TLB_INDEX_WIDTH - 1 downto 0);
+	type CP0HardwareInterruptTrigger_t is
+		record
+			enabled : EnablingControl_t;
+			interruptCodeMask : CP0InterruptCodeMask_t;
+		end record;
+		
+	constant MIPS_CP0_INTERRUPT_SOURCE_COUNT : integer := 2;
+	type CP0HardwareInterruptTriggerArray_t is
+		array(0 to MIPS_CP0_INTERRUPT_SOURCE_COUNT - 1) of 
+		CP0HardwareInterruptTrigger_t;
 
 	-- Constants related to CP0 instructions
 	constant MIPS_CP0_INSTRUCTION_RS_MF : RegisterAddress_t := "00000";
