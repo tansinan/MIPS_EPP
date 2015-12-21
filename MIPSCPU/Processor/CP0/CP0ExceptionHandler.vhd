@@ -22,6 +22,7 @@ end entity;
 
 architecture Behavioral of CP0ExceptionHandler is
 	signal interruptSource : CP0InterruptSource_t;
+	signal exceptionCode: CP0CauseExceptionCode_t;
 begin
 	process(internalInterruptSource, externalInterruptSource)
 	begin
@@ -37,6 +38,7 @@ begin
 	process(clock, reset)
 		variable newCP0CauseRegister : CPUData_t;
 		variable newCP0StatusRegister : CPUData_t;
+		variable newCP0EntryHiRegister : CPUData_t;
 		variable haveInterrupt : boolean;
 	begin
 		-- TODO : CP0 behaviour on EXL set is different!
@@ -60,7 +62,9 @@ begin
 			end loop;
 			newCP0CauseRegister := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_CAUSE);
 			newCP0StatusRegister := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_STATUS);
+			newCP0EntryHiRegister := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_HIGH);
 			haveInterrupt := false;
+			
 			if exceptionTrigger.enabled = FUNC_ENABLED then
 				pcOverrideControl.operation <= REGISTER_OPERATION_WRITE;
 				pcOverrideControl.data <= MIPS_CP0_NONBOOT_EXCEPTION_HANDLER;
@@ -69,8 +73,16 @@ begin
 					operation => REGISTER_OPERATION_WRITE,
 					data => pcValue - 4
 				);
+				exceptionCode <= exceptionTrigger.exceptionCode;
+				if exceptionCode == MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_MODIFICATION
+					or exceptionCode == MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_LOAD
+					or exceptionCode == MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_STORE:
+					newCP0EntryHiRegister(MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_HI downto MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_LO)
+						:=
+					exceptionTrigger.badVirtualAddress(MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_HI downto MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_LO)
+				
 				newCP0CauseRegister(MIPS_CP0_CAUSE_EXCEPTION_CODE_HI downto MIPS_CP0_CAUSE_EXCEPTION_CODE_LO)
-					:= exceptionTrigger.exceptionCode;
+					:= exceptionCode;
 				-- TODO : currently we don't implement any reset/cache/NMI, so it is always EXL to
 				-- be set. if those features are added in the future, this need to be changed!
 				newCP0StatusRegister(MIPS_CP0_STATUS_EXL) := '1';
@@ -85,6 +97,10 @@ begin
 				cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_STATUS) <= (
 					operation => REGISTER_OPERATION_WRITE,
 					data => newCP0StatusRegister
+				);
+				cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_HIGH) <= (
+					operation => REGISTER_OPERATION_WRITE,
+					data => newCP0EntryHiRegister
 				);
 			else
 				-- TODO : This should be changed to consider interrupt priority!
@@ -108,6 +124,10 @@ begin
 						cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_STATUS) <= (
 							operation => REGISTER_OPERATION_WRITE,
 							data => newCP0StatusRegister
+						);
+						cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_HIGH) <= (
+							operation => REGISTER_OPERATION_WRITE,
+							data => newCP0EntryHiRegister
 						);
 					end if;
 				end loop;

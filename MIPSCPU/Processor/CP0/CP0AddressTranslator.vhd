@@ -23,6 +23,8 @@ begin
 		variable pfn0 : CP0TLBPFN_t;
 		variable pfn1 : CP0TLBPFN_t;
 		variable pfn : CP0TLBPFN_t;
+		variable dirty : std_logic;
+		variable valid : std_logic;
 		variable pageMask : CP0TLBPageMask_t;
 		variable evenOddBit : integer := 0;
 	begin
@@ -70,9 +72,21 @@ begin
 					end case;
 					if virtualAddress(evenOddBit) = '0' then
 						pfn := pfn0;
+						valid = pfn0(MIPS_CP0_REGISTER_ENTRY_LOW_VALID);
+						dirty = pfn0(MIPS_CP0_REGISTER_ENTRY_LOW_DIRTY);
 					else
 						pfn := pfn1;
+						valid = pfn1(MIPS_CP0_REGISTER_ENTRY_LOW_VALID);
+						dirty = pfn1(MIPS_CP0_REGISTER_ENTRY_LOW_DIRTY);
 					end if;
+					if valid = '0' then
+						exceptionTrigger <= (
+							enabled => FUNC_ENABLED,
+							exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_LOAD,
+							badVirtualAddress => virtualAddress
+						);
+					end if
+					--TODO : if dirty = '0' and reftype is 'store' then TLB Modified triggers.
 					physicsAddress <= pfn(MIPS_CPU_DATA_WIDTH - 1 - 12 downto evenOddBit - 12) &
 					virtualAddress(evenOddBit - 1 downto 0);
 					tlbEntryFound := true;
