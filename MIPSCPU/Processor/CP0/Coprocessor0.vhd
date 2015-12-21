@@ -89,6 +89,13 @@ begin
 		physicsAddress => physicsAddress,
 		exceptionTriggerOut => memoryTranslationExceptionTrigger
 	);
+	
+	CP0InternalTimerInterrupt_i : entity work.CP0InternalTimerInterrupt_e
+	port map
+	(
+		cp0RegisterFileData => cp0RegisterFileData,
+		interruptTrigger => open
+	);
 
 	-- TODO : Connect internal interrupt source to the timer interrupt trigger.
 	internalInterruptSource(0) <= (

@@ -10,13 +10,29 @@ entity ProcessorTop is
 		clock50M : in Clock_t;
 		clock11M : in Clock_t;
 		reset : in Reset_t;
+		
+		-- Primary physics RAM hardware interface.
 		primaryPhysicsRAMControl : out PhysicsRAMControl_t;
 		primaryPhysicsRAMAddressBus : out PhysicsRAMAddress_t;
 		primaryPhysicsRAMDataBus : inout PhysicsRAMData_t;
+		
+		-- Secondary physics RAM hardware interface.
 		secondaryPhysicsRAMControl : out PhysicsRAMControl_t;
 		secondaryPhysicsRAMAddressBus : out PhysicsRAMAddress_t;
 		secondaryPhysicsRAMDataBus : inout PhysicsRAMData_t;
+		
+		-- FlashROM hardware interface.
+		flashByte : out std_logic;
+		flashVPEN : out std_logic;
+		flashCE, flashOE, flashWE : out std_logic;
+		flashRP : out std_logic;
+		flashAddress : out std_logic_vector(22 downto 0);
+		flashData : inout std_logic_vector(15 downto 0);
+		
+		-- LED for debugging.
 		light : out std_logic_vector(15 downto 0);
+		
+		-- UART hardware interface
 		uart1Transmit : out std_logic;
 		uart1Receive : in std_logic
 	);
@@ -30,6 +46,8 @@ architecture Behavioral of ProcessorTop is
 	signal secondaryRAMResult : RAMData_t;
 	signal uart1Control : HardwareRegisterControl_t;
 	signal uart1Output : CPUData_t;
+	signal flashROMControl : HardwareRegisterControl_t;
+	signal flashROMOutput : CPUData_t;
 	signal debugData : CPUDebugData_t;
 	signal cp0ExternalInterruptSource : CP0ExternalInterruptSource_t;
 begin
@@ -89,6 +107,28 @@ begin
 		uartTransmit => uart1Transmit,
 		uartReceive => uart1Receive,
 		interruptTrigger => cp0ExternalInterruptSource(0)
+	);
+	
+	flashRomController_i : entity work.FlashRomController
+	port map
+	(
+		-- TODO : need to consider which clock to use.
+		clock => clockDivided,
+		reset => reset,
+		control => flashROMControl,
+		output => flashROMOutput,
+		-- TODO : Those signals need to be removed.
+		writeEnable => FUNC_DISABLED,
+		readEnable => FUNC_DISABLED,
+		eraseEnable => FUNC_DISABLED,
+		flashByte => flashByte,
+		flashVPEN => flashVPEN,
+		flashCE => flashCE,
+		flashOE => flashOE,
+		flashWE => flashWE,
+		flashRP => flashRP,
+		flashAddress => flashAddress,
+		flashData => flashData
 	);
 end architecture;
 
