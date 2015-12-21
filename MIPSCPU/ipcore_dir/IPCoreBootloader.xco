@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.7
-# Date: Sat Dec 19 19:48:36 2015
+# Date: Mon Dec 21 19:26:58 2015
 #
 ##############################################################
 #
@@ -40,7 +40,7 @@ SELECT Distributed_Memory_Generator xilinx.com:ip:dist_mem_gen:7.2
 # END Select
 # BEGIN Parameters
 CSET ce_overrides=ce_overrides_sync_controls
-CSET coefficient_file=/my_files/definition1_default.coe
+CSET coefficient_file=/my_files/Documents/MIPS_EPP/Bootloader/bootloader.coe
 CSET common_output_ce=false
 CSET common_output_clk=false
 CSET component_name=IPCoreBootloader
@@ -70,4 +70,4 @@ CSET sync_reset_qspo=false
 MISC pkg_timestamp=2012-11-21T20:07:40Z
 # END Extra information
 GENERATE
-# CRC: faf25398
+# CRC: b8e7845f

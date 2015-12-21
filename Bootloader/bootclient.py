@@ -2,10 +2,11 @@ import argparse
 import os
 import serial
 import time
+import sys
 from subprocess import call
-argumentParser = argparse.ArgumentParser(description = 'MIPS_EPP on-chip bootloader utility')
+#argumentParser = argparse.ArgumentParser(description = 'MIPS_EPP on-chip bootloader utility')
 
-argumentParser.parse_args();
+#argumentParser.parse_args();
 
 def sendFileBySerial(serialObject, binaryFile):
     def integerToLittleEndianArray(value):
@@ -43,22 +44,26 @@ def sendFileBySerial(serialObject, binaryFile):
             for i in range(actualLength, CHUNK_SIZE):
                 dataArr.append(0)
         print(len(dataArr))
-        serialObject.write(dataArr)
-        receivedChecksumArr = serialObject.read(4)
-        print(len(receivedChecksumArr))
-        receivedChecksum = littleEndianArrayToInteger(receivedChecksumArr)
-        print('Expected checksum : %x' % checksum)
-        print('Received checksum : %x' % receivedChecksum)
-        print('0x%x: %d bytes padding to %d bytes, checksum: %d' %
-              (address, actualLength, len(dataArr), checksum))
+        #serialObject.write(dataArr)
+        #receivedChecksumArr = serialObject.read(CHUNK_SIZE)
+        #print(len(receivedChecksumArr))
+        for i in range(0, CHUNK_SIZE):
+            serialObject.write([dataArr[i]])
+            ret = serialObject.read(1)
+            if ret[0] != dataArr[i]:
+                print("Err %d %x %x" % (i, dataArr[i], ret[0]))
+        #receivedChecksum = littleEndianArrayToInteger(receivedChecksumArr)
+        #print('Expected checksum : %x' % checksum)
+        #print('Received checksum : %x' % receivedChecksum)
+        #print('0x%x: %d bytes padding to %d bytes, checksum: %d' %
+        #      (address, actualLength, len(dataArr), checksum))
         if actualLength < CHUNK_SIZE:
             break
         address += CHUNK_SIZE
         print('............')
     print('Done.')
 
-#inputFile = open("bootloader.bin", "rb")
-inputFile = open("../MIPSBarebone/barebone.bin", "rb")
+inputFile = open(sys.argv[1], "rb")
 serialObject = serial.Serial('/dev/ttyUSB0', 115200, timeout=10)
 sendFileBySerial(serialObject, inputFile)
 serialObject.write([0, 0, 0, 0])
