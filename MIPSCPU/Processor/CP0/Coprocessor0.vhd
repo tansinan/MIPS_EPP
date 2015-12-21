@@ -31,6 +31,7 @@ architecture Behavioral of Coprocessor0_e is
 	signal cp0TLBControl : CP0TLBControl_t;
 	signal cp0TLBData : CP0TLBData_t;
 	signal internalInterruptSource : CP0InternalInterruptSource_t;
+	signal timerInterruptCompareRegisterModifiedReset : EnablingControl_t;
 begin
 	cp0PipelinePhaseInstructionDecode_i: entity work.CP0PipelinePhaseInstructionDecode
 	port map
@@ -45,7 +46,9 @@ begin
 		cp0RegisterFileControl => cp0RegisterFileControl0,
 		cp0TLBData => cp0TLBData,
 		cp0TLBControl => cp0TLBControl,
-		pcControl => pcControlPipeline
+		pcControl => pcControlPipeline,
+		compareRegisterModified => 
+			timerInterruptCompareRegisterModifiedReset
 	);
 	
 	cp0RegisterFile_i: entity work.CP0RegisterFile_c
@@ -93,14 +96,18 @@ begin
 	CP0InternalTimerInterrupt_i : entity work.CP0InternalTimerInterrupt_e
 	port map
 	(
+		clock => clock,
+		reset => reset,
 		cp0RegisterFileData => cp0RegisterFileData,
-		interruptTrigger => open
+		interruptTriggerOutput => internalInterruptSource(0),
+		compareRegisterModifiedReset => 
+			timerInterruptCompareRegisterModifiedReset
 	);
 
 	-- TODO : Connect internal interrupt source to the timer interrupt trigger.
-	internalInterruptSource(0) <= (
-		enabled => FUNC_DISABLED,
-		interruptCodeMask => (others => '0')
-	);
+	--internalInterruptSource(0) <= (
+	--	enabled => FUNC_DISABLED,
+	--	interruptCodeMask => (others => '0')
+	--);
 end architecture;
 

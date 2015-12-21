@@ -67,6 +67,8 @@ package MIPSCP0 is
 	
 	constant MIPS_CP0_STATUS_ERL : integer := 2;
 	constant MIPS_CP0_STATUS_EXL : integer := 1;
+	-- Define the interrupt enabled bit in CP0 status register.
+	constant MIPS_CP0_STATUS_IE : integer := 0;
 	
 	subtype CP0CauseExceptionCode_t is
 		std_logic_vector(MIPS_CP0_CAUSE_EXCEPTION_CODE_WIDTH - 1 downto 0);

@@ -1,10 +1,14 @@
 
-
+# General clock and reset pins
 NET "clock50M" LOC = U26;
-NET "clock11M" LOC = U25;
+#NET "clock11M" LOC = U25;
 NET "reset" LOC = T1;
+
+# UART1 pins, shortcut from CPLD.
 NET "uart1Receive" LOC = R26;
 NET "uart1Transmit" LOC = P24;
+
+# RAM Controller pins.
 NET "primaryPhysicsRAMControl_enabled" LOC = AA26;
 NET "primaryPhysicsRAMControl_readEnabled" LOC = AD17;
 NET "primaryPhysicsRAMControl_writeEnabled" LOC = AA25;
@@ -63,9 +67,6 @@ NET "primaryPhysicsRAMDataBus[3]" LOC = AB26;
 NET "primaryPhysicsRAMDataBus[2]" LOC = AC26;
 NET "primaryPhysicsRAMDataBus[1]" LOC = AD24;
 NET "primaryPhysicsRAMDataBus[0]" LOC = AC24;
-
-# PlanAhead Generated physical constraints 
-
 NET "secondaryPhysicsRAMDataBus[31]" LOC = AF12;
 NET "secondaryPhysicsRAMDataBus[30]" LOC = AF11;
 NET "secondaryPhysicsRAMDataBus[29]" LOC = AE11;
@@ -119,6 +120,56 @@ NET "secondaryPhysicsRAMAddressBus[2]" LOC = AD6;
 NET "secondaryPhysicsRAMAddressBus[1]" LOC = AD3;
 NET "secondaryPhysicsRAMAddressBus[0]" LOC = AD4;
 
+# Flash ROM pins
+NET "flashAddress[22]" LOC = G5;
+NET "flashAddress[21]" LOC = D3;
+NET "flashAddress[20]" LOC = F5;
+NET "flashAddress[19]" LOC = C2;
+NET "flashAddress[18]" LOC = A2;
+NET "flashAddress[17]" LOC = B2;
+NET "flashAddress[16]" LOC = C3;
+NET "flashAddress[15]" LOC = C4;
+NET "flashAddress[14]" LOC = A4;
+NET "flashAddress[13]" LOC = B4;
+NET "flashAddress[12]" LOC = E5;
+NET "flashAddress[11]" LOC = C5;
+NET "flashAddress[10]" LOC = B6;
+NET "flashAddress[9]" LOC = A6;
+NET "flashAddress[8]" LOC = D6;
+NET "flashAddress[7]" LOC = C6;
+NET "flashAddress[6]" LOC = C7;
+NET "flashAddress[5]" LOC = A7;
+NET "flashAddress[4]" LOC = E8;
+NET "flashAddress[3]" LOC = D7;
+NET "flashAddress[2]" LOC = D8;
+NET "flashAddress[1]" LOC = C8;
+NET "flashAddress[0]" LOC = G3;
+NET "flashData[15]" LOC = H1;
+NET "flashData[14]" LOC = G2;
+NET "flashData[13]" LOC = E1;
+NET "flashData[12]" LOC = D1;
+NET "flashData[11]" LOC = B1;
+NET "flashData[10]" LOC = H5;
+NET "flashData[9]" LOC = J4;
+NET "flashData[8]" LOC = H3;
+NET "flashData[7]" LOC = G1;
+NET "flashData[6]" LOC = F1;
+NET "flashData[5]" LOC = E2;
+NET "flashData[4]" LOC = C1;
+NET "flashData[3]" LOC = K5;
+NET "flashData[2]" LOC = K3;
+NET "flashData[1]" LOC = J3;
+NET "flashData[0]" LOC = G4;
+NET "flashByte" LOC = F3;
+NET "flashCE" LOC = E6;
+NET "flashCE1" LOC = E4;
+NET "flashCE2" LOC = E3;
+NET "flashOE" LOC = J1;
+NET "flashRP" LOC = A5;
+NET "flashVPEN" LOC = D5;
+NET "flashWE" LOC = K1;
+
+# Debugging LED.
 NET "light[0]" LOC = F26;
 NET "light[1]" LOC = G26;
 NET "light[2]" LOC = G25;
