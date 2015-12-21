@@ -239,6 +239,11 @@ begin
 			ramControl3.writeEnabled <= FUNC_DISABLED;
 			ramControl3.readEnabled <= FUNC_ENABLED;
 			ramControl3.data <= (others => '0');
+			if memoryAccessExceptionTrigger.enabled = FUNC_ENABLED then
+				pipelinePhaseIFIDException <= memoryAccessExceptionTrigger;
+				pipelinePhaseIFIDException.exceptionCode <=
+					MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_LOAD;
+			end if;
 		else
 			if  current_pipeline_phase /= "1111" then
 				pcControl2.operation <= REGISTER_OPERATION_READ;

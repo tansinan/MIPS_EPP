@@ -26,6 +26,9 @@ architecture Behavioral of FlashRomController is
 	signal dataControl : std_logic_vector(15 downto 0);
 	signal address : std_logic_vector(22 downto 0);
 	signal readyStatus : ReadyStatus_t;
+	signal writeEnable : EnablingControl_t;
+	signal readEnable : EnablingControl_t;
+	signal eraseEnable : EnablingControl_t;
 	-- Not for connection
 	signal stateDbg : std_logic_vector(3 downto 0);
 	signal previousControl : HardwareRegisterControl_t;
@@ -59,22 +62,27 @@ begin
 	dataControl <= control.data(15 downto 0);
 	address <= control.address(22 downto 0);
 	
-	process (clock)
-		if not (control.operation = previousControl.operation
-		   and control.data = previousControl.data
-			 and control.address = previousControl.address)
-		   and readyStatus = STATUS_READY then
-			readEnable <= control.data(31);
-			writeEnable <= control.data(30);
-			eraseEnable <= control.data(29);
-		else
+	process (reset, clock)
+	begin
+		if reset = FUNC_ENABLED then
 			readEnable <= '1';
 			writeEnable <= '1';
 			eraseEnable <= '1';
+		elsif rising_edge(clock) then
+			if not (control.operation = previousControl.operation
+			and control.data = previousControl.data
+			and control.address = previousControl.address)
+			and readyStatus = STATUS_READY then
+				readEnable <= control.data(31);
+				writeEnable <= control.data(30);
+				eraseEnable <= control.data(29);
+			else
+				readEnable <= '1';
+				writeEnable <= '1';
+				eraseEnable <= '1';
+			end if;
+			previousControl <= control;
 		end if;
-		previouscontrol.operation <= Control.operation;
-		previousControl.data <= control.data;
-		previousControl.address <= control.address;
 	end process;
 	
 end architecture;

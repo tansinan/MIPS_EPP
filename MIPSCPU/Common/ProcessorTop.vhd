@@ -117,10 +117,6 @@ begin
 		reset => reset,
 		control => flashROMControl,
 		output => flashROMOutput,
-		-- TODO : Those signals need to be removed.
-		writeEnable => FUNC_DISABLED,
-		readEnable => FUNC_DISABLED,
-		eraseEnable => FUNC_DISABLED,
 		flashByte => flashByte,
 		flashVPEN => flashVPEN,
 		flashCE => flashCE,
