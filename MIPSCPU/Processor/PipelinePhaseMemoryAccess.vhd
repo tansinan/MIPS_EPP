@@ -12,7 +12,8 @@ entity PipelinePhaseMemoryAccess is
 		exceptionTriggerOutput : out CP0ExceptionTrigger_t;
 		ramReadResult : in std_logic_vector(MIPS_RAM_DATA_WIDTH - 1 downto 0);
 		ramReadException : in CP0ExceptionTrigger_t;
-		phaseEXExceptionTrigger : out CP0ExceptionTrigger_t
+		phaseEXExceptionTrigger : out CP0ExceptionTrigger_t;
+		cp0ExceptionPipelineClear : in EnablingControl_t
 	);
 end entity;
 
@@ -136,14 +137,9 @@ begin
 	process(exceptionTrigger, phaseWBCtrl)
 	begin
 		if exceptionTrigger.enabled = FUNC_ENABLED then
-			phaseWBCtrlOutput <= (
-				sourceImm => (others => '0'),
-				targetIsRAM => FUNC_DISABLED,
-				targetIsReg => FUNC_DISABLED,
-				targetRAMAddr => (others => '0'),
-				targetRegAddr => (others => '0'),
-				instructionOpcode => (others => '0')
-			);
+			phaseWBCtrlOutput <= PIPELINE_PHASE_MA_WB_INTERFACE_CLEAR;
+		elsif cp0ExceptionPipelineClear = FUNC_ENABLED then
+			phaseWBCtrlOutput <= PIPELINE_PHASE_MA_WB_INTERFACE_CLEAR;
 		else
 			phaseWBCtrlOutput <= phaseWBCtrl;
 		end if;

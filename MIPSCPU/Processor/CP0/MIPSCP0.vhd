@@ -131,16 +131,26 @@ package MIPSCP0 is
 		
 	constant MIPS_CP0_HARDWARE_INTERRUPT_COUNT : integer := 6;
 	subtype CP0InterruptCodeMask_t is
-		std_logic_vector(MIPS_CP0_TLB_INDEX_WIDTH - 1 downto 0);
+		std_logic_vector(MIPS_CP0_HARDWARE_INTERRUPT_COUNT - 1 downto 0);
 	type CP0HardwareInterruptTrigger_t is
 		record
 			enabled : EnablingControl_t;
 			interruptCodeMask : CP0InterruptCodeMask_t;
 		end record;
 		
-	constant MIPS_CP0_INTERRUPT_SOURCE_COUNT : integer := 2;
-	type CP0HardwareInterruptTriggerArray_t is
+	constant MIPS_CP0_INTERNAL_INTERRUPT_SOURCE_COUNT : integer := 1;
+	constant MIPS_CP0_EXTERNAL_INTERRUPT_SOURCE_COUNT : integer := 1;
+	constant MIPS_CP0_INTERRUPT_SOURCE_COUNT : integer := 
+		MIPS_CP0_INTERNAL_INTERRUPT_SOURCE_COUNT +
+		MIPS_CP0_EXTERNAL_INTERRUPT_SOURCE_COUNT;
+	type CP0InterruptSource_t is
 		array(0 to MIPS_CP0_INTERRUPT_SOURCE_COUNT - 1) of 
+		CP0HardwareInterruptTrigger_t;
+	type CP0InternalInterruptSource_t is
+		array(0 to MIPS_CP0_INTERNAL_INTERRUPT_SOURCE_COUNT - 1) of 
+		CP0HardwareInterruptTrigger_t;
+	type CP0ExternalInterruptSource_t is
+		array(0 to MIPS_CP0_EXTERNAL_INTERRUPT_SOURCE_COUNT - 1) of 
 		CP0HardwareInterruptTrigger_t;
 
 	-- Constants related to CP0 instructions

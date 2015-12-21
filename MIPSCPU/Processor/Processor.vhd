@@ -18,7 +18,8 @@ entity Processor is
 		secondaryRAMResult : in RAMData_t;
 		uart1Control : out HardwareRegisterControl_t;
 		light : out std_logic_vector(15 downto 0);
-		uart1Result : in CPUData_t
+		uart1Result : in CPUData_t;
+		cp0ExternalInterruptSource : in CP0ExternalInterruptSource_t
 	);
 end entity;
 
@@ -98,7 +99,8 @@ begin
 		pcValue => pcValue,
 		pcControl => pcControl1,
 		phaseIFExceptionTrigger => pipelinePhaseIFIDException,
-		phaseEXExceptionTrigger => pipelinePhaseIDEXException
+		phaseEXExceptionTrigger => pipelinePhaseIDEXException,
+		cp0ExceptionPipelineClear => cp0ExceptionPipelineClear
 	);
 
 	pipelinePhaseExecute_i: entity work.PipelinePhaseExecute
@@ -111,7 +113,8 @@ begin
 		ramControl => ramControl1,
 		phaseMACtrlOutput => pipelinePhaseEXMAInterface,
 		phaseIDExceptionTrigger => pipelinePhaseIDEXException,
-		phaseMAExceptionTrigger => pipelinePhaseEXMAException
+		phaseMAExceptionTrigger => pipelinePhaseEXMAException,
+		cp0ExceptionPipelineClear => cp0ExceptionPipelineClear
 	);
 
 	pipelinePhaseMemoryAccess_i: entity work.PipelinePhaseMemoryAccess
@@ -123,7 +126,8 @@ begin
 		exceptionTriggerOutput => cp0ExceptionTrigger,
 		ramReadResult => memoryAccessResult,
 		ramReadException => memoryAccessExceptionTrigger,
-		phaseEXExceptionTrigger => pipelinePhaseEXMAException
+		phaseEXExceptionTrigger => pipelinePhaseEXMAException,
+		cp0ExceptionPipelineClear => cp0ExceptionPipelineClear
 	);
 
 	pipelinePhaseWirteBack_i: entity work.PipelinePhaseWriteBack
@@ -156,6 +160,7 @@ begin
 		pcControlException => cp0ExceptionPCControl,
 		pcControlPipeline => cp0PipelinePCControl,
 		exceptionTrigger => cp0ExceptionTrigger,
+		externalInterruptSource => cp0ExternalInterruptSource, 
 		exceptionPipelineClear => cp0ExceptionPipelineClear,
 		debugCP0RegisterFileData => open,
 		virtualAddress => cp0VirtualAddress,

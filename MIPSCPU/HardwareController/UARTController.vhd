@@ -12,6 +12,7 @@ entity UARTController is
 		clock11M : in Clock_t;
 		control : in HardwareRegisterControl_t;
 		output : out CPUData_t;
+		interruptTrigger : out CP0HardwareInterruptTrigger_t;
 		uartTransmit : out std_logic;
 		uartReceive : in std_logic
 	);
@@ -50,6 +51,13 @@ begin
 		tx => uartTransmit,
 		rx => uartReceive
 	);
+	
+	-- TODO : Add Interrupt trigger to UART Controller module!
+	interruptTrigger <= (
+		enabled => FUNC_DISABLED,
+		interruptCodeMask => (others => '0')
+	);
+	
 	process(reset, clock, control)
 		variable hardwareRegisterAddress : std_logic_vector(11 downto 0);
 	begin

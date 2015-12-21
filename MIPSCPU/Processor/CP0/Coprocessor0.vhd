@@ -15,7 +15,7 @@ entity Coprocessor0_e is
 		pcControlException : out RegisterControl_t;
 		pcControlPipeline : out RegisterControl_t;
 		exceptionTrigger : in CP0ExceptionTrigger_t;
-		interruptTriggerArray : in CP0HardwareInterruptTriggerArray_t;
+		externalInterruptSource : in CP0ExternalInterruptSource_t;
 		exceptionPipelineClear : out EnablingControl_t;
 		debugCP0RegisterFileData : out CP0RegisterFileOutput_t;
 		virtualAddress : in RAMAddress_t;
@@ -30,6 +30,7 @@ architecture Behavioral of Coprocessor0_e is
 	signal cp0RegisterFileData : CP0RegisterFileOutput_t;
 	signal cp0TLBControl : CP0TLBControl_t;
 	signal cp0TLBData : CP0TLBData_t;
+	signal internalInterruptSource : CP0InternalInterruptSource_t;
 begin
 	cp0PipelinePhaseInstructionDecode_i: entity work.CP0PipelinePhaseInstructionDecode
 	port map
@@ -71,7 +72,8 @@ begin
 		clock => clock,
 		reset => reset,
 		exceptionTrigger => exceptionTrigger,
-		interruptTriggerArray => interruptTriggerArray,
+		externalInterruptSource => externalInterruptSource,
+		internalInterruptSource => internalInterruptSource,
 		pcValue => pcValue,
 		pcOverrideControl => pcControlException,
 		exceptionPipelineClear => exceptionPipelineClear,
@@ -88,5 +90,10 @@ begin
 		exceptionTriggerOut => memoryTranslationExceptionTrigger
 	);
 
+	-- TODO : Connect internal interrupt source to the timer interrupt trigger.
+	internalInterruptSource(0) <= (
+		enabled => FUNC_DISABLED,
+		interruptCodeMask => (others => '0')
+	);
 end architecture;
 

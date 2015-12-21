@@ -31,6 +31,7 @@ architecture Behavioral of ProcessorTop is
 	signal uart1Control : HardwareRegisterControl_t;
 	signal uart1Output : CPUData_t;
 	signal debugData : CPUDebugData_t;
+	signal cp0ExternalInterruptSource : CP0ExternalInterruptSource_t;
 begin
 	primaryRAMController_i : entity work.RAMController_e
 	port map (
@@ -73,6 +74,7 @@ begin
 		secondaryRAMResult => secondaryRAMResult,
 		uart1control => uart1Control,
 		uart1result => uart1Output,
+		cp0ExternalInterruptSource => cp0ExternalInterruptSource,
 		light => light
 	);
 	
@@ -85,7 +87,8 @@ begin
 		control => uart1Control,
 		output => uart1Output,
 		uartTransmit => uart1Transmit,
-		uartReceive => uart1Receive
+		uartReceive => uart1Receive,
+		interruptTrigger => cp0ExternalInterruptSource(0)
 	);
 end architecture;
 

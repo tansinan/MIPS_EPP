@@ -10,7 +10,8 @@ entity CP0ExceptionHandler is
 		clock : in Clock_t;
 		reset : in Reset_t;
 		exceptionTrigger : in CP0ExceptionTrigger_t;
-		interruptTriggerArray : in CP0HardwareInterruptTriggerArray_t;
+		internalInterruptSource : in CP0InternalInterruptSource_t;
+		externalInterruptSource : in CP0ExternalInterruptSource_t;
 		pcValue : in CPUData_t;
 		pcOverrideControl : out RegisterControl_t;
 		exceptionPipelineClear : out EnablingControl_t;
@@ -20,7 +21,19 @@ entity CP0ExceptionHandler is
 end entity;
 
 architecture Behavioral of CP0ExceptionHandler is
+	signal interruptSource : CP0InterruptSource_t;
 begin
+	process(internalInterruptSource, externalInterruptSource)
+	begin
+		for i in 0 to MIPS_CP0_EXTERNAL_INTERRUPT_SOURCE_COUNT - 1 loop
+			interruptSource(i) <= externalInterruptSource(i);
+		end loop;
+		for i in 0 to MIPS_CP0_INTERNAL_INTERRUPT_SOURCE_COUNT - 1 loop
+			interruptSource(i + MIPS_CP0_EXTERNAL_INTERRUPT_SOURCE_COUNT)
+				<= internalInterruptSource(i);
+		end loop;
+	end process;
+	
 	process(clock, reset)
 		variable newCP0CauseRegister : CPUData_t;
 		variable newCP0StatusRegister : CPUData_t;
@@ -75,15 +88,15 @@ begin
 				);
 			else
 				-- TODO : This should be changed to consider interrupt priority!
-				for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
-					if interruptTriggerArray(i).enabled = FUNC_ENABLED and
-					haveInterrupt = false then
+				for i in 0 to MIPS_CP0_INTERRUPT_SOURCE_COUNT - 1 loop
+					if interruptSource(i).enabled = FUNC_ENABLED
+					and haveInterrupt = false then
 						haveInterrupt := true;
 						exceptionPipelineClear <= FUNC_ENABLED;
 						newCP0StatusRegister(MIPS_CP0_STATUS_EXL) := '1';
 						newCP0StatusRegister(
 							MIPS_CP0_CAUSE_INTERRUPT_PENDING_HI downto MIPS_CP0_CAUSE_INTERRUPT_PENDING_LO)
-						:= interruptTriggerArray(i).interruptCodeMask;
+						:= interruptSource(i).interruptCodeMask;
 						cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_EPC) <= (
 							operation => REGISTER_OPERATION_WRITE,
 							data => pcValue

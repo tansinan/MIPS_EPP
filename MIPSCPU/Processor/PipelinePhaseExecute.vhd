@@ -15,7 +15,8 @@ entity PipelinePhaseExecute is
 		ramControl : out RAMControl_t;
 		phaseMACtrlOutput : out PipelinePhaseEXMAInterface_t;
 		phaseIDExceptionTrigger : in CP0ExceptionTrigger_t;
-		phaseMAExceptionTrigger : out CP0ExceptionTrigger_t
+		phaseMAExceptionTrigger : out CP0ExceptionTrigger_t;
+		cp0ExceptionPipelineClear : in EnablingControl_t
 	);
 end entity;
 architecture Behavioral of PipelinePhaseExecute is
@@ -105,13 +106,11 @@ begin
 			phaseMACtrlOutput.sourceIsRAM <= FUNC_DISABLED;
 			phaseMACtrlOutput.targetIsReg <= FUNC_DISABLED;
 		elsif rising_edge(clock) then
-			phaseMACtrlOutput <= phaseMACtrl;
-			--phaseMACtrlOutput.sourceImm <= phaseMACtrl.sourceImm;
-			--phaseMACtrlOutput.targetIsRAM <= phaseMACtrl.targetIsRAM;
-			--phaseMACtrlOutput.targetIsReg <= phaseMACtrl.targetIsReg;
-			--phaseMACtrlOutput.targetRAMAddr <= phaseMACtrl.targetRAMAddr;
-			--phaseMACtrlOutput.targetRegAddr <= phaseMACtrl.targetRegAddr;
-			--phaseMACtrlOutput.instructionOpcode <= phaseMACtrl.instructionOpcode;
+			if cp0ExceptionPipelineClear = FUNC_ENABLED then
+				phaseMACtrlOutput <= PIPELINE_PHASE_EX_MA_INTERFACE_CLEAR;
+			else
+				phaseMACtrlOutput <= phaseMACtrl;
+			end if;
 		end if;
 	end process;
 end Behavioral;

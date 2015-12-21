@@ -111,7 +111,7 @@ package MIPSCPU is
 	-- MIPS CPU instructions
 	constant MIPS_CPU_INSTRUCTION_NOP :
 		std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0) :=
-		"00100100000000000000000000000000";
+		"00000000000000000000000000000000";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_ADDIU : InstructionOpcode_t := "001001";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_ANDI : InstructionOpcode_t := "001100";
 	constant MIPS_CPU_INSTRUCTION_OPCODE_ORI : InstructionOpcode_t := "001101";
@@ -261,6 +261,18 @@ package MIPSCPU is
 			instructionOpcode : InstructionOpcode_t;
 		end record;
 
+	constant PIPELINE_PHASE_ID_EX_INTERFACE_CLEAR : PipelinePhaseIDEXInterface_t := (
+		operand1 => (others => '0'),
+		operand2 => (others => '0'),
+		operation => ALU_OPERATION_LOGIC_OR,
+		targetReg => (others => '0'),
+		resultIsRAMAddr => FUNC_DISABLED,
+		immIsPCValue => FUNC_DISABLED,
+		targetIsRAM => FUNC_DISABLED,
+		extraImm => (others => '0'),
+		instructionOpcode => MIPS_CPU_INSTRUCTION_OPCODE_ORI
+	);
+
 	type PipelinePhaseEXMAInterface_t is
 		record
 			sourceIsRAM : std_logic;
@@ -273,6 +285,17 @@ package MIPSCPU is
 			instructionOpcode : InstructionOpcode_t;
 		end record;
 
+	constant PIPELINE_PHASE_EX_MA_INTERFACE_CLEAR : PipelinePhaseEXMAInterface_t := (
+		sourceIsRAM => FUNC_DISABLED,
+		sourceRAMAddr => (others => '0'),
+		sourceImm => (others => '0'),
+		targetIsRAM => FUNC_DISABLED,
+		targetIsReg => FUNC_ENABLED,
+		targetRAMAddr => (others => '0'),
+		targetRegAddr => (others => '0'),
+		instructionOpcode => MIPS_CPU_INSTRUCTION_OPCODE_ORI
+	);
+
 	type PipelinePhaseMAWBInterface_t is
 		record
 			sourceImm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
@@ -282,6 +305,15 @@ package MIPSCPU is
 			targetRegAddr : std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
 			instructionOpcode : InstructionOpcode_t;
 		end record;
+	
+	constant PIPELINE_PHASE_MA_WB_INTERFACE_CLEAR : PipelinePhaseMAWBInterface_t := (
+		sourceImm => (others => '0'),
+		targetIsRAM => FUNC_DISABLED,
+		targetIsReg => FUNC_ENABLED,
+		targetRAMAddr => (others => '0'),
+		targetRegAddr => (others => '0'),
+		instructionOpcode => MIPS_CPU_INSTRUCTION_OPCODE_ORI
+	);
 	
 	type CPUDebugData_t is
 	record

@@ -13,7 +13,8 @@ entity PipelinePhaseInstructionDecode is
 		pcControl : out RegisterControl_t;
 		phaseExCtrlOutput : out PipelinePhaseIDEXInterface_t;
 		phaseIFExceptionTrigger : in CP0ExceptionTrigger_t;
-		phaseEXExceptionTrigger : out CP0ExceptionTrigger_t
+		phaseEXExceptionTrigger : out CP0ExceptionTrigger_t;
+		cp0ExceptionPipelineClear : in EnablingControl_t
 	);
 end PipelinePhaseInstructionDecode;
 
@@ -146,7 +147,11 @@ begin
 			phaseExCtrlOutput.targetReg <= (others => '0');
 			phaseExCtrlOutput.resultIsRAMAddr <= FUNC_DISABLED;
 		elsif rising_edge(clock) then
-			phaseExCtrlOutput <= phaseExCtrl;
+			if cp0ExceptionPipelineClear = FUNC_ENABLED then
+				phaseExCtrlOutput <= PIPELINE_PHASE_ID_EX_INTERFACE_CLEAR;
+			else
+				phaseExCtrlOutput <= phaseExCtrl;
+			end if;
 		end if;
 	end process;
 end architecture;
