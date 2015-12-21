@@ -46,13 +46,25 @@ begin
 	
 	generate_single_register: for i in 0 to MIPS_CPU_REGISTER_COUNT - 1 generate
 	begin
-		register_e: component SingleRegister
-			port map (
-        		reset => reset,
-        		clock => clock,
-        		input => usedControl(i).data,
-        		operation => usedControl(i).operation,
-        		output => output(i)
-        	);
+		countRegister_g : if i = MIPS_CP0_REGISTER_INDEX_COUNT generate
+			countRegister_i : entity work.CountRegister
+				port map (
+					reset => reset,
+					clock => clock,
+					input => usedControl(i).data,
+					operation => usedControl(i).operation,
+					output => output(i)
+				);
+		end generate;
+		otherRegister_g : if i /= MIPS_CP0_REGISTER_INDEX_COUNT generate
+			register_i : entity work.SingleRegister
+				port map (
+					reset => reset,
+					clock => clock,
+					input => usedControl(i).data,
+					operation => usedControl(i).operation,
+					output => output(i)
+				);
+		end generate;
 	end generate;
 end architecture;
