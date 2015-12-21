@@ -9,7 +9,6 @@ entity UARTController is
 	(
 		reset : in Reset_t;
 		clock : in Clock_t;
-		clock11M : in Clock_t;
 		control : in HardwareRegisterControl_t;
 		output : out CPUData_t;
 		interruptTrigger : out CP0HardwareInterruptTrigger_t;

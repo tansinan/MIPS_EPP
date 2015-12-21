@@ -104,7 +104,6 @@ begin
 	(
 		reset => reset,
 		clock => clockDivided,
-		clock11M => clock11M,
 		control => uart1Control,
 		output => uart1Output,
 		uartTransmit => uart1Transmit,
