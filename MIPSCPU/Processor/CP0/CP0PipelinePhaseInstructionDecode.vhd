@@ -17,7 +17,8 @@ entity CP0PipelinePhaseInstructionDecode is
 		cp0TLBData : in CP0TLBData_t;
 		cp0TLBControl: out CP0TLBControl_t;
 		pcControl : out RegisterControl_t;
-		exceptionTriggerOut : out CP0ExceptionTrigger_t
+		exceptionTriggerOut : out CP0ExceptionTrigger_t;
+		compareRegisterModified : out EnablingControl_t
 	);
 end entity;
 
@@ -50,6 +51,10 @@ begin
 		statusTemp := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_STATUS);
 		
 		-- Let nothing to be done on default state
+		
+		-- No timer interrupt reset (compare register modified)
+		compareRegisterModified <= FUNC_DISABLED;
+		
 		-- Disable primary register file control
 		primaryRegisterFileControl <= (
 			address => (others => '0'),
@@ -99,6 +104,9 @@ begin
 			primaryRegisterFileControl.data <= (others => '0');
 			cp0TLBControl.writeEnabled <= FUNC_DISABLED;
 			pcControl.operation <= REGISTER_OPERATION_READ;
+			if moveAddressPrimaryInt = MIPS_CP0_REGISTER_INDEX_COMPARE then
+				compareRegisterModified <= FUNC_DISABLED;
+			end if;
 			
 		-- MFC0 instruction
 		elsif rs = MIPS_CP0_INSTRUCTION_RS_MF then

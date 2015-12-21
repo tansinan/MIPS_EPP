@@ -49,6 +49,8 @@ begin
 			end loop;
 			pcOverrideControl.operation <= REGISTER_OPERATION_READ;
 		elsif rising_edge(clock) then
+			
+			-- Let nothing to be done on the beginning of the process.
 			pcOverrideControl.operation <= REGISTER_OPERATION_READ;
 			pcOverrideControl.data <= (others => '0');
 			exceptionPipelineClear <= FUNC_DISABLED;
@@ -61,6 +63,9 @@ begin
 			newCP0CauseRegister := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_CAUSE);
 			newCP0StatusRegister := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_STATUS);
 			haveInterrupt := false;
+			
+			-- Since we don't really implement things like reset/NMI, exception will
+			-- have a higher priority over interrupts.
 			if exceptionTrigger.enabled = FUNC_ENABLED then
 				pcOverrideControl.operation <= REGISTER_OPERATION_WRITE;
 				pcOverrideControl.data <= MIPS_CP0_NONBOOT_EXCEPTION_HANDLER;
@@ -86,31 +91,34 @@ begin
 					operation => REGISTER_OPERATION_WRITE,
 					data => newCP0StatusRegister
 				);
+			-- If no exceptions happens, check interrupts.
 			else
-				-- TODO : This should be changed to consider interrupt priority!
-				for i in 0 to MIPS_CP0_INTERRUPT_SOURCE_COUNT - 1 loop
-					if interruptSource(i).enabled = FUNC_ENABLED
-					and haveInterrupt = false then
-						haveInterrupt := true;
-						exceptionPipelineClear <= FUNC_ENABLED;
-						newCP0StatusRegister(MIPS_CP0_STATUS_EXL) := '1';
-						newCP0StatusRegister(
-							MIPS_CP0_CAUSE_INTERRUPT_PENDING_HI downto MIPS_CP0_CAUSE_INTERRUPT_PENDING_LO)
-						:= interruptSource(i).interruptCodeMask;
-						cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_EPC) <= (
-							operation => REGISTER_OPERATION_WRITE,
-							data => pcValue
-						);
-						cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_CAUSE) <= (
-							operation => REGISTER_OPERATION_WRITE,
-							data => newCP0CauseRegister
-						);
-						cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_STATUS) <= (
-							operation => REGISTER_OPERATION_WRITE,
-							data => newCP0StatusRegister
-						);
-					end if;
-				end loop;
+				-- If global interrupt is enabled, interrupts will be checked.
+				if cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_STATUS)(MIPS_CP0_STATUS_IE) = '1' then
+					for i in 0 to MIPS_CP0_INTERRUPT_SOURCE_COUNT - 1 loop
+						if interruptSource(i).enabled = FUNC_ENABLED
+						and haveInterrupt = false then
+							haveInterrupt := true;
+							exceptionPipelineClear <= FUNC_ENABLED;
+							newCP0StatusRegister(MIPS_CP0_STATUS_EXL) := '1';
+							newCP0StatusRegister(
+								MIPS_CP0_CAUSE_INTERRUPT_PENDING_HI downto MIPS_CP0_CAUSE_INTERRUPT_PENDING_LO)
+							:= interruptSource(i).interruptCodeMask;
+							cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_EPC) <= (
+								operation => REGISTER_OPERATION_WRITE,
+								data => pcValue
+							);
+							cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_CAUSE) <= (
+								operation => REGISTER_OPERATION_WRITE,
+								data => newCP0CauseRegister
+							);
+							cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_STATUS) <= (
+								operation => REGISTER_OPERATION_WRITE,
+								data => newCP0StatusRegister
+							);
+						end if;
+					end loop;
+				end if;
 			end if;
 		end if;
 	end process;

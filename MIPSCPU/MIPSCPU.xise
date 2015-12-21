@@ -100,8 +100,8 @@
       <association xil_pn:name="Implementation" xil_pn:seqID="13"/>
     </file>
     <file xil_pn:name="Processor/CP0/MIPSCP0.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="3" xil_pn:seqIDinc="23"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="2" xil_pn:seqIDinc="23"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="3" xil_pn:seqIDinc="22"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="2" xil_pn:seqIDinc="22"/>
     </file>
     <file xil_pn:name="Testbench/ALU_testbench.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
@@ -128,10 +128,10 @@
       <association xil_pn:name="PostTranslateSimulation" xil_pn:seqID="27"/>
     </file>
     <file xil_pn:name="VirtualHardware/VirtualHardware.vhdl" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="2" xil_pn:seqIDinc="28"/>
-      <association xil_pn:name="PostMapSimulation" xil_pn:seqID="1" xil_pn:seqIDinc="28"/>
-      <association xil_pn:name="PostRouteSimulation" xil_pn:seqID="89" xil_pn:seqIDinc="28"/>
-      <association xil_pn:name="PostTranslateSimulation" xil_pn:seqID="1" xil_pn:seqIDinc="28"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="2" xil_pn:seqIDinc="27"/>
+      <association xil_pn:name="PostMapSimulation" xil_pn:seqID="1" xil_pn:seqIDinc="27"/>
+      <association xil_pn:name="PostRouteSimulation" xil_pn:seqID="89" xil_pn:seqIDinc="27"/>
+      <association xil_pn:name="PostTranslateSimulation" xil_pn:seqID="1" xil_pn:seqIDinc="27"/>
     </file>
     <file xil_pn:name="VirtualHardware/VirtualRAM.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="34"/>
@@ -147,8 +147,8 @@
       <association xil_pn:name="Implementation" xil_pn:seqID="35"/>
     </file>
     <file xil_pn:name="HardwareController/HardwareController.vhd" xil_pn:type="FILE_VHDL">
-      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="1" xil_pn:seqIDinc="32"/>
-      <association xil_pn:name="Implementation" xil_pn:seqID="1" xil_pn:seqIDinc="32"/>
+      <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="1" xil_pn:seqIDinc="31"/>
+      <association xil_pn:name="Implementation" xil_pn:seqID="1" xil_pn:seqIDinc="31"/>
     </file>
     <file xil_pn:name="HardwareDemo/RAMDemo.vhd" xil_pn:type="FILE_VHDL">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="0"/>
