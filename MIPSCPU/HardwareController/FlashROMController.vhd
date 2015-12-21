@@ -9,11 +9,7 @@ entity FlashRomController is
 		clock: in Clock_t;
 		reset: in Reset_t;
 		control : in HardwareRegisterControl_t;
-		writeEnable : in std_logic;
-		readEnable : in std_logic;
-		eraseEnable : in std_logic;
 		output : out CPUData_t;
-		readyStatus : out ReadyStatus_t;
 		-- Connect with Flash ROM
 		flashByte : out std_logic;
 		flashVPEN : out std_logic;
@@ -29,6 +25,7 @@ architecture Behavioral of FlashRomController is
 	signal dataDisplay : std_logic_vector(15 downto 0);
 	signal dataControl : std_logic_vector(15 downto 0);
 	signal address : std_logic_vector(22 downto 0);
+	signal readyStatus : ReadyStatus_t;
 	-- Not for connection
 	signal stateDbg : std_logic_vector(3 downto 0);
 begin
@@ -54,7 +51,10 @@ begin
 		stateDbg => stateDbg
 	);
 	
-	output <= "0000000000000000" & dataDisplay;
+	readEnable <= control.data(31);
+	writeEnable <= control.data(30);
+	eraseEnable <= control.data(29);
+	output <= readyStatus & "000000000000000" & dataDisplay;
 	dataControl <= control.data(15 downto 0);
 	address <= control.address(22 downto 0);
 	
