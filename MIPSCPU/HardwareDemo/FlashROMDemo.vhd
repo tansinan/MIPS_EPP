@@ -36,8 +36,6 @@ architecture Behavioral of FlashROMDemo is
 		signal stateDbg : std_logic_vector(3 downto 0);
 		signal olb : std_logic_vector(15 downto 0);
 begin
-	flashCE1 <= '0';
-	flashCE2 <= '0';
 	outputLight <= olb;
 	--outputLight(15 downto 3) <= (others => '1');
 	--outputLight(2 downto 0) <= state;
@@ -57,6 +55,8 @@ begin
 		flashByte => flashByte,
 		flashVPEN => flashVPEN,
 		flashCE => flashCE,
+		flashCE1 => flashCE1,
+		flashCE2 => flashCE2,
 		flashOE => flashOE,
 		flashWE => flashWE,
 		flashRP => flashRP,

@@ -238,6 +238,9 @@
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="260"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="16"/>
     </file>
+    <file xil_pn:name="PinPlanning/FlashROMDemo.ucf" xil_pn:type="FILE_UCF">
+      <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
+    </file>
     <file xil_pn:name="ipcore_dir/IPCoreDivider.xise" xil_pn:type="FILE_COREGENISE">
       <association xil_pn:name="Implementation" xil_pn:seqID="0"/>
     </file>
@@ -583,6 +586,7 @@
     <binding xil_pn:location="/RAMDemo" xil_pn:name="PinPlanning/RAMDemo.ucf"/>
     <binding xil_pn:location="/UARTSendDemo" xil_pn:name="PinPlanning/UARTSendDemo.ucf"/>
     <binding xil_pn:location="/ProcessorTop" xil_pn:name="PinPlanning/ProcessorTop.ucf"/>
+    <binding xil_pn:location="/FlashROMDemo" xil_pn:name="PinPlanning/FlashROMDemo.ucf"/>
   </bindings>
 
   <libraries/>

@@ -8,7 +8,6 @@ entity ProcessorTop is
 	port
 	(
 		clock50M : in Clock_t;
-		clock11M : in Clock_t;
 		reset : in Reset_t;
 		
 		-- Primary physics RAM hardware interface.
@@ -24,7 +23,11 @@ entity ProcessorTop is
 		-- FlashROM hardware interface.
 		flashByte : out std_logic;
 		flashVPEN : out std_logic;
-		flashCE, flashOE, flashWE : out std_logic;
+		flashCE : out std_logic;
+		flashCE1 : out std_logic;
+		flashCE2 : out std_logic;
+		flashOE : out std_logic;
+		flashWE : out std_logic;
 		flashRP : out std_logic;
 		flashAddress : out std_logic_vector(22 downto 0);
 		flashData : inout std_logic_vector(15 downto 0);
@@ -120,6 +123,8 @@ begin
 		flashByte => flashByte,
 		flashVPEN => flashVPEN,
 		flashCE => flashCE,
+		flashCE1 => flashCE1,
+		flashCE2 => flashCE2,
 		flashOE => flashOE,
 		flashWE => flashWE,
 		flashRP => flashRP,

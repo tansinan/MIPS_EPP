@@ -13,6 +13,8 @@ entity FlashRomController is
 		-- Connect with Flash ROM
 		flashByte : out std_logic;
 		flashVPEN : out std_logic;
+		flashCE1 : out std_logic;
+		flashCE2 : out std_logic;
 		flashCE, flashOE, flashWE : out std_logic;
 		flashRP : out std_logic;
 		flashAddress : out std_logic_vector(22 downto 0);
@@ -45,6 +47,8 @@ begin
 		flashByte => flashByte,
 		flashVPEN => flashVPEN,
 		flashCE => flashCE,
+		flashCE1 => flashCE1,
+		flashCE2 => flashCE2,
 		flashOE => flashOE,
 		flashWE => flashWE,
 		flashRP => flashRP,
@@ -54,13 +58,6 @@ begin
 		reset => reset,
 		stateDbg => stateDbg
 	);
-	
-	readEnable <= control.data(31);
-	writeEnable <= control.data(30);
-	eraseEnable <= control.data(29);
-	output <= readyStatus & "000000000000000" & dataDisplay;
-	dataControl <= control.data(15 downto 0);
-	address <= control.address(22 downto 0);
 	
 	process (reset, clock)
 	begin
@@ -76,6 +73,9 @@ begin
 				readEnable <= control.data(31);
 				writeEnable <= control.data(30);
 				eraseEnable <= control.data(29);
+				output <= readyStatus & "000000000000000" & dataDisplay;
+				dataControl <= control.data(15 downto 0);
+				address <= control.address(22 downto 0);
 			else
 				readEnable <= '1';
 				writeEnable <= '1';
