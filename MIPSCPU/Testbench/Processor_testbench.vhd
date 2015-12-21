@@ -47,7 +47,6 @@ begin
 	port map
 	(
 		clock50M => clock50M,
-		clock11M => '1',
 		reset => reset,
 		primaryPhysicsRAMControl => primaryPhysicsRAMControl,
 		primaryPhysicsRAMAddressBus => primaryPhysicsRAMAddressBus,

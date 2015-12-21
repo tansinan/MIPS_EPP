@@ -105,7 +105,7 @@ begin
 			cp0TLBControl.writeEnabled <= FUNC_DISABLED;
 			pcControl.operation <= REGISTER_OPERATION_READ;
 			if moveAddressPrimaryInt = MIPS_CP0_REGISTER_INDEX_COMPARE then
-				compareRegisterModified <= FUNC_DISABLED;
+				compareRegisterModified <= FUNC_ENABLED;
 			end if;
 			
 		-- MFC0 instruction

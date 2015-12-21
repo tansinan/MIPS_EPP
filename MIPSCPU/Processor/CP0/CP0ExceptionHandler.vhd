@@ -50,6 +50,7 @@ begin
 				);
 			end loop;
 			pcOverrideControl.operation <= REGISTER_OPERATION_READ;
+			exceptionPipelineClear <= FUNC_DISABLED;
 		elsif rising_edge(clock) then
 			
 			-- Let nothing to be done on the beginning of the process.
