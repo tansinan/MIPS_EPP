@@ -11,3 +11,4 @@ We generate them by using Xilinx's IP Core generator.
 ## Team members
 * Tan Si Nan
 * Liao Yi Yang
+* Liang Ze Yu
