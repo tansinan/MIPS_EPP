@@ -79,13 +79,12 @@ begin
 					data => pcValue - 4
 				);
 				exceptionCode <= exceptionTrigger.exceptionCode;
-				if exceptionCode == MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_MODIFICATION
-					or exceptionCode == MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_LOAD
-					or exceptionCode == MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_STORE:
-					newCP0EntryHiRegister(MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_HI downto MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_LO)
-						:=
-					exceptionTrigger.badVirtualAddress(MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_HI downto MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_LO)
-				
+				if exceptionCode = MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_MODIFICATION
+				or exceptionCode = MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_LOAD
+				or exceptionCode = MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_STORE then
+					newCP0EntryHiRegister(MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_HI downto MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_LO) :=
+					exceptionTrigger.badVirtualAddress(MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_HI downto MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_LO);
+				end if;
 				newCP0CauseRegister(MIPS_CP0_CAUSE_EXCEPTION_CODE_HI downto MIPS_CP0_CAUSE_EXCEPTION_CODE_LO)
 					:= exceptionCode;
 				-- TODO : currently we don't implement any reset/cache/NMI, so it is always EXL to
