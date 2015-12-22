@@ -19,6 +19,8 @@ entity HardwareAddressMapper is
 		secondaryRAMResult : in PhysicsRAMData_t;
 		uart1Control : out HardwareRegisterControl_t;
 		uart1Result : in CPUData_t;
+		flashROMControl : out HardwareRegisterControl_t;
+		flashROMData : in CPUData_t;
 		cp0VirtualAddress : out RAMAddress_t;
 		cp0PhysicsAddress : in RAMAddress_t;
 		cp0ExceptionTrigger : in CP0ExceptionTrigger_t;
@@ -30,6 +32,7 @@ entity HardwareAddressMapper is
 		KERNEL_SPACE_ADDRESS,
 		ISA_ADDRESS,
 		BOOTLOADER_ADDRESS,
+		FLASHROM_ADDRESS,
 		UNKNOWN
 	);
 end entity;
@@ -97,6 +100,8 @@ begin
 			addressType <= USER_SPACE_ADDRESS;
 		elsif (physicsAddress and BOOTLOADER_ADDRESS_SPACE_MASK) = BOOTLOADER_ADDRESS_SPACE then
 			addressType <= BOOTLOADER_ADDRESS;
+		elsif (physicsAddress and FLASHROM_ADDRESS_SPACE_MASK) = FLASHROM_ADDRESS_SPACE then
+			addressType <= FLASHROM_ADDRESS;
 		else
 			addressType <= UNKNOWN;
 		end if;
@@ -119,6 +124,11 @@ begin
 			data => (others => '0')
 		);
 		uart1Control <= (
+			operation => REGISTER_OPERATION_READ,
+			address => (others => '0'),
+			data => (others => '0')
+		);
+		flashROMControl <= (
 			operation => REGISTER_OPERATION_READ,
 			address => (others => '0'),
 			data => (others => '0')
@@ -152,6 +162,20 @@ begin
 					uart1Control.address <= cp0PhysicsAddress;
 				end if;
 				uart1Control.data <= usedRAMControl.data;
+			when FLASHROM_ADDRESS =>
+				if usedRAMControl.readEnabled = FUNC_ENABLED then
+					flashROMControl.operation <= REGISTER_OPERATION_READ;
+				elsif usedRAMControl.writeEnabled = FUNC_ENABLED then
+					flashROMControl.operation <= REGISTER_OPERATION_WRITE;
+				end if;
+				
+				if usedRAMControl.readOnStore = FUNC_ENABLED and
+				usedRAMControl.readEnabled = FUNC_ENABLED then
+					flashROMControl.address <= (others => '0');
+				else
+					flashROMControl.address <= cp0PhysicsAddress;
+				end if;
+				flashROMControl.data <= usedRAMControl.data;
 			when others =>
 		end case;
 	end process;
@@ -184,6 +208,8 @@ begin
 				result <= primaryRAMResult;
 			when ISA_ADDRESS =>
 				result <= uart1Result;
+			when FLASHROM_ADDRESS =>
+				result <= flashROMData;
 			when BOOTLOADER_ADDRESS =>
 				result <= savedROMData;
 			when others =>

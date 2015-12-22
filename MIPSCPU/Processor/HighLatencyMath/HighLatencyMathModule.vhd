@@ -22,7 +22,9 @@ architecture Behavioral of HighLatencyMathModule is
 	signal ipCoreWrapperNumber2Signed : EnablingControl_t;
 	signal ipCoreWrapperResultReady : ReadyStatus_t;
 	signal ipCoreWrapperOutput : CPUDoubleWordData_t;
-	
+	signal ipCoreWrapperIsMultiplication : EnablingControl_t;
+	signal ipCoreWrapperIsDivision : EnablingControl_t;
+
 	signal hiRegisterData : CPUData_t;
 	signal hiRegisterControl : RegisterControl_t;
 	signal loRegisterData : CPUData_t;
@@ -39,7 +41,9 @@ begin
 		number2 => ipCoreWrapperNumber2,
 		number2Signed => ipCoreWrapperNumber2Signed,
 		resultReady => ipCoreWrapperResultReady,
-		output => ipCoreWrapperOutput
+		output => ipCoreWrapperOutput,
+		isMultiplication => ipCoreWrapperIsMultiplication,
+		isDivision => ipCoreWrapperIsDivision
 	);
 	
 	hiRegister_i : entity work.SingleRegister

@@ -95,6 +95,8 @@ begin
 		secondaryRAMResult => secondaryRAMResult,
 		uart1control => uart1Control,
 		uart1result => uart1Output,
+		flashROMControl => flashROMControl,
+		flashROMData => flashROMOutput,
 		cp0ExternalInterruptSource => cp0ExternalInterruptSource,
 		light => light
 	);

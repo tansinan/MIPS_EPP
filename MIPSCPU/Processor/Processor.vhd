@@ -19,6 +19,8 @@ entity Processor is
 		uart1Control : out HardwareRegisterControl_t;
 		light : out std_logic_vector(15 downto 0);
 		uart1Result : in CPUData_t;
+		flashROMControl : out HardwareRegisterControl_t;
+		flashROMData : in CPUData_t;
 		cp0ExternalInterruptSource : in CP0ExternalInterruptSource_t
 	);
 end entity;
@@ -185,6 +187,8 @@ begin
 		secondaryRAMResult => secondaryRAMResult,
 		uart1Control => uart1Control,
 		uart1Result => uart1Result,
+		flashROMControl => flashROMControl,
+		flashROMData => flashROMData,
 		cp0VirtualAddress => cp0VirtualAddress,
 		cp0PhysicsAddress => cp0PhysicsAddress,
 		cp0ExceptionTrigger => cp0MemoryAccessExceptionTrigger,
@@ -254,8 +258,8 @@ begin
 				pcControl2.operation <= REGISTER_OPERATION_READ;
 			else
 				pcControl2.operation <= REGISTER_OPERATION_WRITE;
-				--pcControl2.data <= x"bfc00000"; -- for FPGA Boot loader
-				pcControl2.data <= x"80000000"; -- for testbench
+				pcControl2.data <= x"bfc00000"; -- for FPGA Boot loader
+				--pcControl2.data <= x"80000000"; -- for testbench
 			end if;
 			ramControl3.address <= (others => '0');
 			ramControl3.writeEnabled <= FUNC_DISABLED;
@@ -286,7 +290,9 @@ begin
 			funct = MIPS_CPU_INSTRUCTION_FUNCT_MTHI or
 			funct = MIPS_CPU_INSTRUCTION_FUNCT_MTLO or
 			funct = MIPS_CPU_INSTRUCTION_FUNCT_MULT or
-			funct = MIPS_CPU_INSTRUCTION_FUNCT_MULTU) then
+			funct = MIPS_CPU_INSTRUCTION_FUNCT_MULTU or
+			funct = MIPS_CPU_INSTRUCTION_FUNCT_DIV or
+			funct = MIPS_CPU_INSTRUCTION_FUNCT_DIVU) then
 				instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
 				instructionExecutionEnabledCP0 <= FUNC_DISABLED;
 				instructionToHighLatencyMath <= instruction;

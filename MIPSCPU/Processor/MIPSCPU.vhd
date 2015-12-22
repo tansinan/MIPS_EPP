@@ -47,6 +47,8 @@ package MIPSCPU is
 	constant USER_ADDRESS_SPACE_MASK : CPUData_t := x"FFC00000";
 	constant BOOTLOADER_ADDRESS_SPACE : CPUData_t := x"BFC00000";
 	constant BOOTLOADER_ADDRESS_SPACE_MASK : CPUData_t := x"FFFF0000";
+	constant FLASHROM_ADDRESS_SPACE : CPUData_t := x"BE000000";
+	constant FLASHROM_ADDRESS_SPACE_MASK : CPUData_t := x"FF000000";
 
 	-- The address width of the registers in primary processor
 	constant MIPS_CPU_REGISTER_ADDRESS_WIDTH: integer := 5;
@@ -168,6 +170,8 @@ package MIPSCPU is
 	constant MIPS_CPU_INSTRUCTION_FUNCT_MTLO : InstructionFunct_t := "010011";
 	constant MIPS_CPU_INSTRUCTION_FUNCT_MULT : InstructionFunct_t := "011000";
 	constant MIPS_CPU_INSTRUCTION_FUNCT_MULTU : InstructionFunct_t := "011001";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_DIV : InstructionFunct_t := "011010";
+	constant MIPS_CPU_INSTRUCTION_FUNCT_DIVU : InstructionFunct_t := "011011";
 	
 	-- MIPS CPU funct for the special2 opcode
 	constant MIPS_CPU_INSTRUCTION_FUNCT_MUL : InstructionFunct_t := "000010";
