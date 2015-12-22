@@ -98,6 +98,10 @@ begin
 					operation => REGISTER_OPERATION_WRITE,
 					data => newCP0StatusRegister
 				);
+				cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_HIGH) <= (
+					operation => REGISTER_OPERATION_WRITE,
+					data => newCP0EntryHiRegister
+				);
 			-- If no exceptions happens, check interrupts.
 			else
 				-- If global interrupt is enabled, interrupts will be checked.
