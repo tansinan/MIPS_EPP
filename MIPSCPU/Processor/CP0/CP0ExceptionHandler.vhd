@@ -13,6 +13,7 @@ entity CP0ExceptionHandler is
 		internalInterruptSource : in CP0InternalInterruptSource_t;
 		externalInterruptSource : in CP0ExternalInterruptSource_t;
 		pcValue : in CPUData_t;
+		exceptionPCValue : in CPUData_t;
 		pcOverrideControl : out RegisterControl_t;
 		exceptionPipelineClear : out EnablingControl_t;
 		cp0RegisterFileData : in CP0RegisterFileOutput_t;
@@ -88,7 +89,7 @@ begin
 				newCP0StatusRegister(MIPS_CP0_STATUS_EXL) := '1';
 				cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_EPC) <= (
 					operation => REGISTER_OPERATION_WRITE,
-					data => pcValue - 4
+					data => exceptionPCValue
 				);
 				cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_CAUSE) <= (
 					operation => REGISTER_OPERATION_WRITE,
@@ -115,12 +116,12 @@ begin
 							haveInterrupt := true;
 							exceptionPipelineClear <= FUNC_ENABLED;
 							newCP0StatusRegister(MIPS_CP0_STATUS_EXL) := '1';
-							newCP0StatusRegister(
+							newCP0CauseRegister(
 								MIPS_CP0_CAUSE_INTERRUPT_PENDING_HI downto MIPS_CP0_CAUSE_INTERRUPT_PENDING_LO)
 							:= interruptSource(i).interruptCodeMask;
 							cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_EPC) <= (
 								operation => REGISTER_OPERATION_WRITE,
-								data => pcValue
+								data => exceptionPCValue
 							);
 							cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_CAUSE) <= (
 								operation => REGISTER_OPERATION_WRITE,
@@ -130,10 +131,8 @@ begin
 								operation => REGISTER_OPERATION_WRITE,
 								data => newCP0StatusRegister
 							);
-							cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_HIGH) <= (
-								operation => REGISTER_OPERATION_WRITE,
-								data => newCP0EntryHiRegister
-							);
+							pcOverrideControl.operation <= REGISTER_OPERATION_WRITE;
+							pcOverrideControl.data <= MIPS_CP0_NONBOOT_EXCEPTION_HANDLER;
 						end if;
 					end loop;
 				end if;

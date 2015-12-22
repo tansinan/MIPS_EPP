@@ -59,6 +59,7 @@ architecture Behavioral of Processor is
 	signal pcControl2 : RegisterControl_t;
 	signal pcControl3 : RegisterControl_t;
 	signal pcValue : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+	signal exceptionPCBackup : CPUData_t;
 	
 	signal cp0ExceptionPCControl : RegisterControl_t;
 	signal cp0PipelinePCControl : RegisterControl_t;
@@ -157,6 +158,7 @@ begin
 		primaryRegisterFileData => register_file_output,
 		primaryRegisterFileControl => cp0PipelineRegisterFileControl,
 		pcValue => pcValue,
+		exceptionPCValue => exceptionPCBackup,
 		pcControlException => cp0ExceptionPCControl,
 		pcControlPipeline => cp0PipelinePCControl,
 		exceptionTrigger => cp0ExceptionTrigger,
@@ -216,6 +218,7 @@ begin
 				elsif current_pipeline_phase = "0000" then
 					current_pipeline_phase <= current_pipeline_phase + 1;
 				elsif current_pipeline_phase = "0100" then
+					exceptionPCBackup <= pcValue;
 					current_pipeline_phase <= "0000";
 				else
 					current_pipeline_phase <= current_pipeline_phase + 1;
@@ -251,8 +254,8 @@ begin
 				pcControl2.operation <= REGISTER_OPERATION_READ;
 			else
 				pcControl2.operation <= REGISTER_OPERATION_WRITE;
-				pcControl2.data <= x"bfc00000"; -- for FPGA Boot loader
-				--pcControl2.data <= x"80000000"; -- for testbench
+				--pcControl2.data <= x"bfc00000"; -- for FPGA Boot loader
+				pcControl2.data <= x"80000000"; -- for testbench
 			end if;
 			ramControl3.address <= (others => '0');
 			ramControl3.writeEnabled <= FUNC_DISABLED;

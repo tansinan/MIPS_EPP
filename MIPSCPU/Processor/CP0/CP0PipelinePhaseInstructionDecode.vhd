@@ -104,7 +104,7 @@ begin
 			primaryRegisterFileControl.data <= (others => '0');
 			cp0TLBControl.writeEnabled <= FUNC_DISABLED;
 			pcControl.operation <= REGISTER_OPERATION_READ;
-			if moveAddressPrimaryInt = MIPS_CP0_REGISTER_INDEX_COMPARE then
+			if moveAddressCP0Int = MIPS_CP0_REGISTER_INDEX_COMPARE then
 				compareRegisterModified <= FUNC_ENABLED;
 			end if;
 			

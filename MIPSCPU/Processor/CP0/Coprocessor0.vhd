@@ -12,6 +12,7 @@ entity Coprocessor0_e is
 		primaryRegisterFileData : in mips_register_file_port;
 		primaryRegisterFileControl : out RegisterFileControl_t;
 		pcValue : in CPUData_t;
+		exceptionPCValue : in CPUData_t;
 		pcControlException : out RegisterControl_t;
 		pcControlPipeline : out RegisterControl_t;
 		exceptionTrigger : in CP0ExceptionTrigger_t;
@@ -78,6 +79,7 @@ begin
 		externalInterruptSource => externalInterruptSource,
 		internalInterruptSource => internalInterruptSource,
 		pcValue => pcValue,
+		exceptionPCValue => exceptionPCValue,
 		pcOverrideControl => pcControlException,
 		exceptionPipelineClear => exceptionPipelineClear,
 		cp0RegisterFileData => cp0RegisterFileData,
