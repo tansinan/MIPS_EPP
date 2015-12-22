@@ -233,12 +233,14 @@ begin
 		);
 		ramControl3.readOnStore <= FUNC_DISABLED;
 		if  current_pipeline_phase = "0100" then
-			pcControl2.operation <= REGISTER_OPERATION_WRITE;
-			pcControl2.data <= pcValue + 4;
-			ramControl3.address <= pcValue;
-			ramControl3.writeEnabled <= FUNC_DISABLED;
-			ramControl3.readEnabled <= FUNC_ENABLED;
-			ramControl3.data <= (others => '0');
+			if cp0exceptionPipelineClear /= FUNC_ENABLED then
+				pcControl2.operation <= REGISTER_OPERATION_WRITE;
+				pcControl2.data <= pcValue + 4;
+				ramControl3.address <= pcValue;
+				ramControl3.writeEnabled <= FUNC_DISABLED;
+				ramControl3.readEnabled <= FUNC_ENABLED;
+				ramControl3.data <= (others => '0');
+			end if;
 			if memoryAccessExceptionTrigger.enabled = FUNC_ENABLED then
 				pipelinePhaseIFIDException <= memoryAccessExceptionTrigger;
 				pipelinePhaseIFIDException.exceptionCode <=

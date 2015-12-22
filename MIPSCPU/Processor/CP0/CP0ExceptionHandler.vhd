@@ -74,10 +74,6 @@ begin
 				pcOverrideControl.operation <= REGISTER_OPERATION_WRITE;
 				pcOverrideControl.data <= MIPS_CP0_NONBOOT_EXCEPTION_HANDLER;
 				exceptionPipelineClear <= FUNC_ENABLED;
-				cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_EPC) <= (
-					operation => REGISTER_OPERATION_WRITE,
-					data => pcValue - 4
-				);
 				exceptionCode <= exceptionTrigger.exceptionCode;
 				if exceptionCode = MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_MODIFICATION
 				or exceptionCode = MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_LOAD
@@ -92,7 +88,7 @@ begin
 				newCP0StatusRegister(MIPS_CP0_STATUS_EXL) := '1';
 				cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_EPC) <= (
 					operation => REGISTER_OPERATION_WRITE,
-					data => pcValue
+					data => pcValue - 4
 				);
 				cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_CAUSE) <= (
 					operation => REGISTER_OPERATION_WRITE,
@@ -105,7 +101,10 @@ begin
 			-- If no exceptions happens, check interrupts.
 			else
 				-- If global interrupt is enabled, interrupts will be checked.
-				if cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_STATUS)(MIPS_CP0_STATUS_IE) = '1' then
+				if cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_STATUS)(MIPS_CP0_STATUS_IE) = '1'
+				and cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_STATUS)(MIPS_CP0_STATUS_ERL) = '0'
+				and cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_STATUS)(MIPS_CP0_STATUS_EXL) = '0'
+				then
 					for i in 0 to MIPS_CP0_INTERRUPT_SOURCE_COUNT - 1 loop
 						if interruptSource(i).enabled = FUNC_ENABLED
 						and haveInterrupt = false then
