@@ -206,6 +206,24 @@ begin
 					else
 						result.pcControl.operation <= REGISTER_OPERATION_READ;
 					end if;
+				elsif rt = MIPS_CPU_INSTRUCTION_RT_BGEZAL then
+					if rsRegisterData(MIPS_CPU_DATA_WIDTH - 1) = '0' then
+						result.pcControl.operation <= REGISTER_OPERATION_WRITE;
+					else
+						result.pcControl.operation <= REGISTER_OPERATION_READ;
+					end if;
+					result.regDest <= "11111";
+					result.imm <= pcValue + 4;
+					result.operation <= ALU_OPERATION_LOGIC_OR;
+				elsif rt = MIPS_CPU_INSTRUCTION_RT_BLTZAL then
+					if rsRegisterData(MIPS_CPU_DATA_WIDTH - 1) = '1' then
+						result.pcControl.operation <= REGISTER_OPERATION_WRITE;
+					else
+						result.pcControl.operation <= REGISTER_OPERATION_READ;
+					end if;
+					result.regDest <= "11111";
+					result.imm <= pcValue + 4;
+					result.operation <= ALU_OPERATION_LOGIC_OR;
 				end if;
 			when MIPS_CPU_INSTRUCTION_OPCODE_BGTZ => 
 				result.operation <= ALU_OPERATION_ADD;

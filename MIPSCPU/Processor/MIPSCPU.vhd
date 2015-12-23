@@ -145,6 +145,10 @@ package MIPSCPU is
 		std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0) := "00001";
 	constant MIPS_CPU_INSTRUCTION_RT_BLTZ :
 		std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0) := "00000";
+	constant MIPS_CPU_INSTRUCTION_RT_BGEZAL :
+		std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0) := "10001";
+	constant MIPS_CPU_INSTRUCTION_RT_BLTZAL :
+		std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0) := "10000";
 
 	-- MIPS CPU funct for the special opcode
 	constant MIPS_CPU_INSTRUCTION_FUNCT_ADDU : InstructionFunct_t := "100001";
