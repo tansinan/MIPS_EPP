@@ -37,7 +37,7 @@ begin
 	UART_i : entity work.UART
 	generic map (
 			baud => 115200,
-			clock_frequency => 25000000
+			clock_frequency => 24998400
 		)
 	port map (
 		clock => clock,

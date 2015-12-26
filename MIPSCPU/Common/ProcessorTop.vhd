@@ -42,6 +42,7 @@ entity ProcessorTop is
 end entity;
 
 architecture Behavioral of ProcessorTop is
+	signal clockFast : Clock_t;
 	signal clockDivided : Clock_t;
 	signal primaryRAMControl : HardwareRAMControl_t;
 	signal secondaryRAMControl : HardwareRAMControl_t;
@@ -54,9 +55,16 @@ architecture Behavioral of ProcessorTop is
 	signal debugData : CPUDebugData_t;
 	signal cp0ExternalInterruptSource : CP0ExternalInterruptSource_t;
 begin
+	ipCoreClock_i : entity work.IPCoreClock
+	port map
+	(
+		clock50M => clock50M,
+		clock50M_out => clockFast,
+		clockDivided_out => clockDivided
+	);
 	primaryRAMController_i : entity work.RAMController_e
 	port map (
-		clock => clock50M,
+		clock => clockFast,
 		reset => reset,
 		control => primaryRAMControl,
 		result => primaryRAMResult,
@@ -67,7 +75,7 @@ begin
 
 	secondaryRAMController_i : entity work.RAMController_e
 	port map (
-		clock => clock50M,
+		clock => clockFast,
 		reset => reset,
 		control => secondaryRAMControl,
 		result => secondaryRAMResult,
@@ -75,19 +83,12 @@ begin
 		physicsAddressBus => secondaryPhysicsRAMAddressBus,
 		physicsDataBus => secondaryPhysicsRAMDataBus
 	);
-
-	clockDivider_i : entity work.ClockDivider_e
-	port map (
-		clockIn => clock50M,
-		reset => reset,
-		clockOut => clockDivided
-	);
 	
 	processor_i : entity work.Processor
 	port map (
 		reset => reset,
 		clock => clockDivided,
-		clock50M => clock50M,
+		clock50M => clockFast,
 		debugData => debugData,
 		primaryRAMControl => primaryRAMControl,
 		primaryRAMResult => primaryRAMResult,
