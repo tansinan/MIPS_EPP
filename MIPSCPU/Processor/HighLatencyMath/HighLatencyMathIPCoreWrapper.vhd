@@ -84,6 +84,11 @@ begin
 			output <= (others => '0');
 			state <= STATE_IDLE;
 		elsif rising_edge(clock) then
+			mulIpCoreNumber1 <= (others => '0');
+			mulIpCoreNumber2 <= (others => '0');
+			divIpCoreNumber1 <= (others => '0');
+			divIpCoreNumber2 <= (others => '0');
+			divIpCoreEnabled <= FUNC_DISABLED;
 			if state = STATE_IDLE then
 				if isMultiplication = FUNC_ENABLED then
 					if number1Signed = FUNC_ENABLED then

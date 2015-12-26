@@ -23,6 +23,7 @@ architecture Behavioral of PipelinePhaseMemoryAccess is
 begin
 	process(phaseEXInput, phaseEXExceptionTrigger)
 	begin
+		exceptionTrigger <= MIPS_CP0_EXCEPTION_TRIGGER_CLEAR;
 		if ramReadException.enabled = FUNC_ENABLED then
 			exceptionTrigger <= ramReadException;
 		elsif phaseEXExceptionTrigger.enabled = FUNC_ENABLED then

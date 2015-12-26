@@ -233,6 +233,11 @@ begin
 	
 	instructionFetchProcess : process (current_pipeline_phase, pcValue)
 	begin
+		pcControl2 <= (
+			operation => REGISTER_OPERATION_READ,
+			data => (1 => '1', others => '0')
+		);
+		pcControl2.data <= pcValue + 4;
 		ramControl3 <= (
 			address => (others => '0'),
 			data => (others => '0'),
@@ -279,17 +284,19 @@ begin
 		variable funct : InstructionFunct_t;
 		variable instruction : Instruction_t;
 	begin
+		instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
+		instructionToCP0 <= MIPS_CPU_INSTRUCTION_NOP;
+		instructionToHighLatencyMath <= MIPS_CPU_INSTRUCTION_NOP;
+		instructionExecutionEnabledCP0 <= FUNC_DISABLED;
+		instructionExecutionEnabledToHighLatencyMath <= FUNC_DISABLED;
 		if  current_pipeline_phase = "0000" then
 			instruction := memoryAccessResult;
 			opcode :=
 				instruction(MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
 			funct := instruction(MIPS_CPU_INSTRUCTION_FUNCT_HI downto MIPS_CPU_INSTRUCTION_FUNCT_LO);
 			if opcode = MIPS_CPU_INSTRUCTION_OPCODE_CP0 then
-				instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
 				instructionToCP0 <= instruction;
 				instructionExecutionEnabledCP0 <= FUNC_ENABLED;
-				instructionExecutionEnabledToHighLatencyMath <=
-					FUNC_DISABLED;
 			elsif opcode = MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL
 			and (funct = MIPS_CPU_INSTRUCTION_FUNCT_MFHI or
 			funct = MIPS_CPU_INSTRUCTION_FUNCT_MFLO or
@@ -299,21 +306,12 @@ begin
 			funct = MIPS_CPU_INSTRUCTION_FUNCT_MULTU or
 			funct = MIPS_CPU_INSTRUCTION_FUNCT_DIV or
 			funct = MIPS_CPU_INSTRUCTION_FUNCT_DIVU) then
-				instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
-				instructionExecutionEnabledCP0 <= FUNC_DISABLED;
 				instructionToHighLatencyMath <= instruction;
 				instructionExecutionEnabledToHighLatencyMath <=
 					FUNC_ENABLED;
 			else
 				instructionToPrimary <= instruction;
-				instructionToCP0 <= MIPS_CPU_INSTRUCTION_NOP;
-				instructionExecutionEnabledCP0 <= FUNC_DISABLED;
-				instructionExecutionEnabledToHighLatencyMath <=
-					FUNC_DISABLED;
 			end if;
-		else
-			instructionToPrimary <= MIPS_CPU_INSTRUCTION_NOP;
-			instructionExecutionEnabledCP0 <= FUNC_DISABLED;
 		end if;
 	end process;
 	

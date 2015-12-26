@@ -43,6 +43,7 @@ begin
 	);
 	process(rs, rt, rd, opcode, funct, shamt, pcValue, rsData)
 	begin
+		result <= INSTRUCTION_DECODING_RESULT_CLEAR;
 		case funct is
 			
 			-- Handles shift instructions using the shamt field as immediate
