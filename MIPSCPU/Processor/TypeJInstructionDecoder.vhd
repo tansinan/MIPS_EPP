@@ -20,6 +20,7 @@ begin
 		opcode <= instruction
 			(MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
 
+		result <= INSTRUCTION_DECODING_RESULT_CLEAR;
 		result.pcControl.operation <= REGISTER_OPERATION_WRITE;
 		result.pcControl.data(1 downto 0) <= (others => '0');
 		-- TODO: This implementation seems not compliant with MIPS standard!

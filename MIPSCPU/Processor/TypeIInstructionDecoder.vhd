@@ -43,6 +43,7 @@ begin
 		variable shift16Imm : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		variable rsRegisterData : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	begin
+		result <= INSTRUCTION_DECODING_RESULT_CLEAR;
 		zeroExtendedImm(MIPS_CPU_DATA_WIDTH - 1 downto MIPS_CPU_INSTRUCTION_IMM_HI + 1)
 			:= (others => '0');
 

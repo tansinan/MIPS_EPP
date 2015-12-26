@@ -80,6 +80,9 @@ begin
 				exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_SYSCALL,
 				badVirtualAddress => (others => '0')
 			);
+		elsif opcode = MIPS_CPU_INSTRUCTION_OPCODE_SLTI or
+		opcode = MIPS_CPU_INSTRUCTION_OPCODE_SLTIU then
+			decodingResult <= decodingResultTypeI;
 		else
 			case opcode is
 				when MIPS_CPU_INSTRUCTION_OPCODE_ADDIU |
@@ -99,8 +102,6 @@ begin
 				MIPS_CPU_INSTRUCTION_OPCODE_REGIMM |
 				MIPS_CPU_INSTRUCTION_OPCODE_BGTZ |
 				MIPS_CPU_INSTRUCTION_OPCODE_BLEZ |
-				MIPS_CPU_INSTRUCTION_OPCODE_SLTI |
-				MIPS_CPU_INSTRUCTION_OPCODE_SLTIU |
 				MIPS_CPU_INSTRUCTION_OPCODE_LUI =>
 					decodingResult <= decodingResultTypeI;
 				when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL =>
