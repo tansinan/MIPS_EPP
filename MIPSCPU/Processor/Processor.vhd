@@ -233,12 +233,18 @@ begin
 	
 	instructionFetchProcess : process (current_pipeline_phase, pcValue)
 	begin
+		ramControl3 <= (
+			address => (others => '0'),
+			data => (others => '0'),
+			writeEnabled => FUNC_DISABLED,
+			readEnabled => FUNC_DISABLED,
+			readOnStore => FUNC_DISABLED
+		);
 		pipelinePhaseIFIDException <= (
 			enabled => FUNC_DISABLED,
 			exceptionCode => (others => '0'),
 			badVirtualAddress => (others => '0')
 		);
-		ramControl3.readOnStore <= FUNC_DISABLED;
 		if  current_pipeline_phase = "0100" then
 			if cp0exceptionPipelineClear /= FUNC_ENABLED then
 				pcControl2.operation <= REGISTER_OPERATION_WRITE;

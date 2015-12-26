@@ -12,7 +12,7 @@ entity PipelinePhaseMemoryAccess is
 		exceptionTriggerOutput : out CP0ExceptionTrigger_t;
 		ramReadResult : in std_logic_vector(MIPS_RAM_DATA_WIDTH - 1 downto 0);
 		ramReadException : in CP0ExceptionTrigger_t;
-		phaseEXExceptionTrigger : out CP0ExceptionTrigger_t;
+		phaseEXExceptionTrigger : in CP0ExceptionTrigger_t;
 		cp0ExceptionPipelineClear : in EnablingControl_t
 	);
 end entity;
@@ -21,10 +21,12 @@ architecture Behavioral of PipelinePhaseMemoryAccess is
 	signal phaseWBCtrl : PipelinePhaseMAWBInterface_t;
 	signal exceptionTrigger : CP0ExceptionTrigger_t;
 begin
-	process(phaseEXInput)
+	process(phaseEXInput, phaseEXExceptionTrigger)
 	begin
 		if ramReadException.enabled = FUNC_ENABLED then
 			exceptionTrigger <= ramReadException;
+		elsif phaseEXExceptionTrigger.enabled = FUNC_ENABLED then
+			exceptionTrigger <= phaseEXExceptionTrigger;
 		else
 			case phaseEXInput.instructionOpcode is
 				when MIPS_CPU_INSTRUCTION_OPCODE_LW |

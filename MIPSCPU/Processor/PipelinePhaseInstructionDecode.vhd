@@ -28,6 +28,7 @@ architecture Behavioral of PipelinePhaseInstructionDecode is
 	signal opcode : InstructionOpcode_t;
 	signal funct : InstructionFunct_t;
 	signal phaseExCtrl : PipelinePhaseIDEXInterface_t;
+	signal phaseExExceptionTriggerCtrl : CP0ExceptionTrigger_t;
 begin
 	-- Extract opcode and funct from the instruction.
 	process(instruction)
@@ -70,12 +71,12 @@ begin
 	decodingResultTypeI, decodingResultTypeR, decodingResultTypeJ)
 	begin
 		decodingResult <= INSTRUCTION_DECODING_RESULT_CLEAR;
-		phaseExExceptionTrigger <= MIPS_CP0_EXCEPTION_TRIGGER_CLEAR;
+		phaseExExceptionTriggerCtrl <= MIPS_CP0_EXCEPTION_TRIGGER_CLEAR;
 		if phaseIFExceptionTrigger.enabled = FUNC_ENABLED then
-			phaseExExceptionTrigger <= phaseIFExceptionTrigger;
+			phaseExExceptionTriggerCtrl <= phaseIFExceptionTrigger;
 		elsif opcode = MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL and 
 		funct = MIPS_CPU_INSTRUCTION_FUNCT_SYSCALL then
-			phaseExExceptionTrigger <= (
+			phaseExExceptionTriggerCtrl <= (
 				enabled => FUNC_ENABLED,
 				exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_SYSCALL,
 				badVirtualAddress => (others => '0')
@@ -110,7 +111,7 @@ begin
 				MIPS_CPU_INSTRUCTION_OPCODE_JAL =>
 					decodingResult <= decodingResultTypeJ;
 				when others =>
-					phaseExExceptionTrigger <= (
+					phaseExExceptionTriggerCtrl <= (
 						enabled => FUNC_ENABLED,
 						exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_RESERVED_INSTRUCTION,
 						badVirtualAddress => (others => '0')
@@ -162,6 +163,7 @@ begin
 				phaseExCtrlOutput <= PIPELINE_PHASE_ID_EX_INTERFACE_CLEAR;
 			else
 				phaseExCtrlOutput <= phaseExCtrl;
+				phaseExExceptionTrigger <= phaseExExceptionTriggerCtrl;
 			end if;
 		end if;
 	end process;

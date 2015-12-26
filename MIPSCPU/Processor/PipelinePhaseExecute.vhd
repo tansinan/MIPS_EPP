@@ -98,7 +98,6 @@ begin
 			end if;
 		end if;
 	end process;
-	phaseMAExceptionTrigger <= phaseIDExceptionTrigger;
 	PipelinePhaseExecute_Process : process (clock, reset)
 	begin
 		if reset = '0' then
@@ -110,6 +109,7 @@ begin
 				phaseMACtrlOutput <= PIPELINE_PHASE_EX_MA_INTERFACE_CLEAR;
 			else
 				phaseMACtrlOutput <= phaseMACtrl;
+				phaseMAExceptionTrigger <= phaseIDExceptionTrigger;
 			end if;
 		end if;
 	end process;
