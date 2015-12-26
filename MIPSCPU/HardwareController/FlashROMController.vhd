@@ -70,9 +70,9 @@ begin
 			and control.data = previousControl.data
 			and control.address = previousControl.address)
 			and readyStatus = STATUS_READY then
-				readEnable <= control.data(31);
-				writeEnable <= control.data(30);
-				eraseEnable <= control.data(29);
+				writeEnable <= control.data(31);
+				eraseEnable <= control.data(30);
+				readEnable <= control.address(23);
 				output <= readyStatus & "000000000000000" & dataDisplay;
 				dataControl <= control.data(15 downto 0);
 				address <= control.address(22 downto 0);

@@ -41,7 +41,7 @@ begin
 	flashCE1 <= '0';
 	flashCE2 <= '0';
 	
-	process (clock, reset)
+	process (clock, reset, operationState)
 	begin
 		if operationState = "00" then
 			readyStatus <= STATUS_READY;
