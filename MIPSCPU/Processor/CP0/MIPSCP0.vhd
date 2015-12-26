@@ -99,6 +99,9 @@ package MIPSCP0 is
 	
 	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_SYSCALL :
 		CP0CauseExceptionCode_t := "01000";
+		
+	constant MIPS_CP0_CAUSE_EXCEPTION_CODE_RESERVED_INSTRUCTION :
+		CP0CauseExceptionCode_t := "01010";
 
 	constant MIPS_CP0_TLB_INDEX_WIDTH : integer := 4;
 	constant MIPS_CP0_TLB_ENTRY_COUNT : integer := 2**MIPS_CP0_TLB_INDEX_WIDTH;
@@ -132,6 +135,12 @@ package MIPSCP0 is
 			exceptionCode : CP0CauseExceptionCode_t;
 			badVirtualAddress : RAMAddress_t;
 		end record;
+
+	constant MIPS_CP0_EXCEPTION_TRIGGER_CLEAR : CP0ExceptionTrigger_t := (
+		enabled => FUNC_DISABLED,
+		exceptionCode => (others => '0'),
+		badVirtualAddress => (others => '0')
+	);
 		
 	constant MIPS_CP0_HARDWARE_INTERRUPT_COUNT : integer := 6;
 	subtype CP0InterruptCodeMask_t is

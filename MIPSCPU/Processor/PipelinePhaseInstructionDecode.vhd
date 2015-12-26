@@ -19,93 +19,102 @@ entity PipelinePhaseInstructionDecode is
 end PipelinePhaseInstructionDecode;
 
 architecture Behavioral of PipelinePhaseInstructionDecode is
-	component TypeIInstructionDecoder is
-		port (
-			instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
-			pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
-			registerFile : in mips_register_file_port;
-			result : out InstructionDecodingResult_t
-		);
-	end component;
-	component TypeRInstructionDecoder is
-		port (
-			instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
-			pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
-			registerFile : in mips_register_file_port;
-			result : out InstructionDecodingResult_t
-		);
-	end component;
-	component TypeJInstructionDecoder is
-		port (
-			instruction : in std_logic_vector(MIPS_CPU_INSTRUCTION_WIDTH - 1 downto 0);
-			pcValue : in std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0);
-			registerFile : in mips_register_file_port;
-			result : out InstructionDecodingResult_t
-		);
-	end component;
-	component RegisterFileReader is
-		port (
-			register_file_output : in mips_register_file_port;
-			readSelect : in std_logic_vector (MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
-			readResult : out std_logic_vector (MIPS_CPU_DATA_WIDTH - 1 downto 0)
-		);
-	end component;
 	signal regData1 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal regData2 : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 	signal decodingResult : InstructionDecodingResult_t;
 	signal decodingResultTypeI : InstructionDecodingResult_t;
 	signal decodingResultTypeR : InstructionDecodingResult_t;
 	signal decodingResultTypeJ : InstructionDecodingResult_t;
-	signal opcode : std_logic_vector(MIPS_CPU_INSTRUCTION_OPCODE_WIDTH - 1 downto 0);
+	signal opcode : InstructionOpcode_t;
+	signal funct : InstructionFunct_t;
 	signal phaseExCtrl : PipelinePhaseIDEXInterface_t;
 begin
-	opcode <= instruction (MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
+	-- Extract opcode and funct from the instruction.
+	process(instruction)
+	begin
+		opcode <= instruction (MIPS_CPU_INSTRUCTION_OPCODE_HI downto MIPS_CPU_INSTRUCTION_OPCODE_LO);
+		funct <= instruction (MIPS_CPU_INSTRUCTION_FUNCT_HI downto MIPS_CPU_INSTRUCTION_FUNCT_LO);
+	end process;
 	phaseExCtrl.instructionOpcode <= opcode;
 
-	decoder_I : TypeIInstructionDecoder port map (
+	decoder_I : entity work.TypeIInstructionDecoder
+	port map
+	(
 		instruction => instruction,
 		result => decodingResultTypeI,
 		registerFile => register_file,
 		pcValue => pcValue
 	);
 
-	decoder_R : TypeRInstructionDecoder port map (
+	decoder_R : entity work.TypeRInstructionDecoder
+	port map
+	(
 		instruction => instruction,
 		result => decodingResultTypeR,
 		registerFile => register_file,
 		pcValue => pcValue
 	);
 
-	decoder_J : TypeJInstructionDecoder port map (
+	decoder_J : entity work.TypeJInstructionDecoder
+	port map
+	(
 		instruction => instruction,
 		result => decodingResultTypeJ,
 		registerFile => register_file,
 		pcValue => pcValue
 	);
-
-	with opcode select decodingResult <=
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_ADDIU,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_ANDI,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_ORI,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_XORI,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_LW,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_LH,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_LHU,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_LB,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_LBU,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_SW,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_SH,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_SB,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_BNE,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_BEQ,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_REGIMM,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_BGTZ,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_BLEZ,
-		decodingResultTypeI when MIPS_CPU_INSTRUCTION_OPCODE_LUI,
-		decodingResultTypeR when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL,
-		decodingResultTypeJ when MIPS_CPU_INSTRUCTION_OPCODE_J,
-		decodingResultTypeJ when MIPS_CPU_INSTRUCTION_OPCODE_JAL,
-		decodingResultTypeI when others; --TODO :report error!
+	
+	-- determine the decoding result, and whether to trigger an exception,
+	-- according to the opcode, funct, and exception passed from IF.
+	process(opcode, funct, phaseIFExceptionTrigger,
+	decodingResultTypeI, decodingResultTypeR, decodingResultTypeJ)
+	begin
+		decodingResult <= INSTRUCTION_DECODING_RESULT_CLEAR;
+		phaseExExceptionTrigger <= MIPS_CP0_EXCEPTION_TRIGGER_CLEAR;
+		if phaseIFExceptionTrigger.enabled = FUNC_ENABLED then
+			phaseExExceptionTrigger <= phaseIFExceptionTrigger;
+		elsif opcode = MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL and 
+		funct = MIPS_CPU_INSTRUCTION_FUNCT_SYSCALL then
+			phaseExExceptionTrigger <= (
+				enabled => FUNC_ENABLED,
+				exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_SYSCALL,
+				badVirtualAddress => (others => '0')
+			);
+		else
+			case opcode is
+				when MIPS_CPU_INSTRUCTION_OPCODE_ADDIU |
+				MIPS_CPU_INSTRUCTION_OPCODE_ANDI | 
+				MIPS_CPU_INSTRUCTION_OPCODE_ORI |
+				MIPS_CPU_INSTRUCTION_OPCODE_XORI |
+				MIPS_CPU_INSTRUCTION_OPCODE_LW |
+				MIPS_CPU_INSTRUCTION_OPCODE_LH |
+				MIPS_CPU_INSTRUCTION_OPCODE_LHU |
+				MIPS_CPU_INSTRUCTION_OPCODE_LB |
+				MIPS_CPU_INSTRUCTION_OPCODE_LBU |
+				MIPS_CPU_INSTRUCTION_OPCODE_SW |
+				MIPS_CPU_INSTRUCTION_OPCODE_SH |
+				MIPS_CPU_INSTRUCTION_OPCODE_SB |
+				MIPS_CPU_INSTRUCTION_OPCODE_BNE |
+				MIPS_CPU_INSTRUCTION_OPCODE_BEQ |
+				MIPS_CPU_INSTRUCTION_OPCODE_REGIMM |
+				MIPS_CPU_INSTRUCTION_OPCODE_BGTZ |
+				MIPS_CPU_INSTRUCTION_OPCODE_BLEZ |
+				MIPS_CPU_INSTRUCTION_OPCODE_LUI =>
+					decodingResult <= decodingResultTypeI;
+				when MIPS_CPU_INSTRUCTION_OPCODE_SPECIAL =>
+					decodingResult <= decodingResultTypeR;
+				when MIPS_CPU_INSTRUCTION_OPCODE_J |
+				MIPS_CPU_INSTRUCTION_OPCODE_JAL =>
+					decodingResult <= decodingResultTypeJ;
+				when others =>
+					phaseExExceptionTrigger <= (
+						enabled => FUNC_ENABLED,
+						exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_RESERVED_INSTRUCTION,
+						badVirtualAddress => (others => '0')
+					);
+			end case;
+		end if;
+	end process;
 
 	pcControl <= decodingResult.pcControl;
 	--TODO I think this is ugly, need to be changed later.
@@ -115,12 +124,12 @@ begin
 		FUNC_ENABLED when MIPS_CPU_INSTRUCTION_OPCODE_SH,
 		FUNC_DISABLED when others;
 
-	registerFileReader1_e : RegisterFileReader port map (
+	registerFileReader1_e : entity work.RegisterFileReader port map (
 		register_file_output => register_file,
 		readSelect => decodingResult.regAddr1,
 		readResult => regData1
 	);
-	registerFileReader2_e : RegisterFileReader port map (
+	registerFileReader2_e : entity work.RegisterFileReader port map (
 		register_file_output => register_file,
 		readSelect => decodingResult.regAddr2,
 		readResult => regData2
@@ -140,7 +149,6 @@ begin
 		regData2 when FUNC_DISABLED,
 		decodingResult.imm when FUNC_ENABLED;
 
-	phaseExExceptionTrigger <= phaseIFExceptionTrigger;
 	PipelinePhaseInstructionDecode_Process : process (clock, reset)
 	begin
 		if reset = '0' then

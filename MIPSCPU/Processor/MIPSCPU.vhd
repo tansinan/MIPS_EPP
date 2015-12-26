@@ -54,6 +54,9 @@ package MIPSCPU is
 	constant MIPS_CPU_REGISTER_ADDRESS_WIDTH: integer := 5;
 	subtype RegisterAddress_t is
 		std_logic_vector(MIPS_CPU_REGISTER_ADDRESS_WIDTH - 1 downto 0);
+	
+	constant CPU_REGISTER_ZERO : RegisterAddress_t := "00000";
+	constant CPU_REGISTER_RA : RegisterAddress_t := "11111";
 
 	-- The number of registers in primarty processor
 	constant MIPS_CPU_REGISTER_COUNT: integer := 2**MIPS_CPU_REGISTER_ADDRESS_WIDTH;
@@ -249,6 +252,21 @@ package MIPSCPU is
 			immIsPCValue : std_logic;
 			pcControl : RegisterControl_t;
 		end record;
+		
+	constant INSTRUCTION_DECODING_RESULT_CLEAR : InstructionDecodingResult_t := (
+		regAddr1 => CPU_REGISTER_ZERO,
+		regAddr2 => CPU_REGISTER_ZERO,
+		regDest => CPU_REGISTER_ZERO,
+		imm => (others => '0'),
+		operation => ALU_OPERATION_LOGIC_OR,
+		useImmOperand => '0',
+		resultIsRAMAddr => FUNC_DISABLED,
+		immIsPCValue => FUNC_DISABLED,
+		pcControl => (
+			operation => REGISTER_OPERATION_READ,
+			data => (others => '0')
+		)
+	);
 
 	type PipelinePhaseIDEXInterface_t is
 		record

@@ -175,18 +175,6 @@ begin
 				operation => REGISTER_OPERATION_WRITE,
 				data => statusTemp
 			);
-
-		-- SYSCALL instruction
-		elsif funct = MIPS_CP0_INSTRUCTION_FUNCT_SYSCALL then
-			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
-				cp0RegisterFileControl(i).operation <= REGISTER_OPERATION_READ;
-			end loop;
-			cp0TLBControl.writeEnabled <= FUNC_DISABLED;
-			exceptionTrigger <= (
-				enabled => FUNC_ENABLED,
-				exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_SYSCALL,
-				badVirtualAddress => (others => '0')
-			);
 		else
 			for i in 0 to MIPS_CP0_REGISTER_COUNT - 1 loop
 				cp0RegisterFileControl(i).operation <= REGISTER_OPERATION_READ;
