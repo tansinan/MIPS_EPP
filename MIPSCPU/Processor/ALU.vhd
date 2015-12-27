@@ -32,7 +32,7 @@ begin
 			when ALU_OPERATION_LOGIC_OR =>
 				result <= number1 or number2;
 			when ALU_OPERATION_LOGIC_XOR =>
-				result <= number1 or number2;
+				result <= number1 xor number2;
 			when ALU_OPERATION_EQUAL =>
 				if number1 = number2 then
 					result <= (0 => '1', others => '0');
