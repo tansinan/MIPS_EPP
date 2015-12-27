@@ -15,7 +15,7 @@ end entity;
 
 architecture Behavioral of RegisterFileWriter is
 begin
-	process(control1, control2)
+	process(control1, control2, control3)
 		variable validControl : RegisterFileControl_t;
 	begin
 		if control1.address /= "00000" then

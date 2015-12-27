@@ -49,19 +49,7 @@ begin
 		if reset = FUNC_ENABLED then
 			state <= STATE_IDLE;
 		elsif rising_edge(clock) then
-			if state = STATE_BUSY_MOVE then
-				state <= STATE_IDLE;
-			elsif state = STATE_BUSY_MUL then
-				if ipCoreMulWaitCycleRemain /= "000" then
-					ipCoreMulWaitCycleRemain <= ipCoreMulWaitCycleRemain - 1;
-					state <= STATE_BUSY_MUL;
-				else
-					state <= STATE_BUSY_MUL_MOVE;
-				end if;
-			elsif state = STATE_BUSY_MUL_MOVE then
-				state <= STATE_IDLE;
-			end if;
-			if state = STATE_IDLE or state = STATE_BUSY_MUL_MOVE then
+			if state = STATE_IDLE then
 				if instructionExecutionEnabled = FUNC_ENABLED then
 					rs <= instruction(MIPS_CPU_INSTRUCTION_RS_HI downto MIPS_CPU_INSTRUCTION_RS_LO);
 					rt <= instruction(MIPS_CPU_INSTRUCTION_RT_HI downto MIPS_CPU_INSTRUCTION_RT_LO);
@@ -79,17 +67,27 @@ begin
 						when MIPS_CPU_INSTRUCTION_FUNCT_MULT |
 						MIPS_CPU_INSTRUCTION_FUNCT_MULTU =>
 							state <= STATE_BUSY_MUL;
-							ipCoreMulWaitCycleRemain <= "011";
+							ipCoreMulWaitCycleRemain <= "100";
 						when others =>
 							state <= STATE_IDLE;
 					end case;
 				end if;
+			elsif state = STATE_BUSY_MOVE then
+				state <= STATE_IDLE;
+			elsif state = STATE_BUSY_MUL then
+				if ipCoreMulWaitCycleRemain /= "000" then
+					ipCoreMulWaitCycleRemain <= ipCoreMulWaitCycleRemain - 1;
+					state <= STATE_BUSY_MUL;
+				else
+					state <= STATE_BUSY_MUL_MOVE;
+				end if;
+			elsif state = STATE_BUSY_MUL_MOVE then
+				state <= STATE_IDLE;
 			end if;
 		end if;
 	end process;
 	
-	process(state, rs, rt, rd, opcode, funct, shamt, 
-	registerFileData, hiRegisterData, loRegisterData, ipCoreWrapperOutput)
+	process(state, rs, rt, rd, opcode, funct, shamt)
 	begin
 		ipCoreWrapperNumber1 <= (others => '0');
 		ipCoreWrapperNumber2 <= (others => '0');
@@ -110,51 +108,35 @@ begin
 		if state = STATE_BUSY_MOVE then
 			case funct is
 				when MIPS_CPU_INSTRUCTION_FUNCT_MFHI =>
-					hiRegisterControl.operation <= REGISTER_OPERATION_READ;
-					loRegisterControl.operation <= REGISTER_OPERATION_READ;
 					registerFileControl.address <= rd;
 					registerFileControl.data <= hiRegisterData;
 				when MIPS_CPU_INSTRUCTION_FUNCT_MFLO =>
-					hiRegisterControl.operation <= REGISTER_OPERATION_READ;
-					loRegisterControl.operation <= REGISTER_OPERATION_READ;
 					registerFileControl.address <= rd;
 					registerFileControl.data <= loRegisterData;
 				when MIPS_CPU_INSTRUCTION_FUNCT_MTHI =>
 					hiRegisterControl.operation <= REGISTER_OPERATION_WRITE;
 					hiRegisterControl.data <=
 						registerFileData(to_integer(unsigned(rs)));
-					loRegisterControl.operation <= REGISTER_OPERATION_READ;
-					registerFileControl.address <= (others => '0');
 				when MIPS_CPU_INSTRUCTION_FUNCT_MTLO =>
 					loRegisterControl.operation <= REGISTER_OPERATION_WRITE;
 					loRegisterControl.data <=
 						registerFileData(to_integer(unsigned(rs)));
-					hiRegisterControl.operation <= REGISTER_OPERATION_READ;
-					registerFileControl.address <= (others => '0');
 				when others =>
-					hiRegisterControl.operation <= REGISTER_OPERATION_READ;
-					loRegisterControl.operation <= REGISTER_OPERATION_READ;
-					registerFileControl.address <= "00000";
-					registerFileControl.data <= (others => '0');
 			end case;
 		elsif state = STATE_BUSY_MUL then
-			hiRegisterControl.operation <= REGISTER_OPERATION_READ;
-			loRegisterControl.operation <= REGISTER_OPERATION_READ;
-			registerFileControl.address <= "00000";
-			registerFileControl.data <= (others => '0');
 			case funct is
 				when MIPS_CPU_INSTRUCTION_FUNCT_MULT =>
 					ipCoreWrapperNumber1 <= 
 						registerFileData(to_integer(unsigned(rs)));
 					ipCoreWrapperNumber2 <= 
-						registerFileData(to_integer(unsigned(rt)));
+						registerFileData(to_integer(unsigned(rs)));
 					ipCoreWrapperNumber1Signed <= FUNC_ENABLED;
 					ipCoreWrapperNumber2Signed <= FUNC_ENABLED;
 				when MIPS_CPU_INSTRUCTION_FUNCT_MULTU =>
 					ipCoreWrapperNumber1 <= 
 						registerFileData(to_integer(unsigned(rs)));
 					ipCoreWrapperNumber2 <= 
-						registerFileData(to_integer(unsigned(rt)));
+						registerFileData(to_integer(unsigned(rs)));
 					ipCoreWrapperNumber1Signed <= FUNC_DISABLED;
 					ipCoreWrapperNumber2Signed <= FUNC_DISABLED;
 				when others =>
@@ -184,3 +166,4 @@ begin
 		end if;
 	end process;
 end architecture;
+
