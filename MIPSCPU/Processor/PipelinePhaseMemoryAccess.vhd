@@ -68,22 +68,34 @@ begin
 		variable loadHalfWordResult : std_logic_vector(15 downto 0);
 		variable storeByteResult : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
 		variable storeHalfwordResult : std_logic_vector(MIPS_CPU_DATA_WIDTH - 1 downto 0);
+		variable loadWordLeftResult : CPUData_t;
+		variable loadWordRightResult : CPUData_t;
 	begin
 		storeByteResult := ramReadResult;
+		loadWordLeftResult := (others => '0');
+		loadWordRightResult := (others => '0');
 		case phaseEXInput.sourceRAMAddr(1 downto 0) is
 			when "00" =>
 				loadByteResult := ramReadResult(7 downto 0);
 				storeByteResult(7 downto 0) := phaseEXInput.sourceImm(7 downto 0);
+				loadWordLeftResult(7 downto 0) := ramReadResult(31 downto 24);
+				loadWordRightResult := ramReadResult;
 			when "01" =>
 				loadByteResult := ramReadResult(15 downto 8);
 				storeByteResult(15 downto 8) := phaseEXInput.sourceImm(7 downto 0);
+				loadWordLeftResult(15 downto 0) := ramReadResult(31 downto 16);
+				loadWordRightResult(31 downto 8) := ramReadResult(23 downto 0);
 			when "10" =>
 				loadByteResult := ramReadResult(23 downto 16);
 				storeByteResult(23 downto 16) := phaseEXInput.sourceImm(7 downto 0);
+				loadWordLeftResult(23 downto 0) := ramReadResult(31 downto 8);
+				loadWordRightResult(31 downto 16) := ramReadResult(15 downto 0);
 			when "11" =>
 				loadByteResult := ramReadResult(MIPS_CPU_DATA_WIDTH - 1 downto 24);
 				storeByteResult(MIPS_CPU_DATA_WIDTH - 1 downto 24)
 					:= phaseEXInput.sourceImm(7 downto 0);
+				loadWordLeftResult := ramReadResult;
+				loadWordRightResult(31 downto 24) := ramReadResult(7 downto 0);
 			when others =>
 				report "Warning: meta value detected for the LB/LBU address";
 		end case;
@@ -115,6 +127,10 @@ begin
 				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 8)
 					<= (others => loadByteResult(7));
 				phaseWBCtrl.sourceImm(7 downto 0) <= loadByteResult;
+			when MIPS_CPU_INSTRUCTION_OPCODE_LWL =>
+				phaseWBCtrl.sourceImm <= loadWordLeftResult;
+			when MIPS_CPU_INSTRUCTION_OPCODE_LWR =>
+				phaseWBCtrl.sourceImm <= loadWordRightResult;
 			when MIPS_CPU_INSTRUCTION_OPCODE_LBU =>
 				phaseWBCtrl.sourceImm(MIPS_CPU_DATA_WIDTH - 1 downto 8) <= (others => '0');
 				phaseWBCtrl.sourceImm(7 downto 0) <= loadByteResult;
