@@ -30,11 +30,11 @@ def sendFileBySerial(serialObject, binaryFile):
         actualLength = len(fileData)
         if actualLength == 0:
             break
-        
+
         addressArr = integerToLittleEndianArray(address)
         serialObject.write(addressArr)
         print(addressArr)
-        
+
         dataArr = []
         checksum = 0
         for byte in fileData:
@@ -44,19 +44,14 @@ def sendFileBySerial(serialObject, binaryFile):
             for i in range(actualLength, CHUNK_SIZE):
                 dataArr.append(0)
         print(len(dataArr))
-        #serialObject.write(dataArr)
-        #receivedChecksumArr = serialObject.read(CHUNK_SIZE)
-        #print(len(receivedChecksumArr))
-        for i in range(0, CHUNK_SIZE):
-            serialObject.write([dataArr[i]])
-            ret = serialObject.read(1)
-            if ret[0] != dataArr[i]:
-                print("Err %d %x %x" % (i, dataArr[i], ret[0]))
-        #receivedChecksum = littleEndianArrayToInteger(receivedChecksumArr)
-        #print('Expected checksum : %x' % checksum)
-        #print('Received checksum : %x' % receivedChecksum)
-        #print('0x%x: %d bytes padding to %d bytes, checksum: %d' %
-        #      (address, actualLength, len(dataArr), checksum))
+        serialObject.write(dataArr)
+        receivedChecksumArr = serialObject.read(4)
+        print(len(receivedChecksumArr))
+        receivedChecksum = littleEndianArrayToInteger(receivedChecksumArr)
+        print('Expected checksum : %x' % checksum)
+        print('Received checksum : %x' % receivedChecksum)
+        print('0x%x: %d bytes padding to %d bytes, checksum: %d' %
+              (address, actualLength, len(dataArr), checksum))
         if actualLength < CHUNK_SIZE:
             break
         address += CHUNK_SIZE
