@@ -137,6 +137,12 @@ begin
 						result.operation <= (others => 'X');
 				end case;
 		end case;
+		if funct = MIPS_CPU_INSTRUCTION_FUNCT_SLLV or
+		funct = MIPS_CPU_INSTRUCTION_FUNCT_SRLV or
+		funct = MIPS_CPU_INSTRUCTION_FUNCT_SRAV then
+			result.regAddr1 <= rt;
+			result.regAddr2 <= rs;
+		end if;
 	end process;
 
 end architecture;

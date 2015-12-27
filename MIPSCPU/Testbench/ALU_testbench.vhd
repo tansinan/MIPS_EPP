@@ -163,8 +163,8 @@ begin
 
 		report "Testing ALU_OPERATION_SHIFT_LEFT...";
 		operation <= ALU_OPERATION_SHIFT_LEFT;
-		number1 <= "1110";
-		number2 <= "0010";
+		number1 <= "1111";
+		number2 <= "0011";
 		wait for time_delay;
 		if result = "1000" then
 			report "Test case 13 passed";
