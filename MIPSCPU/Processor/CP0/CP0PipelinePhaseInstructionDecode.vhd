@@ -42,11 +42,7 @@ begin
 		funct := instruction(MIPS_CPU_INSTRUCTION_FUNCT_HI downto MIPS_CPU_INSTRUCTION_FUNCT_LO);
 		moveAddressPrimaryInt := to_integer(unsigned(rt));
 		moveAddressCP0Int := to_integer(unsigned(rd));
-		exceptionTrigger <= (
-			enabled => FUNC_DISABLED,
-			exceptionCode => (others => '0'),
-			badVirtualAddress => (others => '0')
-		);
+		exceptionTrigger <= MIPS_CP0_EXCEPTION_TRIGGER_CLEAR;
 		causeTemp := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_CAUSE);
 		statusTemp := cp0RegisterFileData(MIPS_CP0_REGISTER_INDEX_STATUS);
 		

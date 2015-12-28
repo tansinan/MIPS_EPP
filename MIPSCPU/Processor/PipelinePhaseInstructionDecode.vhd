@@ -79,7 +79,8 @@ begin
 			phaseExExceptionTriggerCtrl <= (
 				enabled => FUNC_ENABLED,
 				exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_SYSCALL,
-				badVirtualAddress => (others => '0')
+				badVirtualAddress => (others => '0'),
+				isTLBRefill => FUNC_DISABLED
 			);
 		elsif opcode = MIPS_CPU_INSTRUCTION_OPCODE_SLTI or
 		opcode = MIPS_CPU_INSTRUCTION_OPCODE_SLTIU then
@@ -116,7 +117,8 @@ begin
 					phaseExExceptionTriggerCtrl <= (
 						enabled => FUNC_ENABLED,
 						exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_RESERVED_INSTRUCTION,
-						badVirtualAddress => (others => '0')
+						badVirtualAddress => (others => '0'),
+						isTLBRefill => FUNC_DISABLED
 					);
 			end case;
 		end if;

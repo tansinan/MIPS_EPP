@@ -56,7 +56,21 @@ begin
 					output => output(i)
 				);
 		end generate;
-		otherRegister_g : if i /= MIPS_CP0_REGISTER_INDEX_COUNT generate
+		exceptionBaseRegister_g : if i = MIPS_CP0_REGISTER_INDEX_EXCEPTION_VECTOR_BASE generate
+			exceptionBaseRegister_i : entity work.SingleRegister
+				generic map (
+					initialValue => x"80000000"
+				)
+				port map (
+					reset => reset,
+					clock => clock,
+					input => usedControl(i).data,
+					operation => usedControl(i).operation,
+					output => output(i)
+				);
+		end generate;
+		otherRegister_g : if i /= MIPS_CP0_REGISTER_INDEX_COUNT and
+		i /= MIPS_CP0_REGISTER_INDEX_EXCEPTION_VECTOR_BASE generate
 			register_i : entity work.SingleRegister
 				port map (
 					reset => reset,

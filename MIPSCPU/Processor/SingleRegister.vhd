@@ -4,33 +4,29 @@ use work.MIPSCPU.all;
 
 entity SingleRegister is
 	generic (
-		width : integer := MIPS_CPU_DATA_WIDTH
+		initialValue : CPUData_t := (others => '0')
 	);
 	port ( 
-		reset : in std_logic;
-		clock : in std_logic;
-		input : in  std_logic_vector (width - 1 downto 0);
-		operation : in  std_logic;
-		output : out  std_logic_vector (width - 1 downto 0)
+		reset : in Reset_t;
+		clock : in Clock_t;
+		input : in CPUData_t;
+		operation : in std_logic;
+		output : out CPUData_t
 	);
 end entity;
 
 architecture Behavioral of SingleRegister is
-	signal data : std_logic_vector (width - 1 downto 0);
+	signal data : CPUData_t;
 begin
 	Register_Process : process (clock, reset)
 	begin
-	if reset = '0' then
-		data <= (others => '0');
-		output <= (others => '0');
-	elsif rising_edge(clock) then
-		if operation = REGISTER_OPERATION_WRITE then
-			data <= input;
-			output <= input;
-		else
-			data <= data;
-			output <= data;
+		if reset = '0' then
+			data <= initialValue;
+		elsif rising_edge(clock) then
+			if operation = REGISTER_OPERATION_WRITE then
+				data <= input;
+			end if;
 		end if;
-	end if;
 	end process;
+	output <= data;
 end architecture;

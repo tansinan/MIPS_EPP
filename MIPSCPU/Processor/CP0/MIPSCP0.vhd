@@ -29,6 +29,9 @@ package MIPSCP0 is
 	constant MIPS_CP0_REGISTER_INDEX_STATUS : integer := 12;
 	constant MIPS_CP0_REGISTER_INDEX_CAUSE : integer := 13;
 	constant MIPS_CP0_REGISTER_INDEX_EPC : integer := 14;
+	-- TODO : This is actually based on sel field of MFC0,
+	-- But we gonna ignore it, for Processor Identification is not important.
+	constant MIPS_CP0_REGISTER_INDEX_EXCEPTION_VECTOR_BASE : integer := 15;
 	
 	constant MIPS_CP0_REGISTER_PAGE_MASK_HI : integer := 28;
 	constant MIPS_CP0_REGISTER_PAGE_MASK_LO : integer := 13;
@@ -134,12 +137,14 @@ package MIPSCP0 is
 			enabled : EnablingControl_t;
 			exceptionCode : CP0CauseExceptionCode_t;
 			badVirtualAddress : RAMAddress_t;
+			isTLBRefill : EnablingControl_t;
 		end record;
 
 	constant MIPS_CP0_EXCEPTION_TRIGGER_CLEAR : CP0ExceptionTrigger_t := (
 		enabled => FUNC_DISABLED,
 		exceptionCode => (others => '0'),
-		badVirtualAddress => (others => '0')
+		badVirtualAddress => (others => '0'),
+		isTLBRefill => FUNC_DISABLED
 	);
 		
 	constant MIPS_CP0_HARDWARE_INTERRUPT_COUNT : integer := 6;
@@ -175,7 +180,8 @@ package MIPSCP0 is
 	constant MIPS_CP0_INSTRUCTION_FUNCT_TLBR : InstructionFunct_t := "000001";
 	constant MIPS_CP0_INSTRUCTION_FUNCT_SYSCALL : InstructionFunct_t := "001100";
 	
-	constant MIPS_CP0_NONBOOT_EXCEPTION_HANDLER : RAMAddress_t := x"80000180";
+	constant MIPS_CP0_NONBOOT_TLB_REFILL_EXCEPTION_HANDLER : RAMAddress_t := x"00000000";
+	constant MIPS_CP0_NONBOOT_GENERAL_EXCEPTION_HANDLER : RAMAddress_t := x"00000180";
 
 end package;
 

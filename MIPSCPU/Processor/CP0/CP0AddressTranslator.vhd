@@ -36,7 +36,8 @@ begin
 		exceptionTrigger <= (
 			enabled => FUNC_DISABLED,
 			exceptionCode => (others => '0'),
-			badVirtualAddress => (others => '0')
+			badVirtualAddress => (others => '0'),
+			isTLBRefill => FUNC_DISABLED
 		);
 		tlbEntryFound := false;
 
@@ -47,8 +48,8 @@ begin
 			physicsAddress <= virtualAddress;
 		else
 			for i in 0 to MIPS_CP0_TLB_ENTRY_COUNT - 1 loop
-				vpn2 := tlbData(i).entryHigh(
-					MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_HI downto MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_LO);
+				vpn2 :="0" & tlbData(i).entryHigh(
+					MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_HI - 1 downto MIPS_CP0_REGISTER_ENTRY_HIGH_VPN2_LO);
 				pfn0 := tlbData(i).entryLow0(
 					MIPS_CP0_REGISTER_ENTRY_LOW_PFN_HI downto MIPS_CP0_REGISTER_ENTRY_LOW_PFN_LO);
 				pfn1 := tlbData(i).entryLow1(
@@ -83,7 +84,8 @@ begin
 						exceptionTrigger <= (
 							enabled => FUNC_ENABLED,
 							exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_LOAD,
-							badVirtualAddress => virtualAddress
+							badVirtualAddress => virtualAddress,
+							isTLBRefill => FUNC_DISABLED
 						);
 					end if;
 					--TODO : if dirty = '0' and reftype is 'store' then TLB Modified triggers.
@@ -92,11 +94,12 @@ begin
 					tlbEntryFound := true;
 				end if;
 			end loop;
-			if tlbEntryFound = false then
+			if not tlbEntryFound then
 				exceptionTrigger <= (
 					enabled => FUNC_ENABLED,
 					exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_LOAD,
-					badVirtualAddress => virtualAddress
+					badVirtualAddress => virtualAddress,
+					isTLBRefill => FUNC_ENABLED
 				);
 			end if;
 		end if;

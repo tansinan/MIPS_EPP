@@ -245,11 +245,7 @@ begin
 			readEnabled => FUNC_DISABLED,
 			readOnStore => FUNC_DISABLED
 		);
-		pipelinePhaseIFIDException <= (
-			enabled => FUNC_DISABLED,
-			exceptionCode => (others => '0'),
-			badVirtualAddress => (others => '0')
-		);
+		pipelinePhaseIFIDException <= MIPS_CP0_EXCEPTION_TRIGGER_CLEAR;
 		if  current_pipeline_phase = "0100" then
 			if cp0exceptionPipelineClear /= FUNC_ENABLED then
 				pcControl2.operation <= REGISTER_OPERATION_WRITE;

@@ -196,30 +196,34 @@ begin
 		exceptionTrigger <= (
 			enabled => FUNC_DISABLED,
 			exceptionCode => (others => '0'),
-			badVirtualAddress => (others => '0')
+			badVirtualAddress => (others => '0'),
+			isTLBRefill => FUNC_DISABLED
 		);
+		result <= (others => '0');
 		if cp0ExceptionTriggerRegister.enabled = FUNC_ENABLED then
 			exceptionTrigger <= cp0ExceptionTriggerRegister;
+		else
+			case savedAddressType is
+				when USER_SPACE_ADDRESS =>
+					result <= secondaryRAMResult;
+				when KERNEL_SPACE_ADDRESS =>
+					result <= primaryRAMResult;
+				when ISA_ADDRESS =>
+					result <= uart1Result;
+				when FLASHROM_ADDRESS =>
+					result <= flashROMData;
+				when BOOTLOADER_ADDRESS =>
+					result <= savedROMData;
+				when others =>
+					exceptionTrigger <= (
+						enabled => FUNC_ENABLED,
+						exceptionCode => (others => 'U'), -- TODO needs to add correct excCode.
+						badVirtualAddress => (others => '0'),
+						isTLBRefill => FUNC_DISABLED
+					);
+					result <= (others => '0');
+			end case;
 		end if;
-		case savedAddressType is
-			when USER_SPACE_ADDRESS =>
-				result <= secondaryRAMResult;
-			when KERNEL_SPACE_ADDRESS =>
-				result <= primaryRAMResult;
-			when ISA_ADDRESS =>
-				result <= uart1Result;
-			when FLASHROM_ADDRESS =>
-				result <= flashROMData;
-			when BOOTLOADER_ADDRESS =>
-				result <= savedROMData;
-			when others =>
-				exceptionTrigger <= (
-					enabled => FUNC_ENABLED,
-					exceptionCode => (others => 'U'), -- TODO needs to add correct excCode.
-					badVirtualAddress => (others => '0')
-				);
-				result <= (others => '0');
-		end case;
 	end process;
 
 end architecture;
