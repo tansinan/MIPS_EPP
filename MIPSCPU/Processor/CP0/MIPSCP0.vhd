@@ -23,6 +23,7 @@ package MIPSCP0 is
 	constant MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_LOW0 : integer := 2;
 	constant MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_LOW1 : integer := 3;
 	constant MIPS_CP0_REGISTER_INDEX_TLB_PAGE_MASK : integer := 5;
+	constant MIPS_CP0_REGISTER_INDEX_BAD_VIRTUAL_ADDRESS : integer := 8;
 	constant MIPS_CP0_REGISTER_INDEX_COUNT : integer := 9;
 	constant MIPS_CP0_REGISTER_INDEX_TLB_ENTRY_HIGH : integer := 10;
 	constant MIPS_CP0_REGISTER_INDEX_COMPARE : integer := 11;

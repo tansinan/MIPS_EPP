@@ -121,6 +121,10 @@ begin
 					operation => REGISTER_OPERATION_WRITE,
 					data => newCP0EntryHiRegister
 				);
+				cp0RegisterFileControl(MIPS_CP0_REGISTER_INDEX_BAD_VIRTUAL_ADDRESS) <= (
+					operation => REGISTER_OPERATION_WRITE,
+					data => exceptionTrigger.badVirtualAddress
+				);
 			-- If no exceptions happens, check interrupts.
 			else
 				-- If global interrupt is enabled, interrupts will be checked.
