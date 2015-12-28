@@ -52,10 +52,7 @@ begin
 	);
 	
 	-- TODO : Add Interrupt trigger to UART Controller module!
-	interruptTrigger <= (
-		enabled => FUNC_DISABLED,
-		interruptCodeMask => (others => '0')
-	);
+
 	
 	process(reset, clock, control)
 		variable hardwareRegisterAddress : std_logic_vector(11 downto 0);
@@ -68,6 +65,10 @@ begin
 			writeSTB <= '0';
 			readBuffer <= (others => '0');
 			readBufferAvailable <= '0';
+			interruptTrigger <= (
+				enabled => FUNC_DISABLED,
+				interruptCodeMask => (others => '0')
+			);
 		elsif rising_edge(clock) then
 			-- Handles the signals of the UART module
 			if isWriting = '1' then
@@ -81,6 +82,12 @@ begin
 			if readSTB = '1' then
 				readBuffer <= dataRead;
 				readBufferAvailable <= '1';
+				interruptTrigger <= (
+					enabled => FUNC_ENABLED,
+					-- UART interrupt always use hardware interrupt 2
+					-- (IP4 in all interrupts)
+					interruptCodeMask => "000100"
+				);
 			end if;
 			if hardwareRegisterAddress = UART1_REGISTER_DATA then
 				if control.operation = REGISTER_OPERATION_WRITE then
@@ -96,6 +103,11 @@ begin
 						output(7 downto 0) <= readBuffer;
 						--output(7 downto 0) <= x"31";
 						readBufferAvailable <= '0';
+						-- Clear the interrupt signal.
+						interruptTrigger <= (
+							enabled => FUNC_DISABLED,
+							interruptCodeMask => "000000"
+						);
 					else
 						output <= (others => '0');
 					end if;
