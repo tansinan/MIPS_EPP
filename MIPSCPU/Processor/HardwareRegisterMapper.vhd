@@ -35,6 +35,11 @@ entity HardwareAddressMapper is
 		FLASHROM_ADDRESS,
 		UNKNOWN
 	);
+	type RAMSelect_t is
+	(
+		SELECT_PRIMARY_RAM,
+		SELECT_SECONDARY_RAM
+	);
 end entity;
 
 architecture Behavioral of HardwareAddressMapper is
@@ -44,6 +49,8 @@ architecture Behavioral of HardwareAddressMapper is
 	signal usedRAMControl : RAMControl_t;
 	signal savedROMData : CPUData_t;
 	signal romData : CPUData_t;
+	signal ramSelect : RAMSelect_t;
+	signal savedRAMSelect : RAMSelect_t;
 	signal cp0ExceptionTriggerRegister : CP0ExceptionTrigger_t;
 	component ipcorebootloader
 	port (
@@ -133,21 +140,26 @@ begin
 			address => (others => '0'),
 			data => (others => '0')
 		);
+		ramSelect <= SELECT_PRIMARY_RAM;
 		case addressType is
-			when USER_SPACE_ADDRESS =>
-				secondaryRAMHardwareControl <= (
-					readEnabled => usedRAMControl.readEnabled,
-					writeEnabled => usedRAMControl.writeEnabled,
-					address => cp0PhysicsAddress(2 + PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 2),
-					data => usedRAMControl.data
-				);
-			when KERNEL_SPACE_ADDRESS =>
-				primaryRAMHardwareControl <= (
-					readEnabled => usedRAMControl.readEnabled,
-					writeEnabled => usedRAMControl.writeEnabled,
-					address => cp0PhysicsAddress(2 + PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 2),
-					data => usedRAMControl.data
-				);
+			when USER_SPACE_ADDRESS | KERNEL_SPACE_ADDRESS =>
+				if cp0PhysicsAddress(2 + PHYSICS_RAM_ADDRESS_WIDTH) = '0' then
+					ramSelect <= SELECT_PRIMARY_RAM;
+					primaryRAMHardwareControl <= (
+						readEnabled => usedRAMControl.readEnabled,
+						writeEnabled => usedRAMControl.writeEnabled,
+						address => cp0PhysicsAddress(2 + PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 2),
+						data => usedRAMControl.data
+					);
+				else
+					ramSelect <= SELECT_SECONDARY_RAM;
+					secondaryRAMHardwareControl <= (
+						readEnabled => usedRAMControl.readEnabled,
+						writeEnabled => usedRAMControl.writeEnabled,
+						address => cp0PhysicsAddress(2 + PHYSICS_RAM_ADDRESS_WIDTH - 1 downto 2),
+						data => usedRAMControl.data
+					);
+				end if;
 			when ISA_ADDRESS =>
 				if usedRAMControl.readEnabled = FUNC_ENABLED then
 					uart1Control.operation <= REGISTER_OPERATION_READ;
@@ -185,13 +197,15 @@ begin
 		if rising_edge(clock) then
 			savedAddressType <= addressType;
 			savedROMData <= romData;
+			savedRAMSelect <= ramSelect;
 			cp0ExceptionTriggerRegister <= cp0ExceptionTrigger;
 			savedReadOnStore <= usedRAMControl.readOnStore;
 		end if;
 	end process;
 	
 	-- Determine the result
-	process(savedAddressType, primaryRAMResult, secondaryRAMResult, uart1Result)
+	process(savedAddressType, primaryRAMResult, secondaryRAMResult,
+		uart1Result, savedRAMSelect)
 	begin
 		exceptionTrigger <= (
 			enabled => FUNC_DISABLED,
@@ -204,10 +218,12 @@ begin
 			exceptionTrigger <= cp0ExceptionTriggerRegister;
 		else
 			case savedAddressType is
-				when USER_SPACE_ADDRESS =>
-					result <= secondaryRAMResult;
-				when KERNEL_SPACE_ADDRESS =>
-					result <= primaryRAMResult;
+				when USER_SPACE_ADDRESS | KERNEL_SPACE_ADDRESS =>
+					if savedRAMSelect = SELECT_PRIMARY_RAM then
+						result <= primaryRAMResult;
+					else
+						result <= secondaryRAMResult;
+					end if;
 				when ISA_ADDRESS =>
 					result <= uart1Result;
 				when FLASHROM_ADDRESS =>
