@@ -24,7 +24,6 @@ end entity;
 architecture behaviour of UARTController is
 	signal inputBufferNotEmpty : boolean;
 	signal inputBufferCharacter : integer;
-	signal TempInterruptTrigger : CP0HardwareInterruptTrigger_t;
 begin
 	process(reset, clock)
 		type BinaryFile_t is file of Character;
@@ -33,20 +32,10 @@ begin
 		file outputFile : BinaryFile_t;
 	begin
 		hardwareRegisterAddress := control.address(11 downto 0);
-		interruptTrigger <= (
-			enabled => FUNC_DISABLED,
-			interruptCodeMask => (others => '0')
-		);
-		
 		if reset = FUNC_ENABLED then
 		elsif rising_edge(clock) then
 			if hardwareRegisterAddress = UART1_REGISTER_DATA then
 				if control.operation = REGISTER_OPERATION_READ then
-					interruptTrigger <= (
-						enabled => FUNC_ENABLED,
-						-- Hardware Interrupt 4
-						interruptCodeMask => "010000"
-					);
 				elsif control.operation = REGISTER_OPERATION_WRITE then
 					file_open(outputFile, VIRTUAL_HARDWARE_UART_OUTPUT_PIPE, WRITE_MODE);
 					ch := character'val(to_integer(unsigned(control.data(7 downto 0))));
@@ -60,8 +49,5 @@ begin
 			end if;
 		end if;
 	end process;
-	
-	interruptTrigger <= TempInterruptTrigger;
-	
 end architecture;
 
