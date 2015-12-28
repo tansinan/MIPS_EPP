@@ -1,0 +1,51 @@
+/*
+ * This is a bootloader for our MIPS_EPP project
+ * Note : MUST COMPILE WITH NO BRANCH DELAY SLOT OPTION ON!
+ */
+
+#include "regdef.h"
+#include "cp0regdef.h"
+#include "asm.h"
+
+LEAF(_start)
+
+  .set mips32
+  li $1, 0x12345
+  li $2, 0x678A90
+
+  mult $1, $2
+  mfhi $3
+  mflo $4
+
+  li $10, 0xb40003f8
+  jal wait_for_write
+  sw $3, 0($10)
+
+  mfc0 $10, $15, 0
+  mfc0 $11, $15, 1
+
+  #li $1, 0x80000000
+  #li $2, 0x12345678
+  #sw $2, 0($1)
+  #li $2, 0x9ABCDEF0
+  #sw $2, 4($1)
+  #lwl $10, 0($1)
+  #lwl $11, 1($1)
+  #lwl $12, 2($1)
+  #lwl $13, 3($1)
+  #lwr $14, 4($1)
+  #lwr $15, 5($1)
+  #lwr $16, 6($1)
+  #lwr $17, 7($1)
+
+  halt:
+  j halt
+
+  wait_for_write:
+    li $16, 0xb40003fC
+    not_ready_for_write:
+        lw $17, 0($16)
+        andi $17, $17, 0x2000
+    beqz $17, not_ready_for_write
+    jr ra
+END(_start)

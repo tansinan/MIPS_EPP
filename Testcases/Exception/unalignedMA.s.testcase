@@ -1,0 +1,66 @@
+/*
+ * This is a bootloader for our MIPS_EPP project
+ * Note : MUST COMPILE WITH NO BRANCH DELAY SLOT OPTION ON!
+ */
+
+#include "regdef.h"
+#include "cp0regdef.h"
+#include "asm.h"
+
+LEAF(_start)
+  .set mips32
+  .set reorder
+  .set noat
+  
+  li $10, 0xb40003f8
+  jal wait_for_write
+  li $11, 'H'
+  sw $11, 0($10)
+  li $1, 0x10000
+  mtc0 $1, CP0_COMPARE
+  mtc0 $0, CP0_COUNT  
+  
+  mfc0 $2, CP0_STATUS
+  li $1, 0x400004
+  nor $1, $1, $0
+  and $2, $2, $1
+  mtc0 $2, CP0_STATUS
+  
+  #li $2, 0x8001
+  mfc0 $1, CP0_STATUS
+  or $1, $1, $2
+  mtc0 $1, CP0_STATUS
+  li $1, 0x80000000
+  lw $1, 1($1)
+  li $11, 'M'
+  jal wait_for_write
+  sw $11, 0($10)
+
+  halt:
+  j halt
+
+END(_start)
+
+.section .text.exception_handler
+li $11, 'A'
+jal wait_for_write
+sw $11, 0($10)
+mtc0 $0, CP0_COUNT
+li $1, 0x10000
+mtc0 $1, CP0_COMPARE
+mfc0 $1, CP0_EPC
+addiu $1, $1, 4
+mtc0 $1, CP0_EPC
+eret
+halt2:
+#   mfc0 $10, CP0_COUNT
+#   mfc0 $11, CP0_COMPARE
+j halt2
+
+wait_for_write:
+  li $16, 0xb40003fC
+  not_ready_for_write:
+      lw $17, 0($16)
+      andi $17, $17, 0x2000
+  beqz $17, not_ready_for_write
+  jr ra

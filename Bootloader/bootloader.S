@@ -13,7 +13,7 @@ LEAF(_start)
   .set noat
 
   /* $10 stores the address of the UART data register */
-  li $10, 0xb40003f8
+  li $10, 0xbfd003f8
 
   /* Register allocations
   $1: Temp
@@ -81,7 +81,7 @@ LEAF(_start)
 
 
   wait_for_write:
-    li $16, 0xb40003fC
+    li $16, 0xbfd003fC
     not_ready_for_write:
       lw $17, 0($16)
       andi $17, $17, 0x2000
@@ -89,7 +89,7 @@ LEAF(_start)
     jr ra
 
   wait_for_read:
-    li $16, 0xb40003fC
+    li $16, 0xbfd003fC
     not_ready_for_read:
       lw $17, 0($16)
       andi $17, $17, 0x100

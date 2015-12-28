@@ -13,9 +13,10 @@ LEAF(_start)
   .set noat
 
   li $10, 0xb40003f8
-  li $1, 0x10000000
+  li $1, 0x1000000
   mtc0 $1, CP0_COMPARE
-  
+  mtc0 $0, CP0_COUNT  
+
   mfc0 $2, CP0_STATUS
   li $1, 0x400004
   nor $1, $1, $0
@@ -38,7 +39,7 @@ END(_start)
 li $11, 'A'
 sw $11, 0($10)
 mtc0 $0, CP0_COUNT
-li $1, 0x10000000
+li $1, 0x1000000
 mtc0 $1, CP0_COMPARE
 eret
 #halt2:

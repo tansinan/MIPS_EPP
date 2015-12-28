@@ -1,9 +1,7 @@
 import argparse
 import os
+import sys
 from subprocess import call
-argumentParser = argparse.ArgumentParser(description = 'MIPS_EPP testing automization utility')
-
-argumentParser.parse_args();
 
 def writeRAMWord(val):
     ret = "";
@@ -42,7 +40,7 @@ else:
     call(["sudo", "umount", "/mnt/MIPS_EPP_RAMDISK"])
     call(["sudo", "mount", "-t", "tmpfs", "-o", "size=512M", "tmpfs", "/mnt/MIPS_EPP_RAMDISK"])
 
-f = open("MIPSBarebone/barebone.bin", "rb")
+f = open(sys.argv[1], "rb")
 
 fout = open("/mnt/MIPS_EPP_RAMDISK/RAM1.txt", "w")
 createRAMImage(f,5000,1024 * 16,fout)
