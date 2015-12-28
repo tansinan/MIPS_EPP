@@ -20,7 +20,8 @@ BEGIN
 		tlbData => tlbData,
 		virtualAddress => virtualAddress,
 		physicsAddress => physicsAddress,
-		exceptionTriggerOut => exceptionTriggerOut
+		exceptionTriggerOut => exceptionTriggerOut,
+		instructionOpcode => (others => '0')
 	);  
 
    -- Stimulus process
@@ -29,9 +30,9 @@ BEGIN
 		for i in 0 to MIPS_CP0_TLB_ENTRY_COUNT - 1 loop
 			tlbData(i) <= (
 				pageMask => x"00000000",
-				entryHigh => x"80000000",
-				entryLow0 => x"00000000",
-				entryLow1 => x"00000000"
+				entryHigh => x"00000000",
+				entryLow0 => x"0000ff17",
+				entryLow1 => x"0000ff17"
 			);
 		end loop;
 		virtualAddress <= x"00000100";

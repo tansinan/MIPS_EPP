@@ -74,12 +74,12 @@ begin
 					end case;
 					if virtualAddress(evenOddBit) = '0' then
 						pfn := pfn0;
-						valid := pfn0(MIPS_CP0_REGISTER_ENTRY_LOW_VALID);
-						dirty := pfn0(MIPS_CP0_REGISTER_ENTRY_LOW_DIRTY);
+						valid := tlbData(i).entryLow0(MIPS_CP0_REGISTER_ENTRY_LOW_VALID);
+						dirty := tlbData(i).entryLow0(MIPS_CP0_REGISTER_ENTRY_LOW_DIRTY);
 					else
 						pfn := pfn1;
-						valid := pfn1(MIPS_CP0_REGISTER_ENTRY_LOW_VALID);
-						dirty := pfn1(MIPS_CP0_REGISTER_ENTRY_LOW_DIRTY);
+						valid := tlbData(i).entryLow1(MIPS_CP0_REGISTER_ENTRY_LOW_VALID);
+						dirty := tlbData(i).entryLow1(MIPS_CP0_REGISTER_ENTRY_LOW_DIRTY);
 					end if;
 					if valid = '0' then
 						if instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SW or

@@ -136,6 +136,8 @@ begin
 						if interruptSource(i).enabled = FUNC_ENABLED
 						and haveInterrupt = false then
 							haveInterrupt := true;
+							newCP0CauseRegister(MIPS_CP0_CAUSE_EXCEPTION_CODE_HI downto MIPS_CP0_CAUSE_EXCEPTION_CODE_LO)
+								:= MIPS_CP0_CAUSE_EXCEPTION_CODE_INTERRUPT;
 							exceptionPipelineClear <= FUNC_ENABLED;
 							newCP0StatusRegister(MIPS_CP0_STATUS_EXL) := '1';
 							newCP0CauseRegister(

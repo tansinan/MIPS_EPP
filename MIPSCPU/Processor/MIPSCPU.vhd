@@ -40,7 +40,7 @@ package MIPSCPU is
 			opcode : std_logic_vector(5 downto 0);
 		end record;
 
-	constant ISA_ADDRESS_SPACE : CPUData_t := x"b4000000";
+	constant ISA_ADDRESS_SPACE : CPUData_t := x"bfd00000";
 	constant ISA_ADDRESS_SPACE_MASK : CPUData_t := x"FFFFF000";
 	constant KERNEL_ADDRESS_SPACE : CPUData_t := x"80000000";
 	constant KERNEL_ADDRESS_SPACE_MASK : CPUData_t := x"FF800000";

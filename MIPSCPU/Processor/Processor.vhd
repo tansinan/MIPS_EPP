@@ -83,7 +83,8 @@ begin
 		output => register_file_output
 	);
 
-	pcRegister_i : entity work.SpecialRegister port map (
+	pcRegister_i : entity work.SpecialRegister
+	port map (
 		reset => reset,
 		clock => clock,
 		control0 => cp0ExceptionPCControl,
@@ -265,17 +266,15 @@ begin
 					MIPS_CP0_CAUSE_EXCEPTION_CODE_ADDRESS_LOAD;
 			end if;
 		else
-			if  current_pipeline_phase /= "1111" then
-				pcControl2.operation <= REGISTER_OPERATION_READ;
-			else
-				pcControl2.operation <= REGISTER_OPERATION_WRITE;
-				pcControl2.data <= x"bfc00000"; -- for FPGA Boot loader
-				--pcControl2.data <= x"80000000"; -- for testbench
-			end if;
 			ramControl3.address <= (others => '0');
 			ramControl3.writeEnabled <= FUNC_DISABLED;
 			ramControl3.readEnabled <= FUNC_DISABLED;
 			ramControl3.data <= (others => '0');
+		end if;
+		if  current_pipeline_phase = "1111" then
+			pcControl2.operation <= REGISTER_OPERATION_WRITE;
+			pcControl2.data <= x"bfc00000"; -- for FPGA Boot loader
+			--pcControl2.data <= x"80000000"; -- for testbench
 		end if;
 	end process;
 	
