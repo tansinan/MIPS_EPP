@@ -76,7 +76,8 @@ begin
 				writeEnabled => FUNC_DISABLED,
 				readOnStore => FUNC_ENABLED,
 				address => phaseMACtrl.sourceRAMAddr,
-				data => (others => '0')
+				data => (others => '0'),
+				opcode => phaseMACtrl.instructionOpcode
 			);
 		else
 			if phaseMACtrl.instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SW then
@@ -85,7 +86,8 @@ begin
 					writeEnabled => FUNC_DISABLED,
 					readOnStore => FUNC_ENABLED,
 					address => phaseMACtrl.sourceRAMAddr,
-					data => (others => '0')
+					data => (others => '0'),
+					opcode => phaseMACtrl.instructionOpcode
 				);
 			else
 				ramControl <= (
@@ -93,7 +95,8 @@ begin
 					writeEnabled => FUNC_DISABLED,
 					readOnStore => FUNC_DISABLED,
 					address => phaseMACtrl.sourceRAMAddr,
-					data => (others => '0')
+					data => (others => '0'),
+					opcode => phaseMACtrl.instructionOpcode
 				);
 			end if;
 		end if;

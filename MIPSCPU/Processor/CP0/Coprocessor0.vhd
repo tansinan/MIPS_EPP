@@ -21,7 +21,8 @@ entity Coprocessor0_e is
 		debugCP0RegisterFileData : out CP0RegisterFileOutput_t;
 		virtualAddress : in RAMAddress_t;
 		physicsAddress : out RAMAddress_t;
-		memoryTranslationExceptionTrigger : out CP0ExceptionTrigger_t
+		memoryTranslationExceptionTrigger : out CP0ExceptionTrigger_t;
+		memoryTranslationOpcode : in InstructionOpcode_t
 	);
 end entity;
 
@@ -92,7 +93,8 @@ begin
 		tlbData => cp0TLBData,
 		virtualAddress => virtualAddress,
 		physicsAddress => physicsAddress,
-		exceptionTriggerOut => memoryTranslationExceptionTrigger
+		exceptionTriggerOut => memoryTranslationExceptionTrigger,
+		instructionOpcode => memoryTranslationOpcode
 	);
 	
 	CP0InternalTimerInterrupt_i : entity work.CP0InternalTimerInterrupt_e

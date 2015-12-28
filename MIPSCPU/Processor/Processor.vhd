@@ -68,6 +68,7 @@ architecture Behavioral of Processor is
 	signal cp0ExceptionPipelineClear : EnablingControl_t;
 	signal cp0ExceptionTrigger : CP0ExceptionTrigger_t;
 	signal cp0MemoryAccessExceptionTrigger : CP0ExceptionTrigger_t;
+	signal cp0MemoryAccessOpcode : InstructionOpcode_t;
 	
 	signal cp0VirtualAddress : RAMAddress_t;
 	signal cp0PhysicsAddress : RAMAddress_t;
@@ -169,7 +170,8 @@ begin
 		debugCP0RegisterFileData => open,
 		virtualAddress => cp0VirtualAddress,
 		physicsAddress => cp0PhysicsAddress,
-		memoryTranslationExceptionTrigger => cp0MemoryAccessExceptionTrigger
+		memoryTranslationExceptionTrigger => cp0MemoryAccessExceptionTrigger,
+		memoryTranslationOpcode => cp0MemoryAccessOpcode
 	);
 	
 	hardwareAddressMapper : entity work.HardwareAddressMapper
@@ -192,7 +194,8 @@ begin
 		cp0VirtualAddress => cp0VirtualAddress,
 		cp0PhysicsAddress => cp0PhysicsAddress,
 		cp0ExceptionTrigger => cp0MemoryAccessExceptionTrigger,
-		exceptionTrigger => memoryAccessExceptionTrigger
+		exceptionTrigger => memoryAccessExceptionTrigger,
+		cp0MemoryAccessOpcode => cp0MemoryAccessOpcode
 	);
 	
 	-- Output internal debug data.
@@ -243,7 +246,8 @@ begin
 			data => (others => '0'),
 			writeEnabled => FUNC_DISABLED,
 			readEnabled => FUNC_DISABLED,
-			readOnStore => FUNC_DISABLED
+			readOnStore => FUNC_DISABLED,
+			opcode => (others => '0')
 		);
 		pipelinePhaseIFIDException <= MIPS_CP0_EXCEPTION_TRIGGER_CLEAR;
 		if  current_pipeline_phase = "0100" then

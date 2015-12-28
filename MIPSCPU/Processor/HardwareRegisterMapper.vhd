@@ -23,6 +23,7 @@ entity HardwareAddressMapper is
 		flashROMData : in CPUData_t;
 		cp0VirtualAddress : out RAMAddress_t;
 		cp0PhysicsAddress : in RAMAddress_t;
+		cp0MemoryAccessOpcode : out InstructionOpcode_t;
 		cp0ExceptionTrigger : in CP0ExceptionTrigger_t;
 		exceptionTrigger : out CP0ExceptionTrigger_t
 	);
@@ -75,7 +76,8 @@ begin
 			writeEnabled => FUNC_DISABLED,
 			readOnStore => FUNC_DISABLED,
 			address => x"80000000",
-			data => (others => '0')
+			data => (others => '0'),
+			opcode => (others => '0')
 		);
 		if ramControl3.readEnabled = FUNC_ENABLED or 
 		ramControl3.writeEnabled = FUNC_ENABLED then
@@ -89,9 +91,10 @@ begin
 		end if;
 	end process;
 	
-	process(usedRAMControl.address)
+	process(usedRAMControl)
 	begin
 		cp0VirtualAddress <= usedRAMControl.address;
+		cp0MemoryAccessOpcode <= usedRAMControl.opcode;
 	end process;
 	
 	-- Determine the address type;

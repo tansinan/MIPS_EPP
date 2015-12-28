@@ -26,7 +26,8 @@ begin
 		readEnabled => FUNC_DISABLED,
 		readOnStore => FUNC_DISABLED,
 		address => phaseMAInput.targetRAMAddr,
-		data => phaseMAInput.sourceImm
+		data => phaseMAInput.sourceImm,
+		opcode => phaseMAInput.instructionOpcode
 	);
 
 end Behavioral;

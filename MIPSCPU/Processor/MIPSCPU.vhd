@@ -37,6 +37,7 @@ package MIPSCPU is
 			readOnStore : EnablingControl_t;
 			address : RAMAddress_t;
 			data : RAMData_t;
+			opcode : std_logic_vector(5 downto 0);
 		end record;
 
 	constant ISA_ADDRESS_SPACE : CPUData_t := x"b4000000";

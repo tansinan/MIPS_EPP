@@ -10,6 +10,7 @@ entity CP0AddressTranslator is
 		tlbData : in CP0TLBData_t;
 		virtualAddress : in RAMAddress_t;
 		physicsAddress : out RAMAddress_t;
+		instructionOpcode : in InstructionOpcode_t; 
 		exceptionTriggerOut : out CP0ExceptionTrigger_t
 	);
 end entity;
@@ -81,12 +82,23 @@ begin
 						dirty := pfn1(MIPS_CP0_REGISTER_ENTRY_LOW_DIRTY);
 					end if;
 					if valid = '0' then
-						exceptionTrigger <= (
-							enabled => FUNC_ENABLED,
-							exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_LOAD,
-							badVirtualAddress => virtualAddress,
-							isTLBRefill => FUNC_DISABLED
-						);
+						if instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SW or
+						instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SH or
+						instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SB then
+							exceptionTrigger <= (
+								enabled => FUNC_ENABLED,
+								exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_STORE,
+								badVirtualAddress => virtualAddress,
+								isTLBRefill => FUNC_ENABLED
+							);
+						else
+							exceptionTrigger <= (
+								enabled => FUNC_ENABLED,
+								exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_LOAD,
+								badVirtualAddress => virtualAddress,
+								isTLBRefill => FUNC_ENABLED
+							);
+						end if;
 					end if;
 					--TODO : if dirty = '0' and reftype is 'store' then TLB Modified triggers.
 					physicsAddress <= pfn(MIPS_CPU_DATA_WIDTH - 1 - 12 downto evenOddBit - 12) &
@@ -95,12 +107,23 @@ begin
 				end if;
 			end loop;
 			if not tlbEntryFound then
-				exceptionTrigger <= (
-					enabled => FUNC_ENABLED,
-					exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_LOAD,
-					badVirtualAddress => virtualAddress,
-					isTLBRefill => FUNC_ENABLED
-				);
+				if instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SW or
+				instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SH or
+				instructionOpcode = MIPS_CPU_INSTRUCTION_OPCODE_SB then
+					exceptionTrigger <= (
+						enabled => FUNC_ENABLED,
+						exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_STORE,
+						badVirtualAddress => virtualAddress,
+						isTLBRefill => FUNC_ENABLED
+					);
+				else
+					exceptionTrigger <= (
+						enabled => FUNC_ENABLED,
+						exceptionCode => MIPS_CP0_CAUSE_EXCEPTION_CODE_TLB_LOAD,
+						badVirtualAddress => virtualAddress,
+						isTLBRefill => FUNC_ENABLED
+					);
+				end if;
 			end if;
 		end if;
 	end process;
